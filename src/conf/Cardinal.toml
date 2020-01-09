@@ -1,0 +1,10 @@
+[mysql]
+DBHost="localhost:3306"
+DBUsername="root"
+DBPassword="root"
+DBName="cardinal"
+
+[redis]
+DBHost="localhost"
+DBPort="6379"
+DBPassword="root"
