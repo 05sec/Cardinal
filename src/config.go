@@ -18,6 +18,7 @@ type Base struct {
 	EndTime   time.Time
 	Duration  uint
 	Port      string
+	Salt      string
 }
 
 type MySQL struct {

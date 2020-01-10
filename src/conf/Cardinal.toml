@@ -4,6 +4,7 @@ BeginTime="2020-01-09T08:00:00+08:00"
 EndTime="2020-01-10T22:00:00+08:00"
 Duration=10    # 分钟
 Port=":19999"
+Salt="E99E99E99"
 
 [mysql]
 DBHost="localhost:3306"

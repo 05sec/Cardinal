@@ -6,9 +6,9 @@ import (
 )
 
 type Service struct {
-	Conf  *Config
-	Mysql *gorm.DB
-	Timer *Timer
+	Conf   *Config
+	Mysql  *gorm.DB
+	Timer  *Timer
 	Router *gin.Engine
 }
 
