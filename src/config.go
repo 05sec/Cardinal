@@ -3,11 +3,21 @@ package main
 import (
 	"github.com/BurntSushi/toml"
 	"log"
+	"time"
 )
 
 type Config struct {
+	Base  `toml:"base"`
 	MySQL `toml:"mysql"`
 	Redis `toml:"redis"`
+}
+
+type Base struct {
+	Title     string
+	BeginTime time.Time
+	EndTime   time.Time
+	Duration  uint
+	Port      string
 }
 
 type MySQL struct {

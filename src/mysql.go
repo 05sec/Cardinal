@@ -5,7 +5,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
-	"time"
 )
 
 func (s *Service) initMySQL() {
@@ -22,24 +21,5 @@ func (s *Service) initMySQL() {
 	s.Mysql = db
 
 	// 建表
-	s.Mysql.AutoMigrate(&BaseConfig{})
-
-	// 初始化配置数据
-	var baseConfigCount int
-	s.Mysql.Model(&BaseConfig{}).Count(&baseConfigCount)
-	if baseConfigCount == 0 {
-		tx := s.Mysql.Begin()
-		if tx.Create(&BaseConfig{
-			Title:     "HCTF",
-			BeginTime: time.Date(2020, 1, 9, 8, 00, 00, 0, time.Local),
-			EndTime:   time.Date(2020, 1, 10, 18, 00, 00, 0, time.Local),
-			Duration:  10, // 分钟
-		}).RowsAffected != 1 {
-			tx.Rollback()
-			log.Fatalln("初始化配置数据失败！")
-		}
-		tx.Commit()
-		log.Println("初始化配置数据成功")
-	}
 
 }
