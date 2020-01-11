@@ -3,17 +3,18 @@ package main
 import (
 	"crypto/sha1"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
 )
 
 type Utils struct {}
 
 func (s *Service) makeErrJSON(httpStatusCode int, errCode int, msg interface{}) (int, interface{}) {
-	return httpStatusCode, map[string]interface{}{"error": errCode, "msg": fmt.Sprint(msg)}
+	return httpStatusCode, gin.H{"error": errCode, "msg": fmt.Sprint(msg)}
 }
 
 func (s *Service) makeSuccessJSON(data interface{}) (int, interface{}) {
-	return 200, map[string]interface{}{"error": 0, "msg": "success", "data": data}
+	return 200, gin.H{"error": 0, "msg": "success", "data": data}
 }
 
 func (s *Service) checkPassword(inputPassword string, realPassword string) bool{

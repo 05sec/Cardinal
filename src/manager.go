@@ -14,8 +14,8 @@ type Manager struct {
 }
 
 type ManagerLoginForm struct {
-	Name     string `json:"Name"`
-	Password string `json:"Password"`
+	Name     string `json:"Name" binding:"required"`
+	Password string `json:"Password" binding:"required"`
 }
 
 func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
