@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 // 题目
@@ -14,8 +15,8 @@ type Challenge struct {
 // 队伍靶机
 type GameBox struct {
 	gorm.Model
-	ChallengeID uint8
-	TeamID      uint8
+	ChallengeID uint
+	TeamID      uint
 
 	Description string
 	Visible     bool
@@ -27,7 +28,27 @@ type GameBox struct {
 func (s *Service) GetAllChallenges() (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Find(&challenges)
-	return s.makeSuccessJSON(challenges)
+	type resultStruct struct {
+		ID        uint
+		CreatedAt time.Time
+		Title     string
+		Visible   bool
+	}
+
+	var res []resultStruct
+	for _, v := range challenges{
+		// 获取其中一个靶机的状态来得知 Visible
+		var gameBox GameBox
+		s.Mysql.Where(&GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
+
+		res = append(res, resultStruct{
+			ID:        v.ID,
+			CreatedAt: v.CreatedAt,
+			Title:     v.Title,
+			Visible:   gameBox.Visible,
+		})
+	}
+	return s.makeSuccessJSON(res)
 }
 
 func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
@@ -75,7 +96,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
-	if checkChallenge.Title == ""{
+	if checkChallenge.Title == "" {
 		return s.makeErrJSON(404, 40400, "Challenge 不存在")
 	}
 
@@ -94,7 +115,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 
 func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID    uint   `binding:"required"`
+		ID uint `binding:"required"`
 	}
 
 	var inputForm InputForm
@@ -105,7 +126,7 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 
 	var challenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&challenge)
-	if challenge.Title == ""{
+	if challenge.Title == "" {
 		return s.makeErrJSON(404, 40400, "Challenge 不存在")
 	}
 
