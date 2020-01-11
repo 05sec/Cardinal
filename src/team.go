@@ -2,10 +2,10 @@ package main
 
 import "github.com/jinzhu/gorm"
 
-type Manager struct {
+type Team struct {
 	gorm.Model
 
 	Name     string
 	Password string
-	Token    string // 管理员只允许单点登录
+	Score    int64
 }

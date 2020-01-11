@@ -2,7 +2,16 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
+
+type Manager struct {
+	gorm.Model
+
+	Name     string
+	Password string
+	Token    string // 管理员只允许单点登录
+}
 
 type ManagerLoginForm struct {
 	Name     string `json:"Name"`
