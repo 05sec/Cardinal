@@ -9,7 +9,8 @@ import (
 // 题目
 type Challenge struct {
 	gorm.Model
-	Title string
+	Title     string
+	BaseScore int
 }
 
 func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
@@ -56,7 +57,8 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 
 func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		Title string `binding:"required"`
+		Title     string `binding:"required"`
+		BaseScore int    `binding:"required"`
 	}
 
 	var inputForm InputForm
@@ -66,7 +68,8 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	}
 
 	newChallenge := &Challenge{
-		Title: inputForm.Title,
+		Title:     inputForm.Title,
+		BaseScore: inputForm.BaseScore,
 	}
 	var checkChallenge Challenge
 
@@ -87,8 +90,9 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 
 func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID    uint   `binding:"required"`
-		Title string `binding:"required"`
+		ID        uint   `binding:"required"`
+		Title     string `binding:"required"`
+		BaseScore int    `binding:"required"`
 	}
 
 	var inputForm InputForm
@@ -104,7 +108,8 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	}
 
 	newChallenge := &Challenge{
-		Title: inputForm.Title,
+		Title:     inputForm.Title,
+		BaseScore: inputForm.BaseScore,
 	}
 	tx := s.Mysql.Begin()
 	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newChallenge).RowsAffected != 1 {

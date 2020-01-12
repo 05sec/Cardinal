@@ -44,6 +44,9 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(403, 40300, "GameBox 不存在！")
 	}
 
+	// 更新靶机状态信息
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&GameBox{IsDown: true})
+
 	tx := s.Mysql.Begin()
 	if tx.Create(&DownAction{
 		TeamID:      inputForm.TeamID,

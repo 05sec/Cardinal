@@ -19,7 +19,7 @@ type Team struct {
 	Name      string
 	Password  string `json:"-"`
 	Logo      string
-	Score     int64
+	Score     float64
 	SecretKey string
 }
 

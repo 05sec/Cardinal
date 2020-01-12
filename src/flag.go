@@ -59,6 +59,9 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(403, 40301, "请勿重复提交 Flag")
 	}
 
+	// 更新靶机状态信息
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&GameBox{IsAttacked: true})
+
 	// 无误，加分！
 	tx := s.Mysql.Begin()
 	if tx.Create(&AttackAction{
