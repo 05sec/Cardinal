@@ -45,8 +45,17 @@ func (s *Service) initRouter() {
 		})
 
 		// Team
+		authorized.GET("/teams", func(c *gin.Context) {
+			c.JSON(s.GetAllTeams())
+		})
 		authorized.POST("/teams", func(c *gin.Context) {
 			c.JSON(s.NewTeams(c))
+		})
+		authorized.PUT("/team", func(c *gin.Context) {
+			c.JSON(s.EditTeam(c))
+		})
+		authorized.POST("/team/resetPassword", func(c *gin.Context) {
+
 		})
 	}
 
