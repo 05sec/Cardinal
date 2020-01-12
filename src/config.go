@@ -15,6 +15,7 @@ type Config struct {
 type Base struct {
 	Title     string
 	BeginTime time.Time
+	RestTime  [][]time.Time
 	EndTime   time.Time
 	Duration  uint
 	Port      string
