@@ -17,6 +17,9 @@ Port=":19999"
 FlagPrefix="hctf{"
 FlagSuffix="}"
 
+CheckDownScore=50
+AttackScore=50
+
 [mysql]
 DBHost="localhost:3306"
 DBUsername="root"

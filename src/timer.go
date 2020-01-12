@@ -132,6 +132,7 @@ func (s *Service) timerProcess() {
 				if s.Timer.NowRound < nowRound {
 					s.Timer.NowRound = nowRound
 					// 新一轮 Hook
+					go s.NewRoundCalculateScore()		// 计算分数
 					fmt.Println(s.Timer.NowRound)
 				}
 			}
