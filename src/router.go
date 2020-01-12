@@ -32,6 +32,11 @@ func (s *Service) initRouter() {
 		authorized.POST("/challenge/visible", func(c *gin.Context) {
 			c.JSON(s.SetVisible(c))
 		})
+
+		// GameBox
+		authorized.POST("/gameboxes", func(c *gin.Context) {
+			c.JSON(s.NewGameBoxes(c))
+		})
 	}
 
 	s.Router = r

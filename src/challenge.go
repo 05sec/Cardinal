@@ -12,19 +12,6 @@ type Challenge struct {
 	Title string
 }
 
-// 队伍靶机
-type GameBox struct {
-	gorm.Model
-	ChallengeID uint
-	TeamID      uint
-
-	Description string
-	Visible     bool
-	Score       int64 // 分数可负
-	IsDown      bool
-	IsAttacked  bool
-}
-
 func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID      int
