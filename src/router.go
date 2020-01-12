@@ -55,7 +55,7 @@ func (s *Service) initRouter() {
 			c.JSON(s.EditTeam(c))
 		})
 		authorized.POST("/team/resetPassword", func(c *gin.Context) {
-
+			c.JSON(s.ResetTeamPassword(c))
 		})
 	}
 

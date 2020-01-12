@@ -10,7 +10,7 @@ type Team struct {
 	gorm.Model
 
 	Name     string
-	Password string		`json:"-"`
+	Password string `json:"-"`
 	Logo     string
 	Score    int64
 }
@@ -106,4 +106,32 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	tx.Commit()
 
 	return s.makeSuccessJSON("修改 Team 成功！")
+}
+
+func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
+	type InputForm struct {
+		ID uint `binding:"required"`
+	}
+	var inputForm InputForm
+	err := c.BindJSON(&inputForm)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Error payload")
+	}
+
+	// 检查 Team 是否存在
+	var count int
+	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
+	if count == 0 {
+		return s.makeErrJSON(404, 40400, "Team 不存在")
+	}
+
+	newPassword := randstr.String(16)
+	tx := s.Mysql.Begin()
+	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&Team{Password: s.addSalt(newPassword)}).RowsAffected != 1 {
+		tx.Rollback()
+		return s.makeErrJSON(500, 50001, "重置密码失败！")
+	}
+	tx.Commit()
+
+	return s.makeSuccessJSON(newPassword)
 }
