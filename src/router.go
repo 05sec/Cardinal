@@ -16,6 +16,9 @@ func (s *Service) initRouter() {
 	team := r.Group("/team")
 	team.Use(s.TeamAuthRequired())
 	{
+		team.POST("/flag", func(c *gin.Context) {
+			c.JSON(s.SubmitFlag(c))
+		})
 		team.GET("/info", func(c *gin.Context) {
 			c.JSON(s.GetTeamInfo(c))
 		})

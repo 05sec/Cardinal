@@ -6,9 +6,9 @@ import "github.com/jinzhu/gorm"
 type AttackAction struct {
 	gorm.Model
 
-	TeamID         uint8 // 被攻击者
-	GameBoxID      uint8 // 被攻击者靶机
-	AttackerTeamID uint8 // 攻击者
+	TeamID         uint // 被攻击者
+	GameBoxID      uint // 被攻击者靶机
+	AttackerTeamID uint // 攻击者
 	Round          int
 }
 
@@ -16,8 +16,8 @@ type AttackAction struct {
 type DownAction struct {
 	gorm.Model
 
-	TeamID      uint8
-	ChallengeID uint8
-	GameBoxID   uint8
+	TeamID      uint
+	ChallengeID uint
+	GameBoxID   uint
 	Round       int
 }
