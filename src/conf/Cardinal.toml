@@ -9,8 +9,13 @@ RestTime=[
 ]
 EndTime="2020-01-13T22:00:00+08:00"
 Duration=10    # 分钟
-Port=":19999"
+
 Salt="E99E99E99"
+
+Port=":19999"
+
+FlagPrefix="hctf{"
+FlagSuffix="}"
 
 [mysql]
 DBHost="localhost:3306"

@@ -13,13 +13,15 @@ type Config struct {
 }
 
 type Base struct {
-	Title     string
-	BeginTime time.Time
-	RestTime  [][]time.Time
-	EndTime   time.Time
-	Duration  uint
-	Port      string
-	Salt      string
+	Title      string
+	BeginTime  time.Time
+	RestTime   [][]time.Time
+	EndTime    time.Time
+	Duration   uint
+	Port       string
+	Salt       string
+	FlagPrefix string
+	FlagSuffix string
 }
 
 type MySQL struct {

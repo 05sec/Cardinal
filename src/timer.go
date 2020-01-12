@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strconv"
 	"time"
 )
 
 type Timer struct {
-	BeginTime     time.Time
-	EndTime       time.Time
-	Duration      uint
-	RestTime      [][]time.Time `json:"-"`
-	RunTime       [][]time.Time `json:"-"`
+	BeginTime     time.Time     // init
+	EndTime       time.Time     // init
+	Duration      uint          // init
+	RestTime      [][]time.Time `json:"-"` // init
+	RunTime       [][]time.Time `json:"-"` // init
+	TotalRound    int           //init
 	NowRound      int
 	NextRoundTime time.Time
 	Status        string
@@ -78,7 +80,15 @@ func (s *Service) initTimer() {
 		s.Timer.RunTime = append(s.Timer.RunTime, []time.Time{s.Timer.BeginTime, s.Timer.EndTime})
 	}
 
-	fmt.Println(s.Timer.RunTime)
+	// 计算总轮数
+	var totalTime int64
+	for _, dur := range s.Timer.RunTime {
+		totalTime += dur[1].Unix() - dur[0].Unix()
+	}
+	s.Timer.TotalRound = int(totalTime / 60 / int64(s.Timer.Duration))
+
+	log.Println("比赛总轮数：" + strconv.Itoa(s.Timer.TotalRound))
+	log.Println("比赛总时长：" + strconv.Itoa(int(totalTime/60)) + " 分钟")
 
 	go s.timerProcess()
 }
@@ -94,7 +104,7 @@ func (s *Service) timerProcess() {
 			nowRunTimeIndex := -1
 			for index, dur := range s.Timer.RunTime {
 				if nowTime > dur[0].Unix() && nowTime < dur[1].Unix() {
-					nowRunTimeIndex = index		// 顺便记录当前是在哪个时间周期内的
+					nowRunTimeIndex = index // 顺便记录当前是在哪个时间周期内的
 					break
 				}
 			}
@@ -105,7 +115,7 @@ func (s *Service) timerProcess() {
 			} else {
 				// 比赛进行中
 				var nowRound int
-				var workTime int64	// 比赛进行的累计时间
+				var workTime int64 // 比赛进行的累计时间
 
 				for index, dur := range s.Timer.RunTime {
 					if index < nowRunTimeIndex {
@@ -115,7 +125,7 @@ func (s *Service) timerProcess() {
 						break
 					}
 				}
-				nowRound = int(math.Floor(float64(workTime) / float64(s.Timer.Duration*60))) 	// 计算当前轮数
+				nowRound = int(math.Floor(float64(workTime) / float64(s.Timer.Duration*60))) // 计算当前轮数
 
 				// 判断是否进入新一轮
 				if s.Timer.NowRound < nowRound {

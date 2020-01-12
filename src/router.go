@@ -71,6 +71,11 @@ func (s *Service) initRouter() {
 		manager.POST("/team/resetPassword", func(c *gin.Context) {
 			c.JSON(s.ResetTeamPassword(c))
 		})
+
+		// Flag
+		manager.POST("/flag/generate", func(c *gin.Context) {
+			c.JSON(s.GenerateFlag())
+		})
 	}
 
 	s.Router = r
