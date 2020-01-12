@@ -12,54 +12,61 @@ func (s *Service) initRouter() {
 		c.JSON(s.TeamLogin(c))
 	})
 
+	// 用户
+	team := r.Group("/")
+	team.Use(s.TeamAuthRequired())
+	{
+
+	}
+
 	// 管理员登录
 	r.POST("/manager/login", func(c *gin.Context) {
 		c.JSON(s.ManagerLogin(c))
 	})
 
 	// 管理
-	authorized := r.Group("/manager")
-	authorized.Use(s.ManagerAuthRequired())
+	manager := r.Group("/manager")
+	manager.Use(s.ManagerAuthRequired())
 	{
 		// Challenge
-		authorized.GET("/challenges", func(c *gin.Context) {
+		manager.GET("/challenges", func(c *gin.Context) {
 			c.JSON(s.GetAllChallenges())
 		})
-		authorized.POST("/challenge", func(c *gin.Context) {
+		manager.POST("/challenge", func(c *gin.Context) {
 			c.JSON(s.NewChallenge(c))
 		})
-		authorized.PUT("/challenge", func(c *gin.Context) {
+		manager.PUT("/challenge", func(c *gin.Context) {
 			c.JSON(s.EditChallenge(c))
 		})
-		authorized.DELETE("/challenge", func(c *gin.Context) {
+		manager.DELETE("/challenge", func(c *gin.Context) {
 			c.JSON(s.DeleteChallenge(c))
 		})
-		authorized.POST("/challenge/visible", func(c *gin.Context) {
+		manager.POST("/challenge/visible", func(c *gin.Context) {
 			c.JSON(s.SetVisible(c))
 		})
 
 		// GameBox
-		authorized.GET("/gameboxes", func(c *gin.Context){
+		manager.GET("/gameboxes", func(c *gin.Context){
 			c.JSON(s.GetGameBoxes(c))
 		})
-		authorized.POST("/gameboxes", func(c *gin.Context) {
+		manager.POST("/gameboxes", func(c *gin.Context) {
 			c.JSON(s.NewGameBoxes(c))
 		})
-		authorized.PUT("/gamebox", func(c *gin.Context){
+		manager.PUT("/gamebox", func(c *gin.Context){
 			c.JSON(s.EditGameBox(c))
 		})
 
 		// Team
-		authorized.GET("/teams", func(c *gin.Context) {
+		manager.GET("/teams", func(c *gin.Context) {
 			c.JSON(s.GetAllTeams())
 		})
-		authorized.POST("/teams", func(c *gin.Context) {
+		manager.POST("/teams", func(c *gin.Context) {
 			c.JSON(s.NewTeams(c))
 		})
-		authorized.PUT("/team", func(c *gin.Context) {
+		manager.PUT("/team", func(c *gin.Context) {
 			c.JSON(s.EditTeam(c))
 		})
-		authorized.POST("/team/resetPassword", func(c *gin.Context) {
+		manager.POST("/team/resetPassword", func(c *gin.Context) {
 			c.JSON(s.ResetTeamPassword(c))
 		})
 	}

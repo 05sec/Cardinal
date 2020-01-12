@@ -16,10 +16,11 @@ type Token struct {
 type Team struct {
 	gorm.Model
 
-	Name     string
-	Password string `json:"-"`
-	Logo     string
-	Score    int64
+	Name      string
+	Password  string `json:"-"`
+	Logo      string
+	Score     int64
+	SecretKey string
 }
 
 func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
@@ -70,7 +71,16 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(400, 40000, "Error payload")
 	}
 
-	// 检查是否重复
+	// 检查传入数据是否重复
+	tmpTeamName := make(map[string]int)
+	for _, item := range inputForm {
+		tmpTeamName[item.Name] = 0
+	}
+	if len(tmpTeamName) != len(inputForm){
+		return s.makeErrJSON(400, 40001, "传入数据中存在重复数据")
+	}
+
+	// 与库中数据比对是否重复
 	for _, item := range inputForm {
 		var count int
 		s.Mysql.Model(Team{}).Where(&Team{Name: item.Name}).Count(&count)
@@ -89,9 +99,10 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	for _, item := range inputForm {
 		password := randstr.String(16)
 		newTeam := &Team{
-			Name:     item.Name,
-			Password: s.addSalt(password),
-			Logo:     item.Logo,
+			Name:      item.Name,
+			Password:  s.addSalt(password),
+			Logo:      item.Logo,
+			SecretKey: randstr.Hex(16),
 		}
 		if tx.Create(newTeam).RowsAffected != 1 {
 			tx.Rollback()
