@@ -43,6 +43,11 @@ func (s *Service) initRouter() {
 		authorized.PUT("/gamebox", func(c *gin.Context){
 			c.JSON(s.EditGameBox(c))
 		})
+
+		// Team
+		authorized.POST("/teams", func(c *gin.Context) {
+			c.JSON(s.NewTeams(c))
+		})
 	}
 
 	s.Router = r

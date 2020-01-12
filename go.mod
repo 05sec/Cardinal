@@ -11,5 +11,6 @@ require (
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
+	github.com/thanhpk/randstr v1.0.4
 	moul.io/http2curl v1.0.0 // indirect
 )
