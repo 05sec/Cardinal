@@ -20,8 +20,6 @@ func (s *Service) NewRoundCalculateScore() {
 
 	// 攻击加分
 	s.AddAttack(lastRound)
-	// 防守加分
-
 	// 被攻击减分
 	s.MinusAttack(lastRound)
 
