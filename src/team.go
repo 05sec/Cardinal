@@ -53,6 +53,17 @@ func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
 	}
 }
 
+func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}){
+	teamID, ok := c.Get("teamID")
+	if !ok{
+		return s.makeErrJSON(500, 50000, "Server error")
+	}
+
+	var teamInfo Team
+	s.Mysql.Where(&Team{Model: gorm.Model{ID: teamID.(uint)}}).Find(&teamInfo)
+	return s.makeSuccessJSON(teamInfo)
+}
+
 // 管理
 func (s *Service) GetAllTeams() (int, interface{}) {
 	var teams []Team

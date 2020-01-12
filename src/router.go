@@ -13,10 +13,12 @@ func (s *Service) initRouter() {
 	})
 
 	// 用户
-	team := r.Group("/")
+	team := r.Group("/team")
 	team.Use(s.TeamAuthRequired())
 	{
-
+		team.GET("/info", func(c *gin.Context) {
+			c.JSON(s.GetTeamInfo(c))
+		})
 	}
 
 	// 管理员登录
