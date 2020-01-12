@@ -1,6 +1,8 @@
 package main
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type Score struct {
 	gorm.Model
@@ -16,10 +18,63 @@ func (s *Service) NewRoundCalculateScore() {
 	nowRound := s.Timer.NowRound
 	lastRound := nowRound - 1
 
+	// 攻击加分
+	s.AddAttack(lastRound)
+	// 防守加分
+
+	// 被攻击减分
+	s.MinusAttack(lastRound)
+
 	// 被 CheckDown 减分
 	s.MinusCheckDown(lastRound)
 	// 未被 CheckDown 加分
 	s.AddCheckDown(lastRound)
+}
+
+// 攻击加分
+func (s *Service) AddAttack(round int) {
+	// 遍历 GameBox
+	var gameBoxes []GameBox
+	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
+	for _, gameBox := range gameBoxes {
+		// 查看该 GameBox 本轮是否被攻击
+		var attackActions []AttackAction
+		s.Mysql.Model(&AttackAction{}).Where(&AttackAction{GameBoxID: gameBox.ID, Round: round}).Find(&attackActions)
+		if len(attackActions) != 0 {
+			score := float64(s.Conf.AttackScore) / float64(len(attackActions)) // 攻击者平分的分数
+			// 加分
+			for _, action := range attackActions {
+				// 获取攻击者这道题的 GameBoxID
+				var attackerGameBoxID uint
+				s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID}).Find(&attackerGameBoxID)
+
+				s.Mysql.Create(&Score{
+					TeamID:    action.AttackerTeamID,
+					GameBoxID: attackerGameBoxID,
+					Round:     round,
+					Reason:    "attack",
+					Score:     score,
+				})
+			}
+		}
+	}
+}
+
+// 被攻击减分
+func (s *Service) MinusAttack(round int) {
+	// 获取本轮 AttackAction
+	var attackActions []AttackAction
+	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{Round: round}).Find(&attackActions)
+
+	for _, action := range attackActions {
+		s.Mysql.Create(&Score{
+			TeamID:    action.TeamID,
+			GameBoxID: action.GameBoxID,
+			Round:     round,
+			Reason:    "been_attacked",
+			Score:     float64(-s.Conf.AttackScore),
+		})
+	}
 }
 
 // 被 CheckDown 减分

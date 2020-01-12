@@ -12,6 +12,7 @@ type AttackAction struct {
 
 	TeamID         uint // 被攻击者
 	GameBoxID      uint // 被攻击者靶机
+	ChallengeID    uint // 被攻击题目
 	AttackerTeamID uint // 攻击者
 	Round          int
 }
@@ -19,10 +20,11 @@ type AttackAction struct {
 type Flag struct {
 	gorm.Model
 
-	TeamID    uint
-	GameBoxID uint
-	Round     int
-	Flag      string
+	TeamID      uint
+	GameBoxID   uint
+	ChallengeID uint
+	Round       int
+	Flag        string
 }
 
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
@@ -41,7 +43,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 
 	var flagData Flag
 	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
-	if flagData.ID == 0 {
+	if flagData.ID == 0 || teamID == int(flagData.TeamID){		// 注意不允许提交自己的 flag
 		return s.makeErrJSON(403, 40300, "Flag 错误！")
 	}
 
@@ -63,6 +65,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		TeamID:         flagData.TeamID,
 		GameBoxID:      flagData.GameBoxID,
 		AttackerTeamID: uint(teamID),
+		ChallengeID:    flagData.ChallengeID,
 		Round:          flagData.Round,
 	}).RowsAffected != 1 {
 		tx.Rollback()
@@ -84,10 +87,11 @@ func (s *Service) GenerateFlag() (int, interface{}) {
 		for _, gameBox := range gameBoxes {
 			flag := s.Conf.FlagPrefix + s.sha1Encode(strconv.Itoa(int(gameBox.TeamID))+strconv.Itoa(int(gameBox.ID))+s.sha1Encode(s.Conf.Salt)+strconv.Itoa(round)) + s.Conf.FlagSuffix
 			s.Mysql.Create(&Flag{
-				TeamID:    gameBox.TeamID,
-				GameBoxID: gameBox.ID,
-				Round:     round,
-				Flag:      flag,
+				TeamID:      gameBox.TeamID,
+				GameBoxID:   gameBox.ID,
+				ChallengeID: gameBox.ChallengeID,
+				Round:       round,
+				Flag:        flag,
 			})
 		}
 	}
