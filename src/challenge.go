@@ -25,6 +25,22 @@ type GameBox struct {
 	IsAttacked  bool
 }
 
+func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
+	type InputForm struct {
+		ID      int
+		Visible bool
+	}
+
+	var inputForm InputForm
+	err := c.BindJSON(&inputForm)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Error payload")
+	}
+
+	s.Mysql.Model(&GameBox{}).Where("id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
+	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
+}
+
 func (s *Service) GetAllChallenges() (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Find(&challenges)
@@ -36,7 +52,7 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 	}
 
 	var res []resultStruct
-	for _, v := range challenges{
+	for _, v := range challenges {
 		// 获取其中一个靶机的状态来得知 Visible
 		var gameBox GameBox
 		s.Mysql.Where(&GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)

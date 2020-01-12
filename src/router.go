@@ -29,6 +29,9 @@ func (s *Service) initRouter() {
 		authorized.DELETE("/challenge", func(c *gin.Context) {
 			c.JSON(s.DeleteChallenge(c))
 		})
+		authorized.POST("/challenge/visible", func(c *gin.Context) {
+			c.JSON(s.SetVisible(c))
+		})
 	}
 
 	s.Router = r
