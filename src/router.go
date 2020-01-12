@@ -34,8 +34,14 @@ func (s *Service) initRouter() {
 		})
 
 		// GameBox
+		authorized.GET("/gameboxes", func(c *gin.Context){
+			c.JSON(s.GetGameBoxes(c))
+		})
 		authorized.POST("/gameboxes", func(c *gin.Context) {
 			c.JSON(s.NewGameBoxes(c))
+		})
+		authorized.PUT("/gamebox", func(c *gin.Context){
+			c.JSON(s.EditGameBox(c))
 		})
 	}
 
