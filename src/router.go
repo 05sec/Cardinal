@@ -6,6 +6,11 @@ import (
 
 func (s *Service) initRouter() {
 	r := gin.Default()
+	
+	// 用户登录
+	r.POST("/login", func(c *gin.Context) {
+		c.JSON(s.TeamLogin(c))
+	})
 
 	// 管理员登录
 	r.POST("/manager/login", func(c *gin.Context) {
@@ -14,7 +19,7 @@ func (s *Service) initRouter() {
 
 	// 管理
 	authorized := r.Group("/manager")
-	authorized.Use(s.AuthRequired())
+	authorized.Use(s.ManagerAuthRequired())
 	{
 		// Challenge
 		authorized.GET("/challenges", func(c *gin.Context) {
@@ -63,8 +68,31 @@ func (s *Service) initRouter() {
 	panic(r.Run(s.Conf.Base.Port))
 }
 
-// 鉴权中间件
-func (s *Service) AuthRequired() gin.HandlerFunc {
+// 用户鉴权中间件
+func (s *Service) TeamAuthRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if token == "" {
+			c.JSON(s.makeErrJSON(403, 40300, "未授权访问"))
+			c.Abort()
+			return
+		}
+
+		var tokenData Token
+		s.Mysql.Where(&Token{Token: token}).Find(&tokenData)
+		if tokenData.ID == 0{
+			c.JSON(s.makeErrJSON(401, 40100, "未授权访问"))
+			c.Abort()
+			return
+		}
+
+		c.Set("teamID", tokenData.TeamID)
+		c.Next()
+	}
+}
+
+// 管理员鉴权中间件
+func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {

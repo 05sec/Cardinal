@@ -24,6 +24,7 @@ func (s *Service) initMySQL() {
 	s.Mysql.AutoMigrate(
 		&Manager{},
 		&Challenge{},
+		&Token{},
 		&Team{},
 		&GameBox{},
 

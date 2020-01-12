@@ -6,6 +6,13 @@ import (
 	"github.com/thanhpk/randstr"
 )
 
+type Token struct {
+	gorm.Model
+
+	TeamID uint
+	Token  string
+}
+
 type Team struct {
 	gorm.Model
 
@@ -15,6 +22,37 @@ type Team struct {
 	Score    int64
 }
 
+func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
+	type TeamLoginForm struct {
+		Name     string `json:"Name" binding:"required"`
+		Password string `json:"Password" binding:"required"`
+	}
+
+	var formData TeamLoginForm
+	err := c.BindJSON(&formData)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Error payload")
+	}
+
+	var team Team
+	s.Mysql.Where(&Team{Name: formData.Name}).Find(&team)
+	if team.Name != "" && s.checkPassword(formData.Password, team.Password) {
+		// 登录成功
+		token := s.generateToken()
+
+		tx := s.Mysql.Begin()
+		if tx.Create(&Token{TeamID: team.ID, Token: token}).RowsAffected != 1 {
+			tx.Rollback()
+			return s.makeErrJSON(500, 50000, "Server error")
+		}
+		tx.Commit()
+		return s.makeSuccessJSON(token)
+	} else {
+		return s.makeErrJSON(403, 40300, "账号或密码错误！")
+	}
+}
+
+// 管理
 func (s *Service) GetAllTeams() (int, interface{}) {
 	var teams []Team
 	s.Mysql.Model(&Team{}).Find(&teams)
