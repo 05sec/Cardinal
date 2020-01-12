@@ -97,6 +97,7 @@ func (s *Service) timerProcess() {
 	// 时间处理协程
 	beginTime := s.Timer.BeginTime.Unix()
 	endTime := s.Timer.EndTime.Unix()
+	lastRoundCalculate := false 	// 最后一轮结束计算分数
 	for {
 		nowTime := time.Now().Unix()
 
@@ -140,6 +141,12 @@ func (s *Service) timerProcess() {
 			s.Timer.Status = "wait"
 		} else {
 			// 比赛已结束
+			// 最后一轮结束后结算分数
+			if !lastRoundCalculate{
+				// TODO: 计算分数
+				lastRoundCalculate = true
+			}
+
 			s.Timer.Status = "off"
 		}
 
