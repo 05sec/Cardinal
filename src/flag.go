@@ -6,6 +6,16 @@ import (
 	"strconv"
 )
 
+// 攻击记录
+type AttackAction struct {
+	gorm.Model
+
+	TeamID         uint // 被攻击者
+	GameBoxID      uint // 被攻击者靶机
+	AttackerTeamID uint // 攻击者
+	Round          int
+}
+
 type Flag struct {
 	gorm.Model
 
@@ -30,8 +40,8 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	}
 
 	var flagData Flag
-	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag}).Find(&flagData)
-	if flagData.ID == 0 || flagData.Round != s.Timer.NowRound{		// 判断是否为本轮 Flag
+	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
+	if flagData.ID == 0 {
 		return s.makeErrJSON(403, 40300, "Flag 错误！")
 	}
 
@@ -43,7 +53,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		AttackerTeamID: uint(teamID),
 		Round:          flagData.Round,
 	}).Find(&repeatAttackCheck)
-	if repeatAttackCheck.ID != 0{
+	if repeatAttackCheck.ID != 0 {
 		return s.makeErrJSON(403, 40301, "请勿重复提交 Flag")
 	}
 
@@ -54,7 +64,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		GameBoxID:      flagData.GameBoxID,
 		AttackerTeamID: uint(teamID),
 		Round:          flagData.Round,
-	}).RowsAffected != 1{
+	}).RowsAffected != 1 {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50000, "提交失败！")
 	}

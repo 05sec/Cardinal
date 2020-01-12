@@ -79,6 +79,11 @@ func (s *Service) initRouter() {
 		manager.POST("/flag/generate", func(c *gin.Context) {
 			c.JSON(s.GenerateFlag())
 		})
+
+		// Check
+		manager.POST("/checkDown", func(c *gin.Context) {
+			c.JSON(s.CheckDown(c))
+		})
 	}
 
 	s.Router = r
