@@ -20,6 +20,19 @@ type GameBox struct {
 	IsAttacked  bool
 }
 
+func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
+	var gameBoxes []struct {
+		ChallengeID uint
+		Description string
+		Score       float64
+		IsDown      bool
+		IsAttacked  bool
+	}
+	teamID := c.GetInt("teamID")
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: uint(teamID), Visible: true}).Order("challenge_id").Find(&gameBoxes)
+	return s.makeSuccessJSON(gameBoxes)
+}
+
 func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
 	pageStr := c.Query("page")   // 当前页
 	perPageStr := c.Query("per") // 每页数量

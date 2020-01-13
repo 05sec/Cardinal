@@ -6,7 +6,7 @@ import (
 
 func (s *Service) initRouter() {
 	r := gin.Default()
-	
+
 	// 用户登录
 	r.POST("/login", func(c *gin.Context) {
 		c.JSON(s.TeamLogin(c))
@@ -21,6 +21,12 @@ func (s *Service) initRouter() {
 		})
 		team.GET("/info", func(c *gin.Context) {
 			c.JSON(s.GetTeamInfo(c))
+		})
+		team.GET("/gameboxes", func(c *gin.Context) {
+			c.JSON(s.GetSelfGameBoxes(c))
+		})
+		team.GET("/rank", func(c *gin.Context) {
+			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Team": s.GetRankList()}))
 		})
 	}
 
@@ -51,13 +57,13 @@ func (s *Service) initRouter() {
 		})
 
 		// GameBox
-		manager.GET("/gameboxes", func(c *gin.Context){
+		manager.GET("/gameboxes", func(c *gin.Context) {
 			c.JSON(s.GetGameBoxes(c))
 		})
 		manager.POST("/gameboxes", func(c *gin.Context) {
 			c.JSON(s.NewGameBoxes(c))
 		})
-		manager.PUT("/gamebox", func(c *gin.Context){
+		manager.PUT("/gamebox", func(c *gin.Context) {
 			c.JSON(s.EditGameBox(c))
 		})
 
@@ -102,7 +108,7 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 
 		var tokenData Token
 		s.Mysql.Where(&Token{Token: token}).Find(&tokenData)
-		if tokenData.ID == 0{
+		if tokenData.ID == 0 {
 			c.JSON(s.makeErrJSON(401, 40100, "未授权访问"))
 			c.Abort()
 			return
@@ -125,7 +131,7 @@ func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 
 		var managerData Manager
 		s.Mysql.Where(&Manager{Token: token}).Find(&managerData)
-		if managerData.ID == 0{
+		if managerData.ID == 0 {
 			c.JSON(s.makeErrJSON(401, 40100, "未授权访问"))
 			c.Abort()
 			return
