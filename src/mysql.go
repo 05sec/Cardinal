@@ -27,6 +27,8 @@ func (s *Service) initMySQL() {
 		&Token{},
 		&Team{},
 		&GameBox{},
+		&Bulletin{},
+		&BulletinRead{},
 
 		&AttackAction{},
 		&DownAction{},

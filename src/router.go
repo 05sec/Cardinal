@@ -28,6 +28,9 @@ func (s *Service) initRouter() {
 		team.GET("/rank", func(c *gin.Context) {
 			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Team": s.GetRankList()}))
 		})
+		team.GET("/bulletins", func(c *gin.Context) {
+			c.JSON(s.GetAllBulletins())
+		})
 	}
 
 	// 管理员登录
@@ -89,6 +92,20 @@ func (s *Service) initRouter() {
 		// Check
 		manager.POST("/checkDown", func(c *gin.Context) {
 			c.JSON(s.CheckDown(c))
+		})
+
+		// Bulletin
+		manager.GET("/bulletins", func(c *gin.Context) {
+			c.JSON(s.GetAllBulletins())
+		})
+		manager.POST("/bulletin", func(c *gin.Context) {
+			c.JSON(s.NewBulletin(c))
+		})
+		manager.PUT("/bulletin", func(c *gin.Context) {
+			c.JSON(s.NewBulletin(c))
+		})
+		manager.DELETE("/bulletin", func(c *gin.Context) {
+			c.JSON(s.DeleteBulletin(c))
 		})
 	}
 
