@@ -15,7 +15,7 @@ type GameBox struct {
 
 	Description string
 	Visible     bool
-	Score       int64 // 分数可负
+	Score       float64 // 分数可负
 	IsDown      bool
 	IsAttacked  bool
 }
@@ -97,7 +97,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 
 func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID          uint    `binding:"required"`
+		ID          uint   `binding:"required"`
 		Description string `binding:"required"`
 	}
 	var inputForm InputForm

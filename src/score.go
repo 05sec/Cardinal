@@ -28,7 +28,7 @@ func (s *Service) NewRoundCalculateScore() {
 	// 未被 CheckDown 加分
 	s.AddCheckDown(lastRound)
 
-	// 刷新分数信息到 MySQL / Redis
+	// 刷新分数信息到内存
 	s.RefreshScoreData()
 }
 
@@ -37,23 +37,24 @@ func (s *Service) RefreshScoreData() {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
-		var score float64
-		s.Mysql.Model(&Score{}).Where(&Score{GameBoxID: gameBox.ID}).Select("sum(Score)").Scan(&score)
+		var sc struct{ score float64 }
+		s.Mysql.Model(&Score{}).Where(&Score{GameBoxID: gameBox.ID}).Select("sum(Score)").Scan(&sc)
 		var challenge Challenge
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
-		s.Mysql.Model(&GameBox{}).Update(&Score{Score: float64(challenge.BaseScore) + score})
+		s.Mysql.Model(&GameBox{}).Update(&Score{Score: float64(challenge.BaseScore) + sc.score})
 	}
 
 	// 更新队伍分数（所有公开靶机分数之和）
 	var teams []Team
 	s.Mysql.Model(&Team{}).Find(&teams)
 	for _, team := range teams {
-		var score float64
-		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Select("sum(Score)").Scan(&score)
-		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: score})
+		var sc struct{ score float64 }
+		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Select("sum(Score)").Scan(&sc)
+		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: sc.score})
 	}
 
-	// TODO: Redis
+	// 计算并存储总排行榜
+	s.GenerateRankList()
 }
 
 // 攻击加分

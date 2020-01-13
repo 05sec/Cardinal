@@ -9,7 +9,6 @@ import (
 type Config struct {
 	Base  `toml:"base"`
 	MySQL `toml:"mysql"`
-	Redis `toml:"redis"`
 }
 
 type Base struct {
@@ -31,12 +30,6 @@ type MySQL struct {
 	DBUsername string
 	DBPassword string
 	DBName     string
-}
-
-type Redis struct {
-	DBHost     string
-	DBPort     string
-	DBPassword string
 }
 
 func (s *Service) initConfig() {
