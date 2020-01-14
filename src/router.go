@@ -1,11 +1,17 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func (s *Service) initRouter() {
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},
+		AllowHeaders: []string{"Authorization", "Content-type", "User-Agent"},
+		AllowOrigins: []string{"*"},
+	}))
 
 	// 用户登录
 	r.POST("/login", func(c *gin.Context) {
