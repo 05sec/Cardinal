@@ -13,9 +13,23 @@ func (s *Service) initRouter() {
 		AllowOrigins: []string{"*"},
 	}))
 
+	// 基础信息
+	r.GET("/base", func(c *gin.Context) {
+		c.JSON(s.makeSuccessJSON(gin.H{
+			"Title": s.Conf.Title,
+		}))
+	})
+	r.GET("/time", func(c *gin.Context) {
+		c.JSON(s.getTime())
+	})
+
 	// 用户登录
 	r.POST("/login", func(c *gin.Context) {
 		c.JSON(s.TeamLogin(c))
+	})
+	// 用户登出
+	r.GET("/logout", func(c *gin.Context) {
+		c.JSON(s.TeamLogout(c))
 	})
 
 	// 用户

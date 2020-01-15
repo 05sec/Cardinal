@@ -13,6 +13,8 @@ type GameBox struct {
 	ChallengeID uint
 	TeamID      uint
 
+	IP          string
+	Port        string
 	Description string
 	Visible     bool
 	Score       float64 // 分数可负
@@ -23,13 +25,21 @@ type GameBox struct {
 func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 	var gameBoxes []struct {
 		ChallengeID uint
+		Title       string
+		IP          string
+		Port        string
 		Description string
 		Score       float64
 		IsDown      bool
 		IsAttacked  bool
 	}
 	teamID := c.GetInt("teamID")
-	s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: uint(teamID), Visible: true}).Order("challenge_id").Find(&gameBoxes)
+	s.Mysql.Table("game_boxes").Where(&GameBox{TeamID: uint(teamID), Visible: true}).Order("challenge_id").Find(&gameBoxes)
+	for index, gameBox := range gameBoxes {
+		var challenge Challenge
+		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
+		gameBoxes[index].Title = challenge.Title
+	}
 	return s.makeSuccessJSON(gameBoxes)
 }
 
@@ -62,6 +72,8 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ChallengeID uint   `binding:"required"`
 		TeamID      uint   `binding:"required"`
+		IP          string `binding:"required"`
+		Port        string `binding:"required"`
 		Description string `binding:"required"`
 	}
 	var inputForm []InputForm
@@ -110,7 +122,10 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 
 func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID          uint   `binding:"required"`
+		ID uint `binding:"required"`
+
+		IP          string `binding:"required"`
+		Port        string `binding:"required"`
 		Description string `binding:"required"`
 	}
 	var inputForm InputForm

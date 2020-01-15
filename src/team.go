@@ -53,15 +53,28 @@ func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
 	}
 }
 
-func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}){
+func (s *Service) TeamLogout(c *gin.Context) (int, interface{}) {
+	token := c.GetHeader("Authorization")
+	if token != "" {
+		s.Mysql.Model(&Token{}).Where("token = ?", token).Delete(&Token{})
+	}
+	return s.makeSuccessJSON("登出成功！")
+}
+
+func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}) {
 	teamID, ok := c.Get("teamID")
-	if !ok{
+	if !ok {
 		return s.makeErrJSON(500, 50000, "Server error")
 	}
 
 	var teamInfo Team
 	s.Mysql.Where(&Team{Model: gorm.Model{ID: teamID.(uint)}}).Find(&teamInfo)
-	return s.makeSuccessJSON(teamInfo)
+	return s.makeSuccessJSON(gin.H{
+		"Name":  teamInfo.Name,
+		"Logo":  teamInfo.Logo,
+		"Score": teamInfo.Score,
+		"Token": teamInfo.SecretKey,
+	})
 }
 
 // 管理
@@ -87,7 +100,7 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	for _, item := range inputForm {
 		tmpTeamName[item.Name] = 0
 	}
-	if len(tmpTeamName) != len(inputForm){
+	if len(tmpTeamName) != len(inputForm) {
 		return s.makeErrJSON(400, 40001, "传入数据中存在重复数据")
 	}
 

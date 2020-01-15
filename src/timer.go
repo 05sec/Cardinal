@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"math"
 	"strconv"
@@ -9,15 +10,26 @@ import (
 )
 
 type Timer struct {
-	BeginTime     time.Time     // init
-	EndTime       time.Time     // init
-	Duration      uint          // init
-	RestTime      [][]time.Time `json:"-"` // init
-	RunTime       [][]time.Time `json:"-"` // init
-	TotalRound    int           //init
-	NowRound      int
-	NextRoundTime time.Time
-	Status        string
+	BeginTime       time.Time     // init
+	EndTime         time.Time     // init
+	Duration        uint          // init
+	RestTime        [][]time.Time // init
+	RunTime         [][]time.Time // init
+	TotalRound      int           //init
+	NowRound        int
+	RoundRemainTime int
+	Status          string
+}
+
+func (s *Service) getTime() (int, interface{}) {
+	return s.makeSuccessJSON(gin.H{
+		"BeginTime":       s.Timer.BeginTime.Unix(),
+		"EndTime":         s.Timer.EndTime.Unix(),
+		"Duration":        s.Timer.Duration,
+		"NowRound":        s.Timer.NowRound,
+		"RoundRemainTime": s.Timer.RoundRemainTime,
+		"Status":          s.Timer.Status,
+	})
 }
 
 func (s *Service) initTimer() {
@@ -100,6 +112,7 @@ func (s *Service) timerProcess() {
 	lastRoundCalculate := false // 最后一轮结束计算分数
 	for {
 		nowTime := time.Now().Unix()
+		s.Timer.RoundRemainTime = -1
 
 		if nowTime > beginTime && nowTime < endTime {
 			nowRunTimeIndex := -1
@@ -115,6 +128,7 @@ func (s *Service) timerProcess() {
 				s.Timer.Status = "pause"
 			} else {
 				// 比赛进行中
+				s.Timer.Status = "on"
 				var nowRound int
 				var workTime int64 // 比赛进行的累计时间
 
@@ -126,7 +140,8 @@ func (s *Service) timerProcess() {
 						break
 					}
 				}
-				nowRound = int(math.Floor(float64(workTime) / float64(s.Timer.Duration*60))) // 计算当前轮数
+				nowRound = int(math.Floor(float64(workTime) / float64(s.Timer.Duration*60)))    // 计算当前轮数
+				s.Timer.RoundRemainTime = (nowRound+1)*int(s.Timer.Duration)*60 - int(workTime) // 计算距离下一轮的秒数
 
 				// 判断是否进入新一轮
 				if s.Timer.NowRound < nowRound {
@@ -151,7 +166,7 @@ func (s *Service) timerProcess() {
 				lastRoundCalculate = true
 			}
 
-			s.Timer.Status = "off"
+			s.Timer.Status = "end"
 		}
 
 		time.Sleep(1 * time.Second)
