@@ -137,6 +137,16 @@ func (s *Service) initRouter() {
 		})
 	}
 
+	// 404
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(s.makeErrJSON(404, 40400, "not found"))
+	})
+
+	// 405
+	r.NoMethod(func(c *gin.Context) {
+		c.JSON(s.makeErrJSON(405, 40500, "method not allowed"))
+	})
+
 	s.Router = r
 	panic(r.Run(s.Conf.Base.Port))
 }

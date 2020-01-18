@@ -12,8 +12,8 @@ func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 	}
 	fileExt := map[string]string{
 		"image/png":  ".png",
-		"image/gif":  ".png",
-		"image/jpeg": ".png",
+		"image/gif":  ".gif",
+		"image/jpeg": ".jpg",
 	}
 	ext, ok := fileExt[c.GetHeader("Content-Type")]
 	if !ok {
