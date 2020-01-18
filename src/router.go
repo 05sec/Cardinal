@@ -23,6 +23,9 @@ func (s *Service) initRouter() {
 		c.JSON(s.getTime())
 	})
 
+	// 静态资源
+	r.Static("/uploads", "./uploads")
+
 	// 用户登录
 	r.POST("/login", func(c *gin.Context) {
 		c.JSON(s.TeamLogin(c))
@@ -126,6 +129,11 @@ func (s *Service) initRouter() {
 		})
 		manager.DELETE("/bulletin", func(c *gin.Context) {
 			c.JSON(s.DeleteBulletin(c))
+		})
+
+		// File
+		manager.POST("/uploadPicture", func(c *gin.Context) {
+			c.JSON(s.UploadPicture(c))
 		})
 	}
 
