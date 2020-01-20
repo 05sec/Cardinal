@@ -14,6 +14,10 @@ func (s *Service) initRouter() {
 	}))
 
 	// 基础信息
+	r.Any("/", func(c *gin.Context) {
+		c.JSON(s.makeSuccessJSON("Cardinal"))
+	})
+
 	r.GET("/base", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON(gin.H{
 			"Title": s.Conf.Title,
