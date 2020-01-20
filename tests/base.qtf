@@ -1,0 +1,15 @@
+match $(host) http://localhost:19999/
+
+get $(host)
+ret 200
+json {"data":"Cardinal","error":0,"msg":"success"}
+
+# /base 基础信息
+get $(host)/base
+ret 200
+json {"data":{"Title":"HCTF"},"error":0,"msg":"success"}
+
+# /time 基础信息
+get $(host)/time
+ret 200
+json {"data":{"BeginTime":$(beginTime),"Duration":$(duration),"EndTime":$(endTime),"NowRound":$(nowRound),"RoundRemainTime":$(roundRemainTime),"Status":$(status)},"error":0,"msg":"success"}
