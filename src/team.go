@@ -181,6 +181,33 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("修改 Team 成功！")
 }
 
+func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
+	type InputForm struct {
+		ID uint `binding:"required"`
+	}
+
+	var inputForm InputForm
+	err := c.BindJSON(&inputForm)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Error payload")
+	}
+
+	var team Team
+	s.Mysql.Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&team)
+	if team.Name == "" {
+		return s.makeErrJSON(404, 40400, "Team 不存在")
+	}
+
+	tx := s.Mysql.Begin()
+	if tx.Where("id = ?", inputForm.ID).Delete(&Team{}).RowsAffected != 1 {
+		tx.Rollback()
+		return s.makeErrJSON(500, 50002, "删除 Team 失败！")
+	}
+	tx.Commit()
+
+	return s.makeSuccessJSON("删除 Team 成功！")
+}
+
 func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID uint `binding:"required"`

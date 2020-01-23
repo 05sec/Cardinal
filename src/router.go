@@ -107,6 +107,9 @@ func (s *Service) initRouter() {
 		manager.PUT("/team", func(c *gin.Context) {
 			c.JSON(s.EditTeam(c))
 		})
+		manager.DELETE("/team", func(c *gin.Context){
+			c.JSON(s.DeleteTeam(c))
+		})
 		manager.POST("/team/resetPassword", func(c *gin.Context) {
 			c.JSON(s.ResetTeamPassword(c))
 		})
