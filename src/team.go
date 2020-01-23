@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
+	"strconv"
 )
 
 type Token struct {
@@ -182,24 +183,23 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 }
 
 func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
-	type InputForm struct {
-		ID uint `binding:"required"`
+	idStr, ok := c.GetQuery("id")
+	if !ok {
+		return s.makeErrJSON(400, 40000, "Error query")
 	}
-
-	var inputForm InputForm
-	err := c.BindJSON(&inputForm)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000, "Query must be number")
 	}
 
 	var team Team
-	s.Mysql.Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&team)
+	s.Mysql.Where(&Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
 	if team.Name == "" {
 		return s.makeErrJSON(404, 40400, "Team 不存在")
 	}
 
 	tx := s.Mysql.Begin()
-	if tx.Where("id = ?", inputForm.ID).Delete(&Team{}).RowsAffected != 1 {
+	if tx.Where("id = ?", uint(id)).Delete(&Team{}).RowsAffected != 1 {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50002, "删除 Team 失败！")
 	}
