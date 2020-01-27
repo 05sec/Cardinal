@@ -109,6 +109,8 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		newGameBox := &GameBox{
 			ChallengeID: item.ChallengeID,
 			TeamID:      item.TeamID,
+			IP:          item.IP,
+			Port:        item.Port,
 			Description: item.Description,
 		}
 		if tx.Create(newGameBox).RowsAffected != 1 {
