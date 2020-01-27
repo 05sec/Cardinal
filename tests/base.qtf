@@ -1,4 +1,4 @@
-match $(host) http://localhost:19999/
+match $(host) http://localhost:19999
 
 get $(host)
 ret 200

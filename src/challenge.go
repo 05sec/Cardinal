@@ -16,8 +16,8 @@ type Challenge struct {
 
 func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID      int
-		Visible bool
+		ID      uint `binding:"required"`
+		Visible bool `binding:"required"`
 	}
 
 	var inputForm InputForm
@@ -26,7 +26,13 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(400, 40000, "Error payload")
 	}
 
-	s.Mysql.Model(&GameBox{}).Where("id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
+	var checkChallenge Challenge
+	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
+	if checkChallenge.Title == "" {
+		return s.makeErrJSON(404, 40400, "Challenge 不存在")
+	}
+
+	s.Mysql.Model(&GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
 	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
 }
 
@@ -38,6 +44,7 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 		CreatedAt time.Time
 		Title     string
 		Visible   bool
+		BaseScore int
 	}
 
 	var res []resultStruct
@@ -51,6 +58,7 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 			CreatedAt: v.CreatedAt,
 			Title:     v.Title,
 			Visible:   gameBox.Visible,
+			BaseScore: v.BaseScore,
 		})
 	}
 	return s.makeSuccessJSON(res)
@@ -74,7 +82,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	}
 	var checkChallenge Challenge
 
-	s.Mysql.Where(newChallenge).Find(&checkChallenge)
+	s.Mysql.Model(&Challenge{}).Where(&Challenge{Title: newChallenge.Title}).Find(&checkChallenge)
 	if checkChallenge.Title != "" {
 		return s.makeErrJSON(403, 40300, "重复添加")
 	}
