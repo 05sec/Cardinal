@@ -29,13 +29,19 @@ type Flag struct {
 }
 
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
-	t, _ := c.Get("teamID")
-	teamID := t.(uint)
-	if teamID == 0 {
-		return s.makeErrJSON(500, 50001, "Server error")
+	secretKey := c.GetHeader("Authorization")
+	if secretKey == "" {
+		return s.makeErrJSON(403, 40300, "Token 无效")
 	}
+	var team Team
+	s.Mysql.Model(&Team{}).Where(&Team{SecretKey: secretKey}).Find(&team)
+	teamID := team.ID
+	if teamID == 0 {
+		return s.makeErrJSON(403, 40300, "Token 无效")
+	}
+
 	type InputForm struct {
-		Flag string `binding:"required"`
+		Flag string `json:"flag" binding:"required"`
 	}
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)

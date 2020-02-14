@@ -39,13 +39,15 @@ func (s *Service) initRouter() {
 		c.JSON(s.TeamLogout(c))
 	})
 
+	// 提交 Flag
+	r.POST("/flag", func(c *gin.Context) {
+		c.JSON(s.SubmitFlag(c))
+	})
+
 	// 用户
 	team := r.Group("/team")
 	team.Use(s.TeamAuthRequired())
 	{
-		team.POST("/flag", func(c *gin.Context) {
-			c.JSON(s.SubmitFlag(c))
-		})
 		team.GET("/info", func(c *gin.Context) {
 			c.JSON(s.GetTeamInfo(c))
 		})

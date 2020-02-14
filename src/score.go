@@ -37,20 +37,21 @@ func (s *Service) RefreshScoreData() {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
-		var sc struct{ score float64 }
-		s.Mysql.Model(&Score{}).Where(&Score{GameBoxID: gameBox.ID}).Select("sum(Score)").Scan(&sc)
+		var sc struct{ Score float64 `gorm:"Column:Score"` }
+		s.Mysql.Table("scores").Select("SUM(score) AS Score").Where("`game_box_id` = ?", gameBox.ID).Scan(&sc) // 计算 GameBox 的分数记录
+
 		var challenge Challenge
-		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
-		s.Mysql.Model(&GameBox{}).Update(&Score{Score: float64(challenge.BaseScore) + sc.score})
+		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                  // 获取 GameBox 的基础分数
+		s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&Score{Score: float64(challenge.BaseScore) + sc.Score}) // 更新靶机分数
 	}
 
 	// 更新队伍分数（所有公开靶机分数之和）
 	var teams []Team
 	s.Mysql.Model(&Team{}).Find(&teams)
 	for _, team := range teams {
-		var sc struct{ score float64 }
-		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Select("sum(Score)").Scan(&sc)
-		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: sc.score})
+		var sc struct{ Score float64 `gorm:"Column:Score"` }
+		s.Mysql.Table("game_boxes").Select("SUM(score) AS Score").Where("`team_id` = ? AND `visible` = ?", team.ID, 1).Scan(&sc) // 计算该队伍所有 GameBox 分数
+		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: sc.Score})
 	}
 
 	// 计算并存储总排行榜
@@ -71,12 +72,12 @@ func (s *Service) AddAttack(round int) {
 			// 加分
 			for _, action := range attackActions {
 				// 获取攻击者这道题的 GameBoxID
-				var attackerGameBoxID uint
-				s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID}).Find(&attackerGameBoxID)
+				var attackerGameBox GameBox
+				s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID}).Find(&attackerGameBox)
 
 				s.Mysql.Create(&Score{
 					TeamID:    action.AttackerTeamID,
-					GameBoxID: attackerGameBoxID,
+					GameBoxID: attackerGameBox.ID,
 					Round:     round,
 					Reason:    "attack",
 					Score:     score,
