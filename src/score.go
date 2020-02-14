@@ -28,12 +28,19 @@ func (s *Service) NewRoundCalculateScore() {
 	// 未被 CheckDown 加分
 	s.AddCheckDown(lastRound)
 
-	// 刷新分数信息到内存
-	s.RefreshScoreData()
+	// 更新靶机分数
+	s.CalculateGameBoxScore()
+	// 更新队伍分数
+	s.CalculateTeamScore()
+
+	// 刷新总排行榜标题
+	s.SetRankListTitle()
+	// 计算并存储总排行榜到内存
+	s.SetRankList()
 }
 
-func (s *Service) RefreshScoreData() {
-	// 更新靶机分数
+// 更新靶机分数
+func (s *Service) CalculateGameBoxScore() {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
@@ -44,8 +51,10 @@ func (s *Service) RefreshScoreData() {
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                  // 获取 GameBox 的基础分数
 		s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&Score{Score: float64(challenge.BaseScore) + sc.Score}) // 更新靶机分数
 	}
+}
 
-	// 更新队伍分数（所有公开靶机分数之和）
+// 更新队伍分数（所有公开靶机分数之和）
+func (s *Service) CalculateTeamScore() {
 	var teams []Team
 	s.Mysql.Model(&Team{}).Find(&teams)
 	for _, team := range teams {
@@ -53,12 +62,6 @@ func (s *Service) RefreshScoreData() {
 		s.Mysql.Table("game_boxes").Select("SUM(score) AS Score").Where("`team_id` = ? AND `visible` = ?", team.ID, 1).Scan(&sc) // 计算该队伍所有 GameBox 分数
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: sc.Score})
 	}
-
-	// 刷新总排行榜标题
-	s.SetRankListTitle()
-
-	// 计算并存储总排行榜
-	s.SetRankList()
 }
 
 // 攻击加分

@@ -17,7 +17,7 @@ type Challenge struct {
 func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID      uint `binding:"required"`
-		Visible bool `binding:"required"`
+		Visible bool
 	}
 
 	var inputForm InputForm
@@ -34,8 +34,12 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 
 	s.Mysql.Model(&GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
 
+	// 重新计算队伍分数（可见靶机）
+	s.CalculateTeamScore()
 	// 刷新总排行榜可见靶机标题
 	s.SetRankListTitle()
+	// 刷新总排行榜分数
+	s.SetRankList()
 
 	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
 }
