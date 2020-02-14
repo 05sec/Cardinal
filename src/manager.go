@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/thanhpk/randstr"
+	"strconv"
 )
 
 type Manager struct {
@@ -21,7 +23,7 @@ type ManagerLoginForm struct {
 func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	var formData ManagerLoginForm
 	err := c.BindJSON(&formData)
-	if err != nil{
+	if err != nil {
 		return s.makeErrJSON(400, 40000, "Error payload")
 	}
 
@@ -38,7 +40,104 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 		}
 		tx.Commit()
 		return s.makeSuccessJSON(token)
-	}else{
+	} else {
 		return s.makeErrJSON(403, 40300, "账号或密码错误！")
 	}
+}
+
+func (s *Service) GetAllManager() (int, interface{}) {
+	var manager []Manager
+	s.Mysql.Model(&Manager{}).Find(&manager)
+	return s.makeSuccessJSON(manager)
+}
+
+func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
+	type InputForm struct {
+		Name string `json:"Name" binding:"required"`
+	}
+	var formData InputForm
+	err := c.BindJSON(&formData)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Error payload")
+	}
+
+	var checkManager Manager
+	s.Mysql.Model(&Manager{}).Where(&Manager{Name: formData.Name}).Find(&checkManager)
+	if checkManager.ID != 0 {
+		return s.makeErrJSON(400, 40001, "管理员名称重复")
+	}
+
+	password := randstr.String(16)
+	manager := Manager{
+		Name:     formData.Name,
+		Password: s.addSalt(password),
+	}
+	tx := s.Mysql.Begin()
+	tx.Create(&manager)
+	if tx.Create(&manager).RowsAffected != 1 {
+		tx.Rollback()
+		return s.makeErrJSON(500, 50000, "添加管理员失败！")
+	}
+	tx.Commit()
+	return s.makeSuccessJSON(password)
+}
+
+func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
+	idStr, ok := c.GetQuery("id")
+	if !ok {
+		return s.makeErrJSON(400, 40000, "Error query")
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Query must be number")
+	}
+
+	tx := s.Mysql.Begin()
+	token := s.generateToken()
+	if tx.Model(&Manager{}).Where(&Manager{Model: gorm.Model{ID: uint(id)}}).Update(&Manager{
+		Token: token,
+	}).RowsAffected != 1 {
+		tx.Rollback()
+		return s.makeErrJSON(500, 50000, "更新管理员 Token 失败！")
+	}
+	return s.makeSuccessJSON(token)
+}
+
+func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
+	idStr, ok := c.GetQuery("id")
+	if !ok {
+		return s.makeErrJSON(400, 40000, "Error query")
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Query must be number")
+	}
+
+	tx := s.Mysql.Begin()
+	password := randstr.String(16)
+	if tx.Model(&Manager{}).Where(&Manager{Model: gorm.Model{ID: uint(id)}}).Update(&Manager{
+		Password: s.addSalt(password),
+	}).RowsAffected != 1 {
+		tx.Rollback()
+		return s.makeErrJSON(500, 50000, "更新管理员 Token 失败！")
+	}
+	return s.makeSuccessJSON(password)
+}
+
+func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
+	idStr, ok := c.GetQuery("id")
+	if !ok {
+		return s.makeErrJSON(400, 40000, "Error query")
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return s.makeErrJSON(400, 40000, "Query must be number")
+	}
+
+	tx := s.Mysql.Begin()
+	if tx.Model(&Manager{}).Where("id = ?", id).Delete(&Manager{}).RowsAffected != 1 {
+		tx.Rollback()
+		return s.makeErrJSON(500, 50000, "删除管理员失败")
+	}
+	return s.makeSuccessJSON("删除管理员成功")
 }

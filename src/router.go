@@ -109,11 +109,28 @@ func (s *Service) initRouter() {
 		manager.PUT("/team", func(c *gin.Context) {
 			c.JSON(s.EditTeam(c))
 		})
-		manager.DELETE("/team", func(c *gin.Context){
+		manager.DELETE("/team", func(c *gin.Context) {
 			c.JSON(s.DeleteTeam(c))
 		})
 		manager.POST("/team/resetPassword", func(c *gin.Context) {
 			c.JSON(s.ResetTeamPassword(c))
+		})
+
+		// Manager
+		manager.GET("/manager", func(c *gin.Context) {
+			c.JSON(s.GetAllManager())
+		})
+		manager.POST("/manager", func(c *gin.Context) {
+			c.JSON(s.NewManager(c))
+		})
+		manager.GET("/manager/token", func(c *gin.Context) {
+			c.JSON(s.RefreshManagerToken(c))
+		})
+		manager.POST("/manager/changePassword", func(c *gin.Context) {
+			c.JSON(s.ChangeManagerPassword(c))
+		})
+		manager.DELETE("/manager", func(c *gin.Context) {
+			c.JSON(s.DeleteManager(c))
 		})
 
 		// Flag

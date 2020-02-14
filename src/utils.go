@@ -21,7 +21,7 @@ func (s *Service) makeSuccessJSON(data interface{}) (int, interface{}) {
 
 func (s *Service) checkPassword(inputPassword string, realPassword string) bool {
 	// sha1( sha1(password) + salt )
-	return s.sha1Encode(s.sha1Encode(inputPassword)+s.Conf.Base.Salt) == realPassword
+	return s.addSalt(inputPassword) == realPassword
 }
 
 func (s *Service) addSalt(input string) string {
