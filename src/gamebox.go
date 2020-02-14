@@ -33,8 +33,9 @@ func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 		IsDown      bool
 		IsAttacked  bool
 	}
-	teamID := c.GetInt("teamID")
-	s.Mysql.Table("game_boxes").Where(&GameBox{TeamID: uint(teamID), Visible: true}).Order("challenge_id").Find(&gameBoxes)
+	teamID, _ := c.Get("teamID")
+
+	s.Mysql.Table("game_boxes").Where(&GameBox{TeamID: teamID.(uint), Visible: true}).Order("challenge_id").Find(&gameBoxes)
 	for index, gameBox := range gameBoxes {
 		var challenge Challenge
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)

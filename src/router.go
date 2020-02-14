@@ -115,6 +115,9 @@ func (s *Service) initRouter() {
 		})
 
 		// Flag
+		manager.GET("/flags", func(c *gin.Context) {
+			c.JSON(s.GetFlags(c))
+		})
 		manager.POST("/flag/generate", func(c *gin.Context) {
 			c.JSON(s.GenerateFlag())
 		})

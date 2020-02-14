@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"strconv"
@@ -28,7 +29,8 @@ type Flag struct {
 }
 
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
-	teamID := c.GetInt("teamID")
+	t, _ := c.Get("teamID")
+	teamID := t.(uint)
 	if teamID == 0 {
 		return s.makeErrJSON(500, 50001, "Server error")
 	}
@@ -43,7 +45,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 
 	var flagData Flag
 	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
-	if flagData.ID == 0 || teamID == int(flagData.TeamID){		// 注意不允许提交自己的 flag
+	if flagData.ID == 0 || teamID == flagData.TeamID {                                                 // 注意不允许提交自己的 flag
 		return s.makeErrJSON(403, 40300, "Flag 错误！")
 	}
 
@@ -52,7 +54,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{
 		TeamID:         flagData.TeamID,
 		GameBoxID:      flagData.GameBoxID,
-		AttackerTeamID: uint(teamID),
+		AttackerTeamID: teamID,
 		Round:          flagData.Round,
 	}).Find(&repeatAttackCheck)
 	if repeatAttackCheck.ID != 0 {
@@ -67,7 +69,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	if tx.Create(&AttackAction{
 		TeamID:         flagData.TeamID,
 		GameBoxID:      flagData.GameBoxID,
-		AttackerTeamID: uint(teamID),
+		AttackerTeamID: teamID,
 		ChallengeID:    flagData.ChallengeID,
 		Round:          flagData.Round,
 	}).RowsAffected != 1 {
@@ -78,6 +80,32 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("提交成功！")
 }
 
+func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
+	pageStr := c.DefaultQuery("page", "1")
+	perStr := c.DefaultQuery("per", "15")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page <= 0 {
+		return s.makeErrJSON(400, 40000, "page 参数错误")
+	}
+
+	per, err := strconv.Atoi(perStr)
+	if err != nil || per <= 0 || per >= 100 { // 限制每页最多 100 条
+		return s.makeErrJSON(400, 40001, "per 参数错误")
+	}
+
+	var total int
+	s.Mysql.Model(&Flag{}).Count(&total)
+
+	var flags []Flag
+	s.Mysql.Model(&Flag{}).Offset((page - 1) * per).Limit(per).Find(&flags)
+
+	return s.makeSuccessJSON(gin.H{
+		"array": flags,
+		"total": total,
+	})
+}
+
 func (s *Service) GenerateFlag() (int, interface{}) {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
@@ -86,9 +114,9 @@ func (s *Service) GenerateFlag() (int, interface{}) {
 	s.Mysql.Delete(&Flag{})
 
 	for round := 1; round <= s.Timer.TotalRound; round++ {
-		// Flag = FlagPrefix + sha1(TeamID + GameBoxID + sha1(Salt) + Round) + FlagSuffix
+		// Flag = FlagPrefix + hmacSha1(TeamID + | + GameBoxID + | + Round, sha1(salt)) + FlagSuffix
 		for _, gameBox := range gameBoxes {
-			flag := s.Conf.FlagPrefix + s.sha1Encode(strconv.Itoa(int(gameBox.TeamID))+strconv.Itoa(int(gameBox.ID))+s.sha1Encode(s.Conf.Salt)+strconv.Itoa(round)) + s.Conf.FlagSuffix
+			flag := s.Conf.FlagPrefix + s.hmacSha1Encode(fmt.Sprintf("%d|%d|%d", gameBox.TeamID, gameBox.ID, round), s.sha1Encode(s.Conf.Salt)) + s.Conf.FlagSuffix
 			s.Mysql.Create(&Flag{
 				TeamID:      gameBox.TeamID,
 				GameBoxID:   gameBox.ID,

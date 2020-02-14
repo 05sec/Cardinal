@@ -33,6 +33,7 @@ func (s *Service) initMySQL() {
 		&AttackAction{},
 		&DownAction{},
 		&Score{},
+		&Flag{},
 	)
 
 	// 初始数据
