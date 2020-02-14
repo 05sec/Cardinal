@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"strconv"
 )
 
 type Bulletin struct {
@@ -21,7 +22,7 @@ type BulletinRead struct {
 
 func (s *Service) GetAllBulletins() (int, interface{}) {
 	var bulletins []Bulletin
-	s.Mysql.Model(&Bulletin{}).Find(&bulletins)
+	s.Mysql.Model(&Bulletin{}).Order("`id` DESC").Find(&bulletins)
 	return s.makeSuccessJSON(bulletins)
 }
 
@@ -81,13 +82,13 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 }
 
 func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
-	type InputForm struct {
-		ID uint `binding:"required"`
+	idStr, ok := c.GetQuery("id")
+	if !ok {
+		return s.makeErrJSON(400, 40000, "Error query")
 	}
-	var inputForm InputForm
-	err := c.BindJSON(&inputForm)
+	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000, "Query must be number")
 	}
 
 	var checkBulletin Bulletin
@@ -97,7 +98,7 @@ func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := s.Mysql.Begin()
-	if tx.Where("id = ?", inputForm.ID).Delete(&Bulletin{}).RowsAffected != 1 {
+	if tx.Where("id = ?", id).Delete(&Bulletin{}).RowsAffected != 1 {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50002, "删除公告失败！")
 	}

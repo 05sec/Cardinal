@@ -137,7 +137,7 @@ func (s *Service) initRouter() {
 			c.JSON(s.NewBulletin(c))
 		})
 		manager.PUT("/bulletin", func(c *gin.Context) {
-			c.JSON(s.NewBulletin(c))
+			c.JSON(s.EditBulletin(c))
 		})
 		manager.DELETE("/bulletin", func(c *gin.Context) {
 			c.JSON(s.DeleteBulletin(c))
