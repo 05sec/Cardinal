@@ -83,6 +83,10 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50000, "提交失败！")
 	}
 	tx.Commit()
+
+	// 刷新总排行榜靶机状态
+	s.SetRankList()
+
 	return s.makeSuccessJSON("提交成功！")
 }
 

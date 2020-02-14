@@ -1,6 +1,8 @@
 package main
 
-import "github.com/patrickmn/go-cache"
+import (
+	"github.com/patrickmn/go-cache"
+)
 
 // 排行榜
 type RankItem struct {
@@ -34,11 +36,27 @@ func (s *Service) GetRankListTitle() []string {
 	return rankListTitle.([]string)
 }
 
+// 存储总排行榜标题
+func (s *Service) SetRankListTitle() {
+	var result []struct {
+		Title string `gorm:"Column:Title"`
+	}
+	s.Mysql.Raw("SELECT `challenges`.`Title` FROM `challenges` WHERE `challenges`.`id` IN " +
+		"(SELECT DISTINCT challenge_id FROM `game_boxes` WHERE `visible` = 1 AND `deleted_at` IS NULL) " + // 获得开放的题目 ID 并去重
+		"AND `deleted_at` IS NULL ORDER BY `challenges`.`id`").Scan(&result)
+
+	visibleChallengeTitle := make([]string, len(result))
+	for index, res := range result {
+		visibleChallengeTitle[index] = res.Title
+	}
+	s.Store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // 存储 Challenge Title
+}
+
 // 计算并存储总排行榜
-func (s *Service) GenerateRankList() {
+func (s *Service) SetRankList() {
 	var rankList []*RankItem
 	var teams []Team
-	s.Mysql.Model(&Team{}).Order("score").Find(&teams) // 根据队伍总分排序
+	s.Mysql.Model(&Team{}).Order("score DESC").Find(&teams) // 根据队伍总分排序
 	for _, team := range teams {
 		var gameboxes []GameBox
 		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes) // 排序保证题目顺序一致
@@ -59,13 +77,5 @@ func (s *Service) GenerateRankList() {
 	}
 
 	// 存储总排行榜
-	if len(rankList) != 0 {
-		// 获得开放的 Challenge
-		var visibleChallengeID []uint
-		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: rankList[0].TeamID, Visible: true}).Order("challenge_id").Pluck("id", &visibleChallengeID)
-		var visibleChallengeTitle []string
-		s.Mysql.Model(&Challenge{}).Where("id in (?)", visibleChallengeID).Order("id").Pluck("title", &visibleChallengeTitle)
-		s.Store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // 存储 Challenge Title
-	}
 	s.Store.Set("rankList", rankList, cache.NoExpiration)
 }

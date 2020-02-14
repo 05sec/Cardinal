@@ -54,8 +54,11 @@ func (s *Service) RefreshScoreData() {
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: sc.Score})
 	}
 
+	// 刷新总排行榜标题
+	s.SetRankListTitle()
+
 	// 计算并存储总排行榜
-	s.GenerateRankList()
+	s.SetRankList()
 }
 
 // 攻击加分

@@ -33,6 +33,10 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	}
 
 	s.Mysql.Model(&GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
+
+	// 刷新总排行榜可见靶机标题
+	s.SetRankListTitle()
+
 	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
 }
 

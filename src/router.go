@@ -55,7 +55,7 @@ func (s *Service) initRouter() {
 			c.JSON(s.GetSelfGameBoxes(c))
 		})
 		team.GET("/rank", func(c *gin.Context) {
-			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Team": s.GetRankList()}))
+			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Rank": s.GetRankList()}))
 		})
 		team.GET("/bulletins", func(c *gin.Context) {
 			c.JSON(s.GetAllBulletins())
