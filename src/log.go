@@ -35,11 +35,19 @@ func (s *Service) GetLogs(c *gin.Context) (int, interface{}) {
 }
 
 func (s *Service) Panel(c *gin.Context) (int, interface{}) {
+	var submitFlag int
+	s.Mysql.Model(&AttackAction{}).Count(&submitFlag)
+
+	var checkDown int
+	s.Mysql.Model(&DownAction{}).Count(&checkDown)
+
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)
-
 	return s.makeSuccessJSON(gin.H{
-		"NumGoroutine": runtime.NumGoroutine(),
+		"SubmitFlag":   submitFlag,                      // 提交 Flag 数
+		"CheckDown":    checkDown,                       // Check Down 次数
+		"NumGoroutine": runtime.NumGoroutine(),          // Goroutine 数
+		""
 		"MemAllocated": s.FileSize(int64(m.Alloc)),      // 内存占用量
 		"MemTotal":     s.FileSize(int64(m.TotalAlloc)), // 内存使用量
 	})
