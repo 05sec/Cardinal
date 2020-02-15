@@ -117,7 +117,7 @@ func (s *Service) initRouter() {
 		})
 
 		// Manager
-		manager.GET("/manager", func(c *gin.Context) {
+		manager.GET("/managers", func(c *gin.Context) {
 			c.JSON(s.GetAllManager())
 		})
 		manager.POST("/manager", func(c *gin.Context) {
@@ -126,7 +126,7 @@ func (s *Service) initRouter() {
 		manager.GET("/manager/token", func(c *gin.Context) {
 			c.JSON(s.RefreshManagerToken(c))
 		})
-		manager.POST("/manager/changePassword", func(c *gin.Context) {
+		manager.GET("/manager/changePassword", func(c *gin.Context) {
 			c.JSON(s.ChangeManagerPassword(c))
 		})
 		manager.DELETE("/manager", func(c *gin.Context) {

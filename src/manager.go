@@ -11,7 +11,7 @@ type Manager struct {
 	gorm.Model
 
 	Name     string
-	Password string
+	Password string `json:"-"`
 	Token    string // 管理员只允许单点登录
 }
 
@@ -53,7 +53,8 @@ func (s *Service) GetAllManager() (int, interface{}) {
 
 func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		Name string `json:"Name" binding:"required"`
+		Name     string `json:"Name" binding:"required"`
+		Password string `json:"Password" binding:"required"`
 	}
 	var formData InputForm
 	err := c.BindJSON(&formData)
@@ -67,19 +68,17 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(400, 40001, "管理员名称重复")
 	}
 
-	password := randstr.String(16)
 	manager := Manager{
 		Name:     formData.Name,
-		Password: s.addSalt(password),
+		Password: s.addSalt(formData.Password),
 	}
 	tx := s.Mysql.Begin()
-	tx.Create(&manager)
 	if tx.Create(&manager).RowsAffected != 1 {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50000, "添加管理员失败！")
 	}
 	tx.Commit()
-	return s.makeSuccessJSON(password)
+	return s.makeSuccessJSON("添加管理员成功！")
 }
 
 func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
@@ -100,6 +99,7 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50000, "更新管理员 Token 失败！")
 	}
+	tx.Commit()
 	return s.makeSuccessJSON(token)
 }
 
@@ -119,8 +119,9 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 		Password: s.addSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "更新管理员 Token 失败！")
+		return s.makeErrJSON(500, 50000, "修改管理员密码失败！")
 	}
+	tx.Commit()
 	return s.makeSuccessJSON(password)
 }
 
@@ -139,5 +140,6 @@ func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50000, "删除管理员失败")
 	}
+	tx.Commit()
 	return s.makeSuccessJSON("删除管理员成功")
 }

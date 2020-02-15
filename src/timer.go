@@ -162,8 +162,8 @@ func (s *Service) timerProcess() {
 			// 比赛已结束
 			// 最后一轮结束后结算分数
 			if !lastRoundCalculate {
-				// TODO: 计算分数
 				lastRoundCalculate = true
+				go s.NewRoundCalculateScore()
 			}
 
 			s.Timer.Status = "end"
