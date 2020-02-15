@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"fmt"
+	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
 	"io"
@@ -43,4 +44,8 @@ func (s *Service) hmacSha1Encode(input string, key string) string {
 	h := hmac.New(sha1.New, []byte(key))
 	_, _ = io.WriteString(h, input)
 	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+func (s *Service) FileSize(size int64) string {
+	return humanize.IBytes(uint64(size))
 }

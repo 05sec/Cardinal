@@ -110,6 +110,11 @@ func (s *Service) timerProcess() {
 	beginTime := s.Timer.BeginTime.Unix()
 	endTime := s.Timer.EndTime.Unix()
 	lastRoundCalculate := false // 最后一轮结束计算分数
+
+	{
+		s.SetRankListTitle()	// 刷新排行榜标题
+	}
+
 	for {
 		nowTime := time.Now().Unix()
 		s.Timer.RoundRemainTime = -1

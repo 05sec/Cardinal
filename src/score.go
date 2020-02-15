@@ -38,12 +38,12 @@ func (s *Service) NewRoundCalculateScore() {
 	s.CalculateTeamScore()
 
 	// 刷新总排行榜标题
-	s.SetRankListTitle()
+	//s.SetRankListTitle()
 	// 计算并存储总排行榜到内存
 	s.SetRankList()
 
 	endTime := time.Now().UnixNano()
-	s.NewLog(IMPORTANT, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", lastRound, float64(endTime-startTime)/float64(time.Second)))
+	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", lastRound, float64(endTime-startTime)/float64(time.Second)))
 }
 
 // 更新靶机分数

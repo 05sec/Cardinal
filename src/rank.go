@@ -11,17 +11,33 @@ type RankItem struct {
 	TeamName      string
 	TeamLogo      string
 	Score         float64
-	GameBoxStatus []*GameBoxStatus // 按照 ChallengeID 顺序
+	GameBoxStatus interface{} // 按照 ChallengeID 顺序
 }
 
+// 管理端靶机信息
+type GameBoxInfo struct {
+	Score      float64
+	IsAttacked bool
+	IsDown     bool
+}
+
+// 选手端靶机信息
 type GameBoxStatus struct {
 	IsAttacked bool
 	IsDown     bool
 }
 
-// 获取总排行榜内容
+// 获取选手端总排行榜内容
 func (s *Service) GetRankList() []*RankItem {
 	rankList, ok := s.Store.Get("rankList")
+	if !ok {
+		return []*RankItem{}
+	}
+	return rankList.([]*RankItem)
+}
+
+func (s *Service) GetManagerRankList() []*RankItem {
+	rankList, ok := s.Store.Get("rankManagerList")
 	if !ok {
 		return []*RankItem{}
 	}
@@ -52,24 +68,35 @@ func (s *Service) SetRankListTitle() {
 	}
 	s.Store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // 存储 Challenge Title
 
-	s.NewLog(WARNING, "system", fmt.Sprintf("更新排行榜标题成功"))
+	s.NewLog(NORMAL, "system", fmt.Sprintf("更新排行榜标题成功"))
 }
 
 // 计算并存储总排行榜
 func (s *Service) SetRankList() {
 	var rankList []*RankItem
+	var managerRankList []*RankItem
+
 	var teams []Team
 	s.Mysql.Model(&Team{}).Order("score DESC").Find(&teams) // 根据队伍总分排序
 	for _, team := range teams {
 		var gameboxes []GameBox
 		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes) // 排序保证题目顺序一致
+		var gameBoxInfo []*GameBoxInfo                                                                                   // 管理端靶机信息
 		var gameBoxStatuses []*GameBoxStatus                                                                             // 当前队伍所有靶机状态
+
 		for _, gamebox := range gameboxes {
 			gameBoxStatuses = append(gameBoxStatuses, &GameBoxStatus{
 				IsAttacked: gamebox.IsAttacked,
 				IsDown:     gamebox.IsDown,
 			})
+
+			gameBoxInfo = append(gameBoxInfo, &GameBoxInfo{
+				Score:      gamebox.Score,
+				IsAttacked: gamebox.IsAttacked,
+				IsDown:     gamebox.IsDown,
+			})
 		}
+
 		rankList = append(rankList, &RankItem{
 			TeamID:        team.ID,
 			TeamName:      team.Name,
@@ -77,9 +104,18 @@ func (s *Service) SetRankList() {
 			Score:         team.Score,
 			GameBoxStatus: gameBoxStatuses,
 		})
+		managerRankList = append(managerRankList, &RankItem{
+			TeamID:        team.ID,
+			TeamName:      team.Name,
+			TeamLogo:      team.Logo,
+			Score:         team.Score,
+			GameBoxStatus: gameBoxInfo,
+		})
 	}
 
 	// 存储总排行榜
 	s.Store.Set("rankList", rankList, cache.NoExpiration)
-	s.NewLog(WARNING, "system", fmt.Sprintf("更新总排行榜成功！"))
+	// 存储管理员排行榜
+	s.Store.Set("rankManagerList", managerRankList, cache.NoExpiration)
+	s.NewLog(NORMAL, "system", fmt.Sprintf("更新总排行榜成功！"))
 }

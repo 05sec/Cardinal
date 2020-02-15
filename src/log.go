@@ -1,6 +1,10 @@
 package main
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	"runtime"
+)
 
 const (
 	NORMAL    = 0
@@ -21,5 +25,22 @@ func (s *Service) NewLog(level int, kind string, content string) {
 		Level:   level,
 		Kind:    kind,
 		Content: content,
+	})
+}
+
+func (s *Service) GetLogs(c *gin.Context) (int, interface{}) {
+	var logs []Log
+	s.Mysql.Model(&Log{}).Order("`id` DESC").Limit(30).Find(&logs)
+	return s.makeSuccessJSON(logs)
+}
+
+func (s *Service) Panel(c *gin.Context) (int, interface{}) {
+	m := new(runtime.MemStats)
+	runtime.ReadMemStats(m)
+
+	return s.makeSuccessJSON(gin.H{
+		"NumGoroutine": runtime.NumGoroutine(),
+		"MemAllocated": s.FileSize(int64(m.Alloc)),      // 内存占用量
+		"MemTotal":     s.FileSize(int64(m.TotalAlloc)), // 内存使用量
 	})
 }

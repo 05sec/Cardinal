@@ -164,6 +164,17 @@ func (s *Service) initRouter() {
 		manager.POST("/uploadPicture", func(c *gin.Context) {
 			c.JSON(s.UploadPicture(c))
 		})
+
+		// Log
+		manager.GET("/logs", func(c *gin.Context) {
+			c.JSON(s.GetLogs(c))
+		})
+		manager.GET("/rank", func(c *gin.Context) {
+			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Rank": s.GetManagerRankList()}))
+		})
+		manager.GET("/panel", func(c *gin.Context) {
+			c.JSON(s.Panel(c))
+		})
 	}
 
 	// 404
