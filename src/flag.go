@@ -121,7 +121,7 @@ func (s *Service) GenerateFlag() (int, interface{}) {
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 
 	// 删库
-	s.Mysql.Delete(&Flag{})
+	s.Mysql.Unscoped().Delete(&Flag{})
 
 	for round := 1; round <= s.Timer.TotalRound; round++ {
 		// Flag = FlagPrefix + hmacSha1(TeamID + | + GameBoxID + | + Round, sha1(salt)) + FlagSuffix
