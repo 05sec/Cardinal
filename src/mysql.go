@@ -34,6 +34,7 @@ func (s *Service) initMySQL() {
 		&DownAction{},
 		&Score{},
 		&Flag{},
+		&Log{},
 	)
 
 	// 初始数据
@@ -45,6 +46,7 @@ func (s *Service) initMySQL() {
 			Name:     "e99",
 			Password: s.addSalt("123456"),
 		})
+		s.NewLog(WARNING, "system", fmt.Sprintf("添加默认管理员账号成功，请注意修改密码！"))
 		log.Println("添加默认管理员账号成功")
 	}
 }

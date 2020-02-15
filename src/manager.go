@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
@@ -78,6 +79,8 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50000, "添加管理员失败！")
 	}
 	tx.Commit()
+
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("新的管理员账号 [ %s ] 被添加", manager.Name))
 	return s.makeSuccessJSON("添加管理员成功！")
 }
 
@@ -100,6 +103,8 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50000, "更新管理员 Token 失败！")
 	}
 	tx.Commit()
+
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("管理员 [ ID: %d ] Token 已刷新", id))
 	return s.makeSuccessJSON(token)
 }
 
@@ -122,6 +127,8 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50000, "修改管理员密码失败！")
 	}
 	tx.Commit()
+
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("管理员 [ ID: %d ] 密码已修改", id))
 	return s.makeSuccessJSON(password)
 }
 
@@ -141,5 +148,7 @@ func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50000, "删除管理员失败")
 	}
 	tx.Commit()
+
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("管理员 [ ID: %d ] 已删除", id))
 	return s.makeSuccessJSON("删除管理员成功")
 }

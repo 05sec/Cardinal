@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"strconv"
+	"time"
 )
 
 // 攻击记录
@@ -120,6 +121,7 @@ func (s *Service) GenerateFlag() (int, interface{}) {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 
+	startTime := time.Now().UnixNano()
 	// 删库
 	s.Mysql.Unscoped().Delete(&Flag{})
 
@@ -137,5 +139,9 @@ func (s *Service) GenerateFlag() (int, interface{}) {
 		}
 	}
 
+	var count int
+	s.Mysql.Model(&Flag{}).Count(&count)
+	endTime := time.Now().UnixNano()
+	s.NewLog(WARNING, "system", fmt.Sprintf("重新生成 Flag 完成！共 %d 个。耗时 %f s。", count, float64(endTime-startTime)/float64(time.Second)))
 	return s.makeSuccessJSON("生成 Flag 成功！")
 }

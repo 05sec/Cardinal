@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"math"
@@ -120,6 +121,8 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		}
 	}
 	tx.Commit()
+
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("共 %d 个 GameBox 被创建", len(inputForm)))
 	return s.makeSuccessJSON("添加 GameBox 成功！")
 }
 

@@ -164,6 +164,7 @@ func (s *Service) timerProcess() {
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
 				go s.NewRoundCalculateScore()
+				s.NewLog(IMPORTANT, "system", "比赛已结束")
 			}
 
 			s.Timer.Status = "end"

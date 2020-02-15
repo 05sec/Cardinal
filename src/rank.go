@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -50,6 +51,8 @@ func (s *Service) SetRankListTitle() {
 		visibleChallengeTitle[index] = res.Title
 	}
 	s.Store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // 存储 Challenge Title
+
+	s.NewLog(WARNING, "system", fmt.Sprintf("更新排行榜标题成功"))
 }
 
 // 计算并存储总排行榜
@@ -78,4 +81,5 @@ func (s *Service) SetRankList() {
 
 	// 存储总排行榜
 	s.Store.Set("rankList", rankList, cache.NoExpiration)
+	s.NewLog(WARNING, "system", fmt.Sprintf("更新总排行榜成功！"))
 }

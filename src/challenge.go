@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"strconv"
@@ -41,6 +42,11 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	// 刷新总排行榜分数
 	s.SetRankList()
 
+	status := "不"
+	if inputForm.Visible{
+		status = ""
+	}
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("设置 Challenge [ %s ] 状态为%s可见", checkChallenge.Title, status))
 	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
 }
 
@@ -102,6 +108,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("新的 Challenge [ %s ] 被创建", newChallenge.Title))
 	return s.makeSuccessJSON("添加 Challenge 成功！")
 }
 
@@ -163,5 +170,6 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("Challenge [ %s ] 被删除", challenge.Title))
 	return s.makeSuccessJSON("删除 Challenge 成功！")
 }

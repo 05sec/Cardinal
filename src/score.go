@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Score struct {
@@ -17,6 +19,8 @@ type Score struct {
 func (s *Service) NewRoundCalculateScore() {
 	nowRound := s.Timer.NowRound
 	lastRound := nowRound - 1
+
+	startTime := time.Now().UnixNano()
 
 	// 攻击加分
 	s.AddAttack(lastRound)
@@ -37,6 +41,9 @@ func (s *Service) NewRoundCalculateScore() {
 	s.SetRankListTitle()
 	// 计算并存储总排行榜到内存
 	s.SetRankList()
+
+	endTime := time.Now().UnixNano()
+	s.NewLog(IMPORTANT, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", lastRound, float64(endTime-startTime)/float64(time.Second)))
 }
 
 // 更新靶机分数

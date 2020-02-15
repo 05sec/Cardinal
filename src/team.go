@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
@@ -121,6 +122,7 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	var resultData []resultItem
 
 	tx := s.Mysql.Begin()
+	teamName := ""		// Log
 	for _, item := range inputForm {
 		password := randstr.String(16)
 		newTeam := &Team{
@@ -137,8 +139,11 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 			Name:     item.Name,
 			Password: password,
 		})
+		teamName += item.Name + ", "
 	}
 	tx.Commit()
+
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("%d 个新的 Team [ %s ] 被创建", len(inputForm), teamName))
 	return s.makeSuccessJSON(resultData)
 }
 
@@ -205,6 +210,7 @@ func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("Team [ %s ] 被删除", team.Name))
 	return s.makeSuccessJSON("删除 Team 成功！")
 }
 
@@ -219,9 +225,9 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	}
 
 	// 检查 Team 是否存在
-	var count int
-	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
-	if count == 0 {
+	var checkTeam Team
+	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
+	if checkTeam.Name == "" {
 		return s.makeErrJSON(404, 40400, "Team 不存在")
 	}
 
@@ -233,5 +239,6 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
+	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("Team [ %s ] 登录密码已重置", checkTeam.Name))
 	return s.makeSuccessJSON(newPassword)
 }
