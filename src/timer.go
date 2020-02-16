@@ -15,7 +15,7 @@ type Timer struct {
 	Duration        uint          // init
 	RestTime        [][]time.Time // init
 	RunTime         [][]time.Time // init
-	TotalRound      int           //init
+	TotalRound      int           // init
 	NowRound        int
 	RoundRemainTime int
 	Status          string
@@ -112,7 +112,7 @@ func (s *Service) timerProcess() {
 	lastRoundCalculate := false // 最后一轮结束计算分数
 
 	{
-		s.SetRankListTitle()	// 刷新排行榜标题
+		s.SetRankListTitle() // 刷新排行榜标题
 	}
 
 	for {
@@ -145,8 +145,8 @@ func (s *Service) timerProcess() {
 						break
 					}
 				}
-				nowRound = int(math.Floor(float64(workTime) / float64(s.Timer.Duration*60)))    // 计算当前轮数
-				s.Timer.RoundRemainTime = (nowRound+1)*int(s.Timer.Duration)*60 - int(workTime) // 计算距离下一轮的秒数
+				nowRound = int(math.Ceil(float64(workTime) / float64(s.Timer.Duration*60))) // 计算当前轮数
+				s.Timer.RoundRemainTime = nowRound*int(s.Timer.Duration)*60 - int(workTime) // 计算距离下一轮开始的秒数
 
 				// 判断是否进入新一轮
 				if s.Timer.NowRound < nowRound {
@@ -168,6 +168,7 @@ func (s *Service) timerProcess() {
 			// 最后一轮结束后结算分数
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
+				s.Timer.NowRound = s.Timer.TotalRound + 1		// 设置当前轮为总轮数 +1，使得可以计算最后一轮分数
 				go s.NewRoundCalculateScore()
 				s.NewLog(IMPORTANT, "system", "比赛已结束")
 			}
