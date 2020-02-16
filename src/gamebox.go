@@ -141,7 +141,11 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := s.Mysql.Begin()
-	if tx.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.ID}}).Updates(&GameBox{Description: inputForm.Description}).RowsAffected != 1 {
+	if tx.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.ID}}).Updates(&GameBox{
+		IP:          inputForm.IP,
+		Port:        inputForm.Port,
+		Description: inputForm.Description,
+	}).RowsAffected != 1 {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50001, "修改 GameBox 失败！")
 	}
