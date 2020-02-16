@@ -122,7 +122,7 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	var resultData []resultItem
 
 	tx := s.Mysql.Begin()
-	teamName := ""		// Log
+	teamName := "" // Log
 	for _, item := range inputForm {
 		password := randstr.String(16)
 		newTeam := &Team{
@@ -151,7 +151,7 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID   uint   `binding:"required"`
 		Name string `binding:"required"`
-		Logo string `binding:"required"`
+		Logo string // Logo 不是必须的
 	}
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
@@ -173,12 +173,11 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(400, 40001, "Team 重复")
 	}
 
-	newTeam := &Team{
-		Name: inputForm.Name,
-		Logo: inputForm.Logo,
-	}
 	tx := s.Mysql.Begin()
-	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newTeam).RowsAffected != 1 {
+	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(gin.H{
+		"Name": inputForm.Name,
+		"Logo": inputForm.Logo,
+	}).RowsAffected != 1 {
 		tx.Rollback()
 		return s.makeErrJSON(500, 50001, "修改 Team 失败！")
 	}

@@ -43,7 +43,7 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	s.SetRankList()
 
 	status := "不"
-	if inputForm.Visible{
+	if inputForm.Visible {
 		status = ""
 	}
 	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("设置 Challenge [ %s ] 状态为%s可见", checkChallenge.Title, status))
@@ -141,6 +141,22 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50001, "修改 Challenge 失败！")
 	}
 	tx.Commit()
+
+	// 若修改了题目分数，则重新算分并更新排行榜
+	if inputForm.BaseScore != checkChallenge.BaseScore{
+		// 更新靶机分数
+		s.CalculateGameBoxScore()
+		// 更新队伍分数
+		s.CalculateTeamScore()
+		// 计算并存储总排行榜到内存
+		s.SetRankList()
+	}
+
+	// 若修改了题目标题，则更新排行榜标题
+	if inputForm.Title != checkChallenge.Title{
+		// 刷新总排行榜标题
+		s.SetRankListTitle()
+	}
 
 	return s.makeSuccessJSON("修改 Challenge 成功！")
 }

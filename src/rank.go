@@ -36,6 +36,7 @@ func (s *Service) GetRankList() []*RankItem {
 	return rankList.([]*RankItem)
 }
 
+// 获取管理员端排行榜内容
 func (s *Service) GetManagerRankList() []*RankItem {
 	rankList, ok := s.Store.Get("rankManagerList")
 	if !ok {

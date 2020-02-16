@@ -47,7 +47,6 @@ func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 		"SubmitFlag":   submitFlag,                      // 提交 Flag 数
 		"CheckDown":    checkDown,                       // Check Down 次数
 		"NumGoroutine": runtime.NumGoroutine(),          // Goroutine 数
-		""
 		"MemAllocated": s.FileSize(int64(m.Alloc)),      // 内存占用量
 		"MemTotal":     s.FileSize(int64(m.TotalAlloc)), // 内存使用量
 	})
