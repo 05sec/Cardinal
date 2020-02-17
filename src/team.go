@@ -70,11 +70,24 @@ func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}) {
 	}
 
 	var teamInfo Team
-	s.Mysql.Where(&Team{Model: gorm.Model{ID: teamID.(uint)}}).Find(&teamInfo)
+	rank := 0
+	var teams []Team
+
+	s.Mysql.Model(&Team{}).Order("`score` DESC").Find(&teams)
+	// 遍历获取排名
+	for index, t := range teams {
+		if teamID.(uint) == t.ID {
+			rank = index + 1
+			teamInfo = t
+			break
+		}
+	}
+
 	return s.makeSuccessJSON(gin.H{
 		"Name":  teamInfo.Name,
 		"Logo":  teamInfo.Logo,
 		"Score": teamInfo.Score,
+		"Rank":  rank,
 		"Token": teamInfo.SecretKey,
 	})
 }
