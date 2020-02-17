@@ -16,6 +16,11 @@ type DownAction struct {
 }
 
 func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
+	// 比赛暂停 / 停止无法 check
+	if s.Timer.Status != "on" {
+		return s.makeErrJSON(403, 40300, "比赛未开始")
+	}
+
 	type InputForm struct {
 		GameBoxID uint `binding:"required"`
 	}

@@ -30,6 +30,11 @@ type Flag struct {
 }
 
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
+	// 比赛暂停 / 停止无法提交 flag
+	if s.Timer.Status != "on" {
+		return s.makeErrJSON(403, 40300, "比赛未开始")
+	}
+
 	secretKey := c.GetHeader("Authorization")
 	if secretKey == "" {
 		return s.makeErrJSON(403, 40300, "Token 无效")
