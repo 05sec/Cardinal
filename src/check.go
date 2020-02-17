@@ -17,7 +17,6 @@ type DownAction struct {
 
 func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		TeamID    uint `binding:"required"`
 		GameBoxID uint `binding:"required"`
 	}
 	var inputForm InputForm
@@ -29,7 +28,6 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	// 是否重复 Check
 	var repeatCheck DownAction
 	s.Mysql.Model(&DownAction{}).Where(&DownAction{
-		TeamID:    inputForm.TeamID,
 		GameBoxID: inputForm.GameBoxID,
 		Round:     s.Timer.NowRound,
 	}).Find(&repeatCheck)
@@ -39,7 +37,7 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 
 	// 确认 GameBox 信息
 	var gameBox GameBox
-	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}, TeamID: inputForm.TeamID}).Find(&gameBox)
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
 	if gameBox.ID == 0 {
 		return s.makeErrJSON(403, 40300, "GameBox 不存在！")
 	}
@@ -49,7 +47,7 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 
 	tx := s.Mysql.Begin()
 	if tx.Create(&DownAction{
-		TeamID:      inputForm.TeamID,
+		TeamID:      gameBox.TeamID,
 		ChallengeID: gameBox.ChallengeID,
 		GameBoxID:   inputForm.GameBoxID,
 		Round:       s.Timer.NowRound,

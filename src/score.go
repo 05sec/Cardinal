@@ -86,7 +86,7 @@ func (s *Service) AddAttack(round int) {
 			for _, action := range attackActions {
 				// 获取攻击者这道题的 GameBoxID
 				var attackerGameBox GameBox
-				s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID}).Find(&attackerGameBox)
+				s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID, ChallengeID: gameBox.ChallengeID}).Find(&attackerGameBox)
 
 				s.Mysql.Create(&Score{
 					TeamID:    action.AttackerTeamID,
