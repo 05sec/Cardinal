@@ -1,24 +1,24 @@
 [base]
-Title="HCTF"
-BeginTime="2020-02-17T12:00:00+08:00"
+Title="HCTF"    # 比赛名称
+BeginTime="2020-02-17T12:00:00+08:00"   # 比赛开始时间
 RestTime=[
-#    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],
+    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],      # 中途暂停区间
 ]
-EndTime="2020-02-17T23:00:00+08:00"
-Duration=2    # 分钟
+EndTime="2020-02-17T23:00:00+08:00"      # 比赛结束时间
+Duration=2    # 每轮长度（分钟）
 
-Salt="E99E99E99"
+Salt="E99E99E99"    # 务必改成一个谁也猜不到的随机字符串！！
 
-Port=":19999"
+Port=":19999"       # 平台后端服务端口
 
-FlagPrefix="hctf{"
-FlagSuffix="}"
+FlagPrefix="hctf{"  # Flag 前缀
+FlagSuffix="}"      # Flag 后缀
 
-CheckDownScore=50
-AttackScore=50
+CheckDownScore=50   # 每次 CheckDown 扣分
+AttackScore=50      # 每次攻击得分
 
-[mysql]
-DBHost="localhost:3306"
-DBUsername="root"
-DBPassword="root"
-DBName="cardinal"
+[mysql]     # 数据库配置信息
+DBHost="localhost:3306" # 数据库地址
+DBUsername="root"       # 数据库账号
+DBPassword="root"       # 数据库密码
+DBName="cardinal"       # 数据库表名
