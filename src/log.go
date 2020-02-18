@@ -6,12 +6,14 @@ import (
 	"runtime"
 )
 
+// Log levels
 const (
 	NORMAL    = 0
 	WARNING   = 1
 	IMPORTANT = 2
 )
 
+// Log is a gorm model for database table `logs`.
 type Log struct {
 	gorm.Model
 
@@ -20,6 +22,7 @@ type Log struct {
 	Content string
 }
 
+// NewLog create a new log record in database.
 func (s *Service) NewLog(level int, kind string, content string) {
 	s.Mysql.Create(&Log{
 		Level:   level,
@@ -28,12 +31,14 @@ func (s *Service) NewLog(level int, kind string, content string) {
 	})
 }
 
+// GetLogs returns the latest 30 logs.
 func (s *Service) GetLogs(c *gin.Context) (int, interface{}) {
 	var logs []Log
 	s.Mysql.Model(&Log{}).Order("`id` DESC").Limit(30).Find(&logs)
 	return s.makeSuccessJSON(logs)
 }
 
+// Panel returns the system runtime status, which is used in backstage data panel.
 func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 	var submitFlag int
 	s.Mysql.Model(&AttackAction{}).Count(&submitFlag)
@@ -44,10 +49,10 @@ func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)
 	return s.makeSuccessJSON(gin.H{
-		"SubmitFlag":   submitFlag,                      // 提交 Flag 数
-		"CheckDown":    checkDown,                       // Check Down 次数
-		"NumGoroutine": runtime.NumGoroutine(),          // Goroutine 数
-		"MemAllocated": s.FileSize(int64(m.Alloc)),      // 内存占用量
-		"MemTotal":     s.FileSize(int64(m.TotalAlloc)), // 内存使用量
+		"SubmitFlag":   submitFlag,
+		"CheckDown":    checkDown,
+		"NumGoroutine": runtime.NumGoroutine(),          // Goroutine number
+		"MemAllocated": s.FileSize(int64(m.Alloc)),      // Allocated memory
+		"MemTotal":     s.FileSize(int64(m.TotalAlloc)), // Total memory usage
 	})
 }

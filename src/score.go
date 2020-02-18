@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// Score is a gorm model for database table `scores`.
+// Every action (checkdown, attacked...) will be created a score record, and the total score will be calculated by SUM(`score`).
 type Score struct {
 	gorm.Model
 
@@ -16,75 +18,76 @@ type Score struct {
 	Score     float64 `gorm:"index"`
 }
 
+// NewRoundCalculateScore will calculate the score of the last round.
 func (s *Service) NewRoundCalculateScore() {
 	nowRound := s.Timer.NowRound
 	lastRound := nowRound - 1
 
 	startTime := time.Now().UnixNano()
 
-	// 攻击加分
+	// + Attacked score
 	s.AddAttack(lastRound)
-	// 被攻击减分
+	// - Been attacked score
 	s.MinusAttack(lastRound)
 
-	// 被 CheckDown 减分
+	// - Been check down
 	s.MinusCheckDown(lastRound)
-	// 未被 CheckDown 加分
+	// + Service online
 	s.AddCheckDown(lastRound)
 
-	// 更新靶机分数
+	// Calculate and update all the gameboxes' score.
 	s.CalculateGameBoxScore()
-	// 更新队伍分数
+	// Calculate and update all the teams' score.
 	s.CalculateTeamScore()
 
-	// 刷新总排行榜标题
+	// Refresh the ranking list table header.
 	//s.SetRankListTitle()
-	// 计算并存储总排行榜到内存
+	// Refresh the ranking list.
 	s.SetRankList()
 
 	endTime := time.Now().UnixNano()
 	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", lastRound, float64(endTime-startTime)/float64(time.Second)))
 }
 
-// 更新靶机分数
+// CalculateGameBoxScore will calculate all the gameboxes' scores according to the data in scores table.
 func (s *Service) CalculateGameBoxScore() {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
 		var sc struct{ Score float64 `gorm:"Column:Score"` }
-		s.Mysql.Table("scores").Select("SUM(score) AS Score").Where("`game_box_id` = ?", gameBox.ID).Scan(&sc) // 计算 GameBox 的分数记录
+		s.Mysql.Table("scores").Select("SUM(score) AS Score").Where("`game_box_id` = ?", gameBox.ID).Scan(&sc)
 
 		var challenge Challenge
-		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                  // 获取 GameBox 的基础分数
-		s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&Score{Score: float64(challenge.BaseScore) + sc.Score}) // 更新靶机分数
+		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                  // Get the gamebox's base score.
+		s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&Score{Score: float64(challenge.BaseScore) + sc.Score}) // Update the gamebox's score.
 	}
 }
 
-// 更新队伍分数（所有公开靶机分数之和）
+// CalculateTeamScore will Calculate all the teams' score. (By sum the team's gameboxes' scores)
 func (s *Service) CalculateTeamScore() {
 	var teams []Team
 	s.Mysql.Model(&Team{}).Find(&teams)
 	for _, team := range teams {
 		var sc struct{ Score float64 `gorm:"Column:Score"` }
-		s.Mysql.Table("game_boxes").Select("SUM(score) AS Score").Where("`team_id` = ? AND `visible` = ?", team.ID, 1).Scan(&sc) // 计算该队伍所有 GameBox 分数
+		s.Mysql.Table("game_boxes").Select("SUM(score) AS Score").Where("`team_id` = ? AND `visible` = ?", team.ID, 1).Scan(&sc)
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: team.ID}}).Update(&Team{Score: sc.Score})
 	}
 }
 
-// 攻击加分
+// AddAttack will add scores to the attacker.
 func (s *Service) AddAttack(round int) {
-	// 遍历 GameBox
+	// Traversal all the gameboxes.
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
-		// 查看该 GameBox 本轮是否被攻击
+		// This gamebox has been attacked or not.
 		var attackActions []AttackAction
 		s.Mysql.Model(&AttackAction{}).Where(&AttackAction{GameBoxID: gameBox.ID, Round: round}).Find(&attackActions)
 		if len(attackActions) != 0 {
-			score := float64(s.Conf.AttackScore) / float64(len(attackActions)) // 攻击者平分的分数
-			// 加分
+			score := float64(s.Conf.AttackScore) / float64(len(attackActions)) // Score which every attacker can get from this gamebox.
+			// Add score to the attackers.
 			for _, action := range attackActions {
-				// 获取攻击者这道题的 GameBoxID
+				// Get the attacker's gamebox ID of this challenge.
 				var attackerGameBox GameBox
 				s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID, ChallengeID: gameBox.ChallengeID}).Find(&attackerGameBox)
 
@@ -100,9 +103,9 @@ func (s *Service) AddAttack(round int) {
 	}
 }
 
-// 被攻击减分
+// MinusAttack will minus scores from the victim.
 func (s *Service) MinusAttack(round int) {
-	// 获取本轮 AttackAction
+	// Get all the AttackAction of this round.
 	var attackActions []AttackAction
 	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{Round: round}).Find(&attackActions)
 
@@ -117,9 +120,9 @@ func (s *Service) MinusAttack(round int) {
 	}
 }
 
-// 被 CheckDown 减分
+// MinusCheckDown will minus scores from the service down gameboxes.
 func (s *Service) MinusCheckDown(round int) {
-	// 获取 CheckDown 记录给对应的 GameBox 减分
+	// Get all the DownAction of this round.
 	var downActions []DownAction
 	s.Mysql.Model(&DownAction{}).Where(&DownAction{Round: round}).Find(&downActions)
 
@@ -134,28 +137,30 @@ func (s *Service) MinusCheckDown(round int) {
 	}
 }
 
-// 未被 CheckDown 加分
+// AddCheckDown will add scores to the service online gameboxes.
 func (s *Service) AddCheckDown(round int) {
-	// 遍历 Challenge
+	// Traversal all the challenges.
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Find(&challenges)
 	for _, challenge := range challenges {
-		// 获取该题被 CheckDown 的队伍
+		// Get the check down teams of this challenge.
 		var downActions []DownAction
 		s.Mysql.Model(&DownAction{}).Where(&DownAction{ChallengeID: challenge.ID, Round: round}).Find(&downActions)
-		totalScore := len(downActions) * s.Conf.CheckDownScore // 可供平分的分数
+		totalScore := len(downActions) * s.Conf.CheckDownScore // Score which every online team can get from this challenge.
 
-		var downGameBoxID []uint // 被攻陷的 GameBox IDs
+		// Get the service online teams' Gamebox ID of this challenge.
+		// For the score will be added separately into their **gameboxes**.
+		var downGameBoxID []uint // Firstly, get the down Gamebox ID of this challenge.
 		for _, action := range downActions {
 			downGameBoxID = append(downGameBoxID, action.GameBoxID)
 		}
 
-		// 获取该题未被 CheckDown 的队伍（排除法）
+		// Then, get the service online Gamebox ID. (Process of elimination)
 		var safeGameBoxes []GameBox
 		s.Mysql.Model(&GameBox{}).Where(&GameBox{ChallengeID: challenge.ID}).Not("id", downGameBoxID).Find(&safeGameBoxes)
 		score := float64(totalScore) / float64(len(safeGameBoxes))
 
-		// 加分
+		// Well, add score!
 		for _, gamebox := range safeGameBoxes {
 			s.Mysql.Create(&Score{
 				TeamID:    gamebox.TeamID,

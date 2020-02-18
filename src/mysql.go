@@ -20,7 +20,7 @@ func (s *Service) initMySQL() {
 
 	s.Mysql = db
 
-	// 建表
+	// Create tables.
 	s.Mysql.AutoMigrate(
 		&Manager{},
 		&Challenge{},
@@ -37,11 +37,11 @@ func (s *Service) initMySQL() {
 		&Log{},
 	)
 
-	// 初始数据
+	// Create init data.
 	var managerCount int
 	s.Mysql.Model(&Manager{}).Count(&managerCount)
 	if managerCount == 0 {
-		// 添加默认管理员
+		// Create default manager account.
 		s.Mysql.Create(&Manager{
 			Name:     "e99",
 			Password: s.addSalt("123456"),

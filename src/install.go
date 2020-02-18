@@ -63,6 +63,7 @@ func (s *Service) install() {
 	}
 }
 
+// GenerateConfigFileGuide can lead the user to fill in the config file.
 func (s *Service) GenerateConfigFileGuide() ([]byte, error) {
 	input := struct {
 		Title, BeginTime, RestTime, EndTime, Duration, Port, Salt, FlagPrefix, FlagSuffix, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string

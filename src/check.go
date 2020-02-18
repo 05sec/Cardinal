@@ -5,7 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// CheckDown 记录
+// DownAction is a gorm model for database table `down_actions`.
 type DownAction struct {
 	gorm.Model
 
@@ -15,8 +15,9 @@ type DownAction struct {
 	Round       int
 }
 
+// CheckDown is the gamebox check down handler for bots.
 func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
-	// 比赛暂停 / 停止无法 check
+	// Check down is forbidden if the competition isn't start.
 	if s.Timer.Status != "on" {
 		return s.makeErrJSON(403, 40300, "比赛未开始")
 	}
@@ -30,7 +31,7 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(400, 40000, "Error payload")
 	}
 
-	// 是否重复 Check
+	// Does it check down one gamebox repeatedly in one round?
 	var repeatCheck DownAction
 	s.Mysql.Model(&DownAction{}).Where(&DownAction{
 		GameBoxID: inputForm.GameBoxID,
@@ -40,14 +41,14 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(403, 40300, "重复 Check down，已忽略")
 	}
 
-	// 确认 GameBox 信息
+	// Check the gamebox is existed or not.
 	var gameBox GameBox
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
 	if gameBox.ID == 0 {
 		return s.makeErrJSON(403, 40300, "GameBox 不存在！")
 	}
 
-	// 更新靶机状态信息
+	// No problem! Update the gamebox status to down.
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&GameBox{IsDown: true})
 
 	tx := s.Mysql.Begin()

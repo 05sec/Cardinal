@@ -12,7 +12,6 @@ import (
 	"os"
 )
 
-type Utils struct{}
 
 func (s *Service) makeErrJSON(httpStatusCode int, errCode int, msg interface{}) (int, interface{}) {
 	return httpStatusCode, gin.H{"error": errCode, "msg": fmt.Sprint(msg)}
@@ -48,15 +47,18 @@ func (s *Service) hmacSha1Encode(input string, key string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
+// FileSize returns the formatter text of the giving size.
 func (s *Service) FileSize(size int64) string {
 	return humanize.IBytes(uint64(size))
 }
 
+// IsExist check the file or folder existed.
 func IsExist(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil || os.IsExist(err)
 }
 
+// InputString used in the install.go for the config file guide.
 func InputString(str *string, hint string) {
 	var input string
 	for input == ""{

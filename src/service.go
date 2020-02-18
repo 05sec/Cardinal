@@ -6,6 +6,7 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+// Service is the main struct contains all the part of the Cardinal.
 type Service struct {
 	Conf   *Config
 	Mysql  *gorm.DB

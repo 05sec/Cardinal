@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// Bulletin is a gorm model for database table `bulletins`.
 type Bulletin struct {
 	gorm.Model
 
@@ -13,6 +14,7 @@ type Bulletin struct {
 	Content string
 }
 
+// BulletinRead gorm model, used to store the bulletin is read by a team.
 type BulletinRead struct {
 	gorm.Model
 
@@ -20,12 +22,14 @@ type BulletinRead struct {
 	BulletinID uint
 }
 
+// GetAllBulletins returns all bulletins from the database.
 func (s *Service) GetAllBulletins() (int, interface{}) {
 	var bulletins []Bulletin
 	s.Mysql.Model(&Bulletin{}).Order("`id` DESC").Find(&bulletins)
 	return s.makeSuccessJSON(bulletins)
 }
 
+// NewBulletin is post new bulletin handler for manager.
 func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		Title   string `binding:"required"`
@@ -49,6 +53,7 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("添加公告成功！")
 }
 
+// EditBulletin is edit new bulletin handler for manager.
 func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID      uint   `binding:"required"`
@@ -81,6 +86,7 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("修改公告成功！")
 }
 
+// DeleteBulletin is delete new bulletin handler for manager.
 func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
