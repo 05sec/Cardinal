@@ -40,8 +40,6 @@ cd Cardinal/src
 go build -o Cardinal
 ./Cardinal
 ```
-根据提示修改`/conf/Cardinal.toml`配置文件，并确保`uploads`目录可写。
-
 运行编译后的二进制文件即可。
 
 ### Release 安装
