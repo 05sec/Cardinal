@@ -1,20 +1,20 @@
 [base]
-Title="HCTF"    # 比赛名称
-BeginTime="2020-02-17T12:00:00+08:00"   # 比赛开始时间
+Title=""    # 比赛名称
+BeginTime=""   # 比赛开始时间
 RestTime=[
-    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],      # 中途暂停区间
+#    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],      # 中途暂停区间
 ]
-EndTime="2020-02-17T23:00:00+08:00"      # 比赛结束时间
+EndTime=""      # 比赛结束时间
 Duration=2    # 每轮长度（分钟）
 
-Salt="E99E99E99"    # 务必改成一个谁也猜不到的随机字符串！！
+Salt=""    # 务必改成一个谁也猜不到的随机字符串！！
 
 Port=":19999"       # 平台后端服务端口
 
 FlagPrefix="hctf{"  # Flag 前缀
 FlagSuffix="}"      # Flag 后缀
 
-CheckDownScore=50   # 每次 CheckDown 扣分
+CheckDownScore=50  # 每次 CheckDown 扣分
 AttackScore=50      # 每次攻击得分
 
 [mysql]     # 数据库配置信息

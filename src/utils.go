@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"crypto/hmac"
 	"crypto/sha1"
 	"fmt"
@@ -8,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
 	"io"
+	"os"
 )
 
 type Utils struct{}
@@ -48,4 +50,25 @@ func (s *Service) hmacSha1Encode(input string, key string) string {
 
 func (s *Service) FileSize(size int64) string {
 	return humanize.IBytes(uint64(size))
+}
+
+func IsExist(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil || os.IsExist(err)
+}
+
+func InputString(str *string, hint string) {
+	var input string
+	for input == ""{
+		fmt.Println(">", hint)
+
+		stdin := bufio.NewReader(os.Stdin)
+		_, err := fmt.Fscanln(stdin, &input)
+		if err != nil {
+			if *str != ""{
+				break
+			}
+		}
+		*str = input
+	}
 }

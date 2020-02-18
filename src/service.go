@@ -15,10 +15,10 @@ type Service struct {
 }
 
 func (s *Service) init() {
+	s.install()
 	s.initConfig()
 	s.initMySQL()
 	s.initStore()
 	s.initTimer()
 	s.initRouter()
-
 }

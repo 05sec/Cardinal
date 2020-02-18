@@ -2,6 +2,8 @@
 
 # Cardinal —— CTF AWD 线下赛平台
 
+![](https://goreportcard.com/badge/github.com/vidar-team/Cardinal)
+
 ## 介绍
 
 Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本程序可以作为 CTF 线下比赛平台，亦可用于团队内部 AWD 模拟练习。
@@ -36,6 +38,7 @@ yarn build
 git clone https://github.com/vidar-team/Cardinal.git
 cd Cardinal/src
 go build -o Cardinal
+./Cardinal
 ```
 根据提示修改`/conf/Cardinal.toml`配置文件，并确保`uploads`目录可写。
 
