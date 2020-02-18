@@ -7,7 +7,7 @@ import (
 
 func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 	file, err := c.FormFile("picture")
-	if err != nil{
+	if err != nil {
 		return s.makeErrJSON(400, 40000, "请选择图片文件！")
 	}
 	fileExt := map[string]string{

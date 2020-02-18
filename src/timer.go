@@ -152,7 +152,7 @@ func (s *Service) timerProcess() {
 			// 最后一轮结束后结算分数
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
-				s.Timer.NowRound = s.Timer.TotalRound + 1		// 设置当前轮为总轮数 +1，使得可以计算最后一轮分数
+				s.Timer.NowRound = s.Timer.TotalRound + 1 // 设置当前轮为总轮数 +1，使得可以计算最后一轮分数
 				go s.NewRoundCalculateScore()
 				s.NewLog(IMPORTANT, "system", "比赛已结束")
 			}
@@ -164,7 +164,7 @@ func (s *Service) timerProcess() {
 	}
 }
 
-func (s *Service) checkRestTimeConfig(){
+func (s *Service) checkRestTimeConfig() {
 	// 检查 RestTime 数据是否正确
 	for key, dur := range s.Timer.RestTime {
 		if len(dur) != 2 {

@@ -143,7 +143,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	tx.Commit()
 
 	// 若修改了题目分数，则重新算分并更新排行榜
-	if inputForm.BaseScore != checkChallenge.BaseScore{
+	if inputForm.BaseScore != checkChallenge.BaseScore {
 		// 更新靶机分数
 		s.CalculateGameBoxScore()
 		// 更新队伍分数
@@ -153,7 +153,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	}
 
 	// 若修改了题目标题，则更新排行榜标题
-	if inputForm.Title != checkChallenge.Title{
+	if inputForm.Title != checkChallenge.Title {
 		// 刷新总排行榜标题
 		s.SetRankListTitle()
 	}
