@@ -13,7 +13,7 @@ func (s *Service) initRouter() {
 		AllowOrigins: []string{"*"},
 	}))
 
-	// 基础信息
+	// Cardinal basic info
 	r.Any("/", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON("Cardinal"))
 	})
@@ -27,24 +27,24 @@ func (s *Service) initRouter() {
 		c.JSON(s.getTime())
 	})
 
-	// 静态资源
+	// Static files
 	r.Static("/uploads", "./uploads")
 
-	// 用户登录
+	// Team login
 	r.POST("/login", func(c *gin.Context) {
 		c.JSON(s.TeamLogin(c))
 	})
-	// 用户登出
+	// Team logout
 	r.GET("/logout", func(c *gin.Context) {
 		c.JSON(s.TeamLogout(c))
 	})
 
-	// 提交 Flag
+	// Submit flag
 	r.POST("/flag", func(c *gin.Context) {
 		c.JSON(s.SubmitFlag(c))
 	})
 
-	// 用户
+	// For team
 	team := r.Group("/team")
 	team.Use(s.TeamAuthRequired())
 	{
@@ -62,12 +62,12 @@ func (s *Service) initRouter() {
 		})
 	}
 
-	// 管理员登录
+	// Manager login
 	r.POST("/manager/login", func(c *gin.Context) {
 		c.JSON(s.ManagerLogin(c))
 	})
 
-	// 管理
+	// For manager
 	manager := r.Group("/manager")
 	manager.Use(s.ManagerAuthRequired())
 	{
@@ -191,7 +191,7 @@ func (s *Service) initRouter() {
 	panic(r.Run(s.Conf.Base.Port))
 }
 
-// 用户鉴权中间件
+// TeamAuthRequired is the team permission check middleware.
 func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
@@ -214,7 +214,7 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 	}
 }
 
-// 管理员鉴权中间件
+// ManagerAuthRequired is the manager permission check middleware.
 func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")

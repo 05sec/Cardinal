@@ -8,17 +8,20 @@ import (
 	"time"
 )
 
-// 攻击记录
+// AttackAction is a gorm model for database table `attack_actions`.
+// Used to store the flag submitted record.
 type AttackAction struct {
 	gorm.Model
 
-	TeamID         uint // 被攻击者
-	GameBoxID      uint // 被攻击者靶机
-	ChallengeID    uint // 被攻击题目
-	AttackerTeamID uint // 攻击者
+	TeamID         uint // Victim's team ID
+	GameBoxID      uint // Victim's gamebox ID
+	ChallengeID    uint // Victim's challenge ID
+	AttackerTeamID uint // Attacker's Team ID
 	Round          int
 }
 
+// Flag is a gorm model for database table `flags`.
+// All the flags will be generated before the competition start and save in this table.
 type Flag struct {
 	gorm.Model
 
@@ -29,8 +32,9 @@ type Flag struct {
 	Flag        string
 }
 
+// SubmitFlag is submit flag handler for teams.
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
-	// 比赛暂停 / 停止无法提交 flag
+	// Submit flag is forbidden if the competition isn't start.
 	if s.Timer.Status != "on" {
 		return s.makeErrJSON(403, 40300, "比赛未开始")
 	}
@@ -61,7 +65,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(403, 40300, "Flag 错误！")
 	}
 
-	// 判断是否重复提交
+	// Check if the flag has been submitted by the team before.
 	var repeatAttackCheck AttackAction
 	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{
 		TeamID:         flagData.TeamID,
@@ -73,10 +77,10 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(403, 40301, "请勿重复提交 Flag")
 	}
 
-	// 更新靶机状态信息
+	// Update the victim's gamebox status to `down`.
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&GameBox{IsAttacked: true})
 
-	// 无误，加分！
+	// Save this attack record.
 	tx := s.Mysql.Begin()
 	if tx.Create(&AttackAction{
 		TeamID:         flagData.TeamID,
@@ -90,12 +94,13 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
-	// 刷新总排行榜靶机状态
+	// Refresh the ranking list.
 	s.SetRankList()
 
 	return s.makeSuccessJSON("提交成功！")
 }
 
+// GetFlags get flags from the database for backstage manager.
 func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
 	pageStr := c.DefaultQuery("page", "1")
 	perStr := c.DefaultQuery("per", "15")
@@ -122,12 +127,13 @@ func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
 	})
 }
 
+// GenerateFlag is the generate flag handler for manager.
 func (s *Service) GenerateFlag() (int, interface{}) {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 
 	startTime := time.Now().UnixNano()
-	// 删库
+	// Delete all the flags in the table.
 	s.Mysql.Unscoped().Delete(&Flag{})
 
 	for round := 1; round <= s.Timer.TotalRound; round++ {

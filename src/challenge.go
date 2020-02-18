@@ -8,13 +8,16 @@ import (
 	"time"
 )
 
-// 题目
+// Challenge is a gorm model for database table `challenges`, used to store the challenges like Web1, Pwn1.
 type Challenge struct {
 	gorm.Model
 	Title     string
 	BaseScore int
 }
 
+// SetVisible is setting challenge visible status handler.
+// When a challenge's visible status changed, all the teams' challenge scores and their total scores will be calculated immediately.
+// The ranking list will also be updated.
 func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID      uint `binding:"required"`
@@ -35,11 +38,11 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 
 	s.Mysql.Model(&GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
 
-	// 重新计算队伍分数（可见靶机）
+	// Calculate all the teams' score. (Only visible challenges)
 	s.CalculateTeamScore()
-	// 刷新总排行榜可见靶机标题
+	// Refresh the ranking list table's header.
 	s.SetRankListTitle()
-	// 刷新总排行榜分数
+	// Refresh the ranking list teams' scores.
 	s.SetRankList()
 
 	status := "不"
@@ -50,6 +53,7 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
 }
 
+// GetAllChallenges get all challenges from the database.
 func (s *Service) GetAllChallenges() (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Find(&challenges)
@@ -63,7 +67,9 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 
 	var res []resultStruct
 	for _, v := range challenges {
-		// 获取其中一个靶机的状态来得知 Visible
+		// For the challenge model doesn't have the `visible` field,
+		// We can only get the challenge's visible status by one for its gamebox.
+		// TODO: Need to find a better way to get the challenge's visible status.
 		var gameBox GameBox
 		s.Mysql.Where(&GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
 
@@ -78,6 +84,7 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 	return s.makeSuccessJSON(res)
 }
 
+// NewChallenge is new challenge handler for manager.
 func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		Title     string `binding:"required"`
@@ -112,6 +119,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("添加 Challenge 成功！")
 }
 
+// EditChallenge is edit challenge handler for manager.
 func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID        uint   `binding:"required"`
@@ -142,25 +150,25 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
-	// 若修改了题目分数，则重新算分并更新排行榜
+	// If the challenge's score is updated, we need to calculate the gameboxes' scores and the teams' scores.
 	if inputForm.BaseScore != checkChallenge.BaseScore {
-		// 更新靶机分数
-		s.CalculateGameBoxScore()
-		// 更新队伍分数
+		// Calculate all the teams' score. (Only visible challenges)
 		s.CalculateTeamScore()
-		// 计算并存储总排行榜到内存
+		// Refresh the ranking list table's header.
+		s.SetRankListTitle()
+		// Refresh the ranking list teams' scores.
 		s.SetRankList()
 	}
 
-	// 若修改了题目标题，则更新排行榜标题
+	// If the challenge's title is updated, we just need to update the ranking list table's header.
 	if inputForm.Title != checkChallenge.Title {
-		// 刷新总排行榜标题
 		s.SetRankListTitle()
 	}
 
 	return s.makeSuccessJSON("修改 Challenge 成功！")
 }
 
+// DeleteChallenge is delete challenge handler for manager.
 func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {

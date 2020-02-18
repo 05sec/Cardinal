@@ -6,11 +6,13 @@ import (
 	"time"
 )
 
+// Config is the `cardinal.toml` config file struct.
 type Config struct {
 	Base  `toml:"base"`
 	MySQL `toml:"mysql"`
 }
 
+// Base is the basic config of the cardinal.
 type Base struct {
 	Title          string
 	BeginTime      time.Time
@@ -25,6 +27,7 @@ type Base struct {
 	AttackScore    int
 }
 
+// MySQL is the database config of the cardinal.
 type MySQL struct {
 	DBHost     string
 	DBUsername string
@@ -32,6 +35,7 @@ type MySQL struct {
 	DBName     string
 }
 
+// initConfig will decode the config file and put it into `s.Conf`, so we can get the config globally.
 func (s *Service) initConfig() {
 	var conf *Config
 	_, err := toml.DecodeFile("./conf/Cardinal.toml", &conf)

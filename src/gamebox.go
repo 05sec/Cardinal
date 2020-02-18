@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-// 队伍靶机
+// GameBox is a gorm model for database table `gameboxes`.
 type GameBox struct {
 	gorm.Model
 	ChallengeID uint
@@ -23,6 +23,7 @@ type GameBox struct {
 	IsAttacked  bool
 }
 
+// GetSelfGameBoxes returns the gameboxes which belong to the team.
 func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 	var gameBoxes []struct {
 		ChallengeID uint
@@ -45,6 +46,7 @@ func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON(gameBoxes)
 }
 
+// GetGameBoxes returns the gameboxes for manager.
 func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
 	pageStr := c.Query("page")   // 当前页
 	perPageStr := c.Query("per") // 每页数量
@@ -70,6 +72,7 @@ func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
 	})
 }
 
+// NewGameBoxes is add a new gamebox handler for manager.
 func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ChallengeID uint   `binding:"required"`
@@ -87,19 +90,20 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	for _, item := range inputForm {
 		var count int
 
-		// 检查 ChallengeID
+		// Check the ChallengeID
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Count(&count)
 		if count != 1 {
 			return s.makeErrJSON(400, 40001, "Challenge 不存在")
 		}
 
-		// 检查 TeamID
+		// Check the TeamID
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: item.TeamID}}).Count(&count)
 		if count != 1 {
 			return s.makeErrJSON(400, 40001, "Team 不存在")
 		}
 
-		// 检查是否重复
+		// Check if the gamebox is existed by challenge ID and team ID,
+		// since every team should have only one gamebox for each challenge.
 		s.Mysql.Model(GameBox{}).Where(&GameBox{ChallengeID: item.ChallengeID, TeamID: item.TeamID}).Count(&count)
 		if count != 0 {
 			return s.makeErrJSON(400, 40001, "存在重复添加数据")
@@ -126,6 +130,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("添加 GameBox 成功！")
 }
 
+// EditGameBox is edit gamebox handler for manager.
 func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		ID uint `binding:"required"`

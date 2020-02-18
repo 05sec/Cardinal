@@ -8,19 +8,22 @@ import (
 	"strconv"
 )
 
+// Manager is a gorm model for database table `managers`.
 type Manager struct {
 	gorm.Model
 
 	Name     string
 	Password string `json:"-"`
-	Token    string // 管理员只允许单点登录
+	Token    string // For single sign-on
 }
 
+// ManagerLoginForm is used for binding login form JSON data.
 type ManagerLoginForm struct {
 	Name     string `json:"Name" binding:"required"`
 	Password string `json:"Password" binding:"required"`
 }
 
+// ManagerLogin is manager login handler.
 func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	var formData ManagerLoginForm
 	err := c.BindJSON(&formData)
@@ -32,7 +35,7 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	s.Mysql.Where(&Manager{Name: formData.Name}).Find(&manager)
 
 	if manager.Name != "" && s.checkPassword(formData.Password, manager.Password) {
-		// 登录成功
+		// Login successfully
 		token := s.generateToken()
 		tx := s.Mysql.Begin()
 		if tx.Model(&Manager{}).Where(&Manager{Name: manager.Name}).Updates(&Manager{Token: token}).RowsAffected != 1 {
@@ -41,17 +44,18 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 		}
 		tx.Commit()
 		return s.makeSuccessJSON(token)
-	} else {
-		return s.makeErrJSON(403, 40300, "账号或密码错误！")
 	}
+	return s.makeErrJSON(403, 40300, "账号或密码错误！")
 }
 
+// GetAllManager returns all the manager.
 func (s *Service) GetAllManager() (int, interface{}) {
 	var manager []Manager
 	s.Mysql.Model(&Manager{}).Find(&manager)
 	return s.makeSuccessJSON(manager)
 }
 
+// NewManager is add a new manager handler.
 func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
 		Name     string `json:"Name" binding:"required"`
@@ -84,6 +88,8 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON("添加管理员成功！")
 }
 
+// RefreshManagerToken can refresh a manager's token.
+// For the check down bot also use a manager account in Cardinal, they can't login by themselves.
 func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
@@ -108,6 +114,7 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON(token)
 }
 
+// ChangeManagerPassword will change a manager's password to a random string.
 func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
@@ -132,6 +139,7 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 	return s.makeSuccessJSON(password)
 }
 
+// DeleteManager is delete manager handler.
 func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {

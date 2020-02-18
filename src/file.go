@@ -5,6 +5,7 @@ import (
 	"github.com/thanhpk/randstr"
 )
 
+// UploadPicture is upload team logo handler for manager.
 func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 	file, err := c.FormFile("picture")
 	if err != nil {

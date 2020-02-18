@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// Timer is the time data of the Cardinal.
 type Timer struct {
 	BeginTime       time.Time     // init
 	EndTime         time.Time     // init
@@ -42,7 +43,7 @@ func (s *Service) initTimer() {
 	}
 	s.checkRestTimeConfig()
 
-	// 计算休息时间周期
+	// Calculate the rest time cycle.
 	for i := 0; i < len(s.Timer.RestTime)-1; i++ {
 		j := i + 1
 		if s.Timer.RestTime[i][1].Unix() >= s.Timer.RestTime[j][0].Unix() {
@@ -56,7 +57,7 @@ func (s *Service) initTimer() {
 			i++
 		}
 	}
-	// 去除空元素
+	// Remove the empty element.
 	for i := 0; i < len(s.Timer.RestTime); i++ {
 		if s.Timer.RestTime[i] == nil {
 			s.Timer.RestTime = append(s.Timer.RestTime[:i], s.Timer.RestTime[i+1:]...)
@@ -64,7 +65,7 @@ func (s *Service) initTimer() {
 		}
 	}
 
-	// 设置 RunTime 比赛时间周期
+	// Set the competition time cycle.
 	if len(s.Timer.RestTime) != 0 {
 		s.Timer.RunTime = append(s.Timer.RunTime, []time.Time{s.Timer.BeginTime, s.Timer.RestTime[0][0]})
 		for i := 0; i < len(s.Timer.RestTime)-1; i++ {
@@ -76,7 +77,7 @@ func (s *Service) initTimer() {
 		s.Timer.RunTime = append(s.Timer.RunTime, []time.Time{s.Timer.BeginTime, s.Timer.EndTime})
 	}
 
-	// 计算总轮数
+	// Calculate the total round.
 	var totalTime int64
 	for _, dur := range s.Timer.RunTime {
 		totalTime += dur[1].Unix() - dur[0].Unix()
@@ -90,13 +91,12 @@ func (s *Service) initTimer() {
 }
 
 func (s *Service) timerProcess() {
-	// 时间处理协程
 	beginTime := s.Timer.BeginTime.Unix()
 	endTime := s.Timer.EndTime.Unix()
-	lastRoundCalculate := false // 最后一轮结束计算分数
+	lastRoundCalculate := false // A sign for the last round score calculate.
 
 	{
-		s.SetRankListTitle() // 刷新排行榜标题
+		s.SetRankListTitle() // Refresh ranking list table header.
 	}
 
 	for {
@@ -107,19 +107,19 @@ func (s *Service) timerProcess() {
 			nowRunTimeIndex := -1
 			for index, dur := range s.Timer.RunTime {
 				if nowTime > dur[0].Unix() && nowTime < dur[1].Unix() {
-					nowRunTimeIndex = index // 顺便记录当前是在哪个时间周期内的
+					nowRunTimeIndex = index // Get which time cycle now.
 					break
 				}
 			}
 
 			if nowRunTimeIndex == -1 {
-				// 比赛已暂停
+				// Suspended
 				s.Timer.Status = "pause"
 			} else {
-				// 比赛进行中
+				// In progress
 				s.Timer.Status = "on"
 				var nowRound int
-				var workTime int64 // 比赛进行的累计时间
+				var workTime int64 // Cumulative time until now.
 
 				for index, dur := range s.Timer.RunTime {
 					if index < nowRunTimeIndex {
@@ -129,30 +129,30 @@ func (s *Service) timerProcess() {
 						break
 					}
 				}
-				nowRound = int(math.Ceil(float64(workTime) / float64(s.Timer.Duration*60))) // 计算当前轮数
-				s.Timer.RoundRemainTime = nowRound*int(s.Timer.Duration)*60 - int(workTime) // 计算距离下一轮开始的秒数
+				nowRound = int(math.Ceil(float64(workTime) / float64(s.Timer.Duration*60))) // Calculate current round.
+				s.Timer.RoundRemainTime = nowRound*int(s.Timer.Duration)*60 - int(workTime) // Calculate the time to next round.
 
-				// 判断是否进入新一轮
+				// Check if it is a new round.
 				if s.Timer.NowRound < nowRound {
 					s.Timer.NowRound = nowRound
-					// 新一轮 Hook
-					// 清空靶机状态
+					// New round hook
+					// Clean the status of the gameboxes.
 					s.Mysql.Model(&GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
-					// 计算分数
+					// Calculate scores.
 					go s.NewRoundCalculateScore()
 					fmt.Println(s.Timer.NowRound)
 				}
 			}
 
 		} else if nowTime < beginTime {
-			// 比赛未开始
+			// Not started.
 			s.Timer.Status = "wait"
 		} else {
-			// 比赛已结束
-			// 最后一轮结束后结算分数
+			// Over.
+			// Calculate the score of the last round when the competition is ovet.
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
-				s.Timer.NowRound = s.Timer.TotalRound + 1 // 设置当前轮为总轮数 +1，使得可以计算最后一轮分数
+				s.Timer.NowRound = s.Timer.TotalRound + 1 // Set current round + 1, so it can calculate the last round score.
 				go s.NewRoundCalculateScore()
 				s.NewLog(IMPORTANT, "system", "比赛已结束")
 			}
@@ -165,7 +165,7 @@ func (s *Service) timerProcess() {
 }
 
 func (s *Service) checkRestTimeConfig() {
-	// 检查 RestTime 数据是否正确
+	// Check the RestTime in config file is correct.
 	for key, dur := range s.Timer.RestTime {
 		if len(dur) != 2 {
 			log.Fatalln("RestTime 单个时间周期配置错误！")
