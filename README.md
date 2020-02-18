@@ -43,4 +43,4 @@ TODO
 ## 协议与许可
 © Vidar-Team
 
-使用 GNU General Public License v3.0 开源协议进行许可，禁止商业用途。
+使用 APACHE LICENSE VERSION 2.0 进行许可，禁止商业用途。
