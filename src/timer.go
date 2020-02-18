@@ -40,23 +40,7 @@ func (s *Service) initTimer() {
 		RestTime:  s.Conf.Base.RestTime,
 		NowRound:  -1,
 	}
-
-	// 检查 RestTime 数据是否正确
-	for key, dur := range s.Timer.RestTime {
-		if len(dur) != 2 {
-			log.Fatalln("RestTime 单个时间周期配置错误！")
-		}
-		if dur[0].Unix() >= dur[1].Unix() {
-			log.Fatalln("RestTime 配置错误！前一时间应在后一时间点之前。[ " + dur[0].String() + " - " + dur[1].String() + " ]")
-		}
-		if dur[0].Unix() <= s.Timer.BeginTime.Unix() || dur[1].Unix() >= s.Timer.EndTime.Unix() {
-			log.Fatalln("RestTime 配置错误！不能在比赛开始时间之前或比赛结束时间之后。[ " + dur[0].String() + " - " + dur[1].String() + " ]")
-		}
-		// 配置数据按开始时间顺序输入，方便后面计算
-		if key != 0 && dur[0].Unix() <= s.Timer.RestTime[key-1][0].Unix() {
-			log.Fatalln("RestTime 需要按开始时间顺序输入！[ " + dur[0].String() + " - " + dur[1].String() + " ]")
-		}
-	}
+	s.checkRestTimeConfig()
 
 	// 计算休息时间周期
 	for i := 0; i < len(s.Timer.RestTime)-1; i++ {
@@ -177,5 +161,24 @@ func (s *Service) timerProcess() {
 		}
 
 		time.Sleep(1 * time.Second)
+	}
+}
+
+func (s *Service) checkRestTimeConfig(){
+	// 检查 RestTime 数据是否正确
+	for key, dur := range s.Timer.RestTime {
+		if len(dur) != 2 {
+			log.Fatalln("RestTime 单个时间周期配置错误！")
+		}
+		if dur[0].Unix() >= dur[1].Unix() {
+			log.Fatalln("RestTime 配置错误！前一时间应在后一时间点之前。[ " + dur[0].String() + " - " + dur[1].String() + " ]")
+		}
+		if dur[0].Unix() <= s.Timer.BeginTime.Unix() || dur[1].Unix() >= s.Timer.EndTime.Unix() {
+			log.Fatalln("RestTime 配置错误！不能在比赛开始时间之前或比赛结束时间之后。[ " + dur[0].String() + " - " + dur[1].String() + " ]")
+		}
+		// 配置数据按开始时间顺序输入，方便后面计算
+		if key != 0 && dur[0].Unix() <= s.Timer.RestTime[key-1][0].Unix() {
+			log.Fatalln("RestTime 需要按开始时间顺序输入！[ " + dur[0].String() + " - " + dur[1].String() + " ]")
+		}
 	}
 }

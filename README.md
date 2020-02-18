@@ -3,7 +3,7 @@
 # Cardinal —— CTF AWD 线下赛平台
 
 ![Build](https://github.com/vidar-team/Cardinal/workflows/Build/badge.svg)
-![](https://goreportcard.com/badge/github.com/vidar-team/Cardinal)
+[![](https://goreportcard.com/badge/github.com/vidar-team/Cardinal)](https://goreportcard.com/report/github.com/vidar-team/Cardinal)
 
 ## 介绍
 
