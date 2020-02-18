@@ -13,6 +13,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/qiniu/qiniutest v1.0.1 // indirect
+	github.com/qiniu/x v0.0.0-20190911131702-ec64d9399366
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/thanhpk/randstr v1.0.4
