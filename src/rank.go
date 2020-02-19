@@ -120,5 +120,5 @@ func (s *Service) SetRankList() {
 	s.Store.Set("rankList", rankList, cache.NoExpiration)
 	// Save the ranking list for manager into cache.
 	s.Store.Set("rankManagerList", managerRankList, cache.NoExpiration)
-	s.NewLog(NORMAL, "system", fmt.Sprintf("更新总排行榜成功！"))
+	//s.NewLog(NORMAL, "system", fmt.Sprintf("更新总排行榜成功！"))
 }

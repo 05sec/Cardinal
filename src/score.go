@@ -105,9 +105,13 @@ func (s *Service) AddAttack(round int) {
 
 // MinusAttack will minus scores from the victim.
 func (s *Service) MinusAttack(round int) {
-	// Get all the AttackAction of this round.
-	var attackActions []AttackAction
-	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{Round: round}).Find(&attackActions)
+	var attackActions []struct {
+		GameBoxID uint		`gorm:"game_box_id"`
+		TeamID    uint		`gorm:"team_id"`
+	}
+
+	// Every gamebox can only be deducted once in one round.
+	s.Mysql.Table("attack_actions").Select("DISTINCT(`game_box_id`) AS game_box_id, team_id").Where(&AttackAction{Round: round}).Scan(&attackActions)
 
 	for _, action := range attackActions {
 		s.Mysql.Create(&Score{
