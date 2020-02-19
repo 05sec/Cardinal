@@ -94,7 +94,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
-	// Refresh the ranking list.
+	// Update the gamebox status in ranking list.
 	s.SetRankList()
 
 	return s.makeSuccessJSON("提交成功！")

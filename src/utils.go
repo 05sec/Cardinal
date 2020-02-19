@@ -10,8 +10,8 @@ import (
 	"github.com/satori/go.uuid"
 	"io"
 	"os"
+	"strings"
 )
-
 
 func (s *Service) makeErrJSON(httpStatusCode int, errCode int, msg interface{}) (int, interface{}) {
 	return httpStatusCode, gin.H{"error": errCode, "msg": fmt.Sprint(msg)}
@@ -60,14 +60,16 @@ func IsExist(path string) bool {
 
 // InputString used in the install.go for the config file guide.
 func InputString(str *string, hint string) {
+	var err error
 	var input string
-	for input == ""{
+	for input == "" {
 		fmt.Println(">", hint)
 
 		stdin := bufio.NewReader(os.Stdin)
-		_, err := fmt.Fscanln(stdin, &input)
+		input, err = stdin.ReadString('\n')
+		input = strings.Trim(input, "\n")
 		if err != nil {
-			if *str != ""{
+			if *str != "" {
 				break
 			}
 		}

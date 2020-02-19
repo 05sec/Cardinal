@@ -62,5 +62,9 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(500, 50000, "Server error")
 	}
 	tx.Commit()
+
+	// Update the gamebox status in ranking list.
+	s.SetRankList()
+
 	return s.makeSuccessJSON("success")
 }

@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"github.com/thanhpk/randstr"
 	"io/ioutil"
 	"log"
 	"os"
 	"text/template"
+	"time"
 )
 
 const configTemplate = `
@@ -81,8 +83,23 @@ func (s *Service) GenerateConfigFileGuide() ([]byte, error) {
 	log.Println("Cardinal.toml 配置文件不存在，安装向导将带领您进行配置。")
 
 	InputString(&input.Title, "请输入比赛名称")
-	InputString(&input.BeginTime, "请输入比赛开始时间（格式 2020-02-17T12:00:00+08:00）")
-	InputString(&input.EndTime, "请输入比赛结束时间（格式 2020-02-17T12:00:00+08:00）")
+
+	var beginTime time.Time
+	err := errors.New("")
+	for err != nil {
+		InputString(&input.BeginTime, "请输入比赛开始时间（格式 2020-02-17 12:00:00）")
+		beginTime, err = time.ParseInLocation("2006-01-02 15:04:05", input.BeginTime, time.Local)
+	}
+	input.BeginTime = beginTime.Format(time.RFC3339)
+
+	var endTime time.Time
+	err = errors.New("")
+	for err != nil {
+		InputString(&input.EndTime, "请输入比赛结束时间（格式 2020-02-17 12:00:00）")
+		endTime, err = time.ParseInLocation("2006-01-02 15:04:05 ", input.EndTime, time.Local)
+	}
+	input.EndTime = endTime.Format(time.RFC3339)
+
 	InputString(&input.Duration, "请输入每轮长度（单位：分钟，默认值：2）")
 	InputString(&input.Port, "请输入后端服务器端口号（默认值：19999）")
 	InputString(&input.FlagPrefix, "请输入 Flag 前缀（默认值：hctf{）")
@@ -99,7 +116,7 @@ func (s *Service) GenerateConfigFileGuide() ([]byte, error) {
 
 	var wr bytes.Buffer
 	configTmpl, err := template.New("").Parse(configTemplate)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	err = configTmpl.Execute(&wr, input)

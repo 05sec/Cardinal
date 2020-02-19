@@ -18,22 +18,22 @@ type Score struct {
 	Score     float64 `gorm:"index"`
 }
 
-// NewRoundCalculateScore will calculate the score of the last round.
+// NewRoundCalculateScore will calculate the score of the previous round.
 func (s *Service) NewRoundCalculateScore() {
 	nowRound := s.Timer.NowRound
-	lastRound := nowRound - 1
+	previousRound := nowRound - 1
 
 	startTime := time.Now().UnixNano()
 
 	// + Attacked score
-	s.AddAttack(lastRound)
+	s.AddAttack(previousRound)
 	// - Been attacked score
-	s.MinusAttack(lastRound)
+	s.MinusAttack(previousRound)
 
 	// - Been check down
-	s.MinusCheckDown(lastRound)
+	s.MinusCheckDown(previousRound)
 	// + Service online
-	s.AddCheckDown(lastRound)
+	s.AddCheckDown(previousRound)
 
 	// Calculate and update all the gameboxes' score.
 	s.CalculateGameBoxScore()
@@ -46,7 +46,10 @@ func (s *Service) NewRoundCalculateScore() {
 	s.SetRankList()
 
 	endTime := time.Now().UnixNano()
-	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", lastRound, float64(endTime-startTime)/float64(time.Second)))
+	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", previousRound, float64(endTime-startTime)/float64(time.Second)))
+
+	// Do healthy check to make sure the score is correct.
+	s.HealthyCheck()
 }
 
 // CalculateGameBoxScore will calculate all the gameboxes' scores according to the data in scores table.
@@ -105,9 +108,13 @@ func (s *Service) AddAttack(round int) {
 
 // MinusAttack will minus scores from the victim.
 func (s *Service) MinusAttack(round int) {
-	// Get all the AttackAction of this round.
-	var attackActions []AttackAction
-	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{Round: round}).Find(&attackActions)
+	var attackActions []struct {
+		GameBoxID uint		`gorm:"game_box_id"`
+		TeamID    uint		`gorm:"team_id"`
+	}
+
+	// Every gamebox can only be deducted once in one round.
+	s.Mysql.Table("attack_actions").Select("DISTINCT(`game_box_id`) AS game_box_id, team_id").Where(&AttackAction{Round: round}).Scan(&attackActions)
 
 	for _, action := range attackActions {
 		s.Mysql.Create(&Score{
