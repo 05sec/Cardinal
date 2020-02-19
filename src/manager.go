@@ -48,6 +48,15 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	return s.makeErrJSON(403, 40300, "账号或密码错误！")
 }
 
+// ManagerLogout is the manager logout handler.
+func (s *Service) ManagerLogout(c *gin.Context) (int, interface{}) {
+	token := c.GetHeader("Authorization")
+	if token != "" {
+		s.Mysql.Model(&Manager{}).Where("token = ?", token).Delete(&Token{})
+	}
+	return s.makeSuccessJSON("登出成功！")
+}
+
 // GetAllManager returns all the manager.
 func (s *Service) GetAllManager() (int, interface{}) {
 	var manager []Manager

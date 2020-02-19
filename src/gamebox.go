@@ -18,7 +18,7 @@ type GameBox struct {
 	Port        string
 	Description string
 	Visible     bool
-	Score       float64 // 分数可负
+	Score       float64 // The score can be negative.
 	IsDown      bool
 	IsAttacked  bool
 }

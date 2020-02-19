@@ -67,6 +67,11 @@ func (s *Service) initRouter() {
 		c.JSON(s.ManagerLogin(c))
 	})
 
+	// Manager logout
+	r.GET("/manager/logout", func(c *gin.Context) {
+		c.JSON(s.ManagerLogout(c))
+	})
+
 	// For manager
 	manager := r.Group("/manager")
 	manager.Use(s.ManagerAuthRequired())
