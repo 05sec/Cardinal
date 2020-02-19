@@ -47,6 +47,9 @@ func (s *Service) NewRoundCalculateScore() {
 
 	endTime := time.Now().UnixNano()
 	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", previousRound, float64(endTime-startTime)/float64(time.Second)))
+
+	// Do healthy check to make sure the score is correct.
+	s.HealthyCheck()
 }
 
 // CalculateGameBoxScore will calculate all the gameboxes' scores according to the data in scores table.
