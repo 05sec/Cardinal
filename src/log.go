@@ -49,10 +49,12 @@ func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)
 	return s.makeSuccessJSON(gin.H{
-		"SubmitFlag":   submitFlag,
-		"CheckDown":    checkDown,
-		"NumGoroutine": runtime.NumGoroutine(),          // Goroutine number
-		"MemAllocated": s.FileSize(int64(m.Alloc)),      // Allocated memory
-		"MemTotal":     s.FileSize(int64(m.TotalAlloc)), // Total memory usage
+		"SubmitFlag":         submitFlag,
+		"CheckDown":          checkDown,
+		"NumGoroutine":       runtime.NumGoroutine(),          // Goroutine number
+		"MemAllocated":       s.FileSize(int64(m.Alloc)),      // Allocated memory
+		"MemTotal":           s.FileSize(int64(m.TotalAlloc)), // Total memory usage
+		"TotalScore":         s.TotalScore(),
+		"PreviousRoundScore": s.PreviousRoundScore(),
 	})
 }
