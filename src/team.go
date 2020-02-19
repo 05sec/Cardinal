@@ -79,7 +79,7 @@ func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}) {
 	var teams []Team
 
 	s.Mysql.Model(&Team{}).Order("`score` DESC").Find(&teams)
-	// 遍历获取排名
+	// Get the team rank by its index.
 	for index, t := range teams {
 		if teamID.(uint) == t.ID {
 			rank = index + 1
@@ -245,7 +245,7 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 		return s.makeErrJSON(400, 40000, "Error payload")
 	}
 
-	// 检查 Team 是否存在
+	// Check the team existed or not.
 	var checkTeam Team
 	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
 	if checkTeam.Name == "" {

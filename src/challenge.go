@@ -68,7 +68,7 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 	var res []resultStruct
 	for _, v := range challenges {
 		// For the challenge model doesn't have the `visible` field,
-		// We can only get the challenge's visible status by one for its gamebox.
+		// We can only get the challenge's visible status by one of its gamebox.
 		// TODO: Need to find a better way to get the challenge's visible status.
 		var gameBox GameBox
 		s.Mysql.Where(&GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
