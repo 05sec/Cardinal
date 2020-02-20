@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/go-release.action@v1.0.8
+        uses: wuhan005/go-release.action@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: "386"
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/go-release.action@v1.0.8
+        uses: wuhan005/go-release.action@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/go-release.action@v1.0.8
+        uses: wuhan005/go-release.action@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: "386"
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/go-release.action@v1.0.8
+        uses: wuhan005/go-release.action@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/go-release.action@v1.0.8
+        uses: wuhan005/go-release.action@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: "386"
@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/go-release.action@v1.0.8
+        uses: wuhan005/go-release.action@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
