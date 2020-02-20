@@ -53,7 +53,6 @@ func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 		"CheckDown":          checkDown,
 		"NumGoroutine":       runtime.NumGoroutine(),          // Goroutine number
 		"MemAllocated":       s.FileSize(int64(m.Alloc)),      // Allocated memory
-		"MemTotal":           s.FileSize(int64(m.TotalAlloc)), // Total memory usage
 		"TotalScore":         s.TotalScore(),
 		"PreviousRoundScore": s.PreviousRoundScore(),
 	})
