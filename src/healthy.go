@@ -30,16 +30,16 @@ func (s *Service) HealthyCheck() {
 	}
 }
 
-// PreviousRoundScoreCount returns the previous round's score count.
+// PreviousRoundScore returns the previous round's score count.
 func (s *Service) PreviousRoundScore() float64 {
 	var score []float64
-	// Pay attention if there is not action in the previous round, the SUM(`score`) is NULL.
+	// Pay attention if there is no action in the previous round, the SUM(`score`) will be NULL.
 	s.Mysql.Model(&Score{}).Where(&Score{Round: s.Timer.NowRound}).Pluck("IFNULL(SUM(`score`), 0)", &score)
 	value, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", score[0]), 64)
 	return value
 }
 
-// TotalScoreCount returns all the rounds' score count.
+// TotalScore returns all the rounds' score count.
 func (s *Service) TotalScore() float64 {
 	var score []float64
 	// Pay attention in the first round, the SUM(`score`) is NULL.

@@ -84,8 +84,8 @@ func (s *Service) SetRankList() {
 		var gameboxes []GameBox
 		// Get the challenge data ordered by the challenge ID, to make sure the table header can match with the score correctly.
 		s.Mysql.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes)
-		var gameBoxInfo []*GameBoxInfo                                                                                   // Gamebox info for manager.
-		var gameBoxStatuses []*GameBoxStatus                                                                             // Gamebox info for users and public.
+		var gameBoxInfo []*GameBoxInfo       // Gamebox info for manager.
+		var gameBoxStatuses []*GameBoxStatus // Gamebox info for users and public.
 
 		for _, gamebox := range gameboxes {
 			gameBoxStatuses = append(gameBoxStatuses, &GameBoxStatus{
