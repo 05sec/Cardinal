@@ -23,6 +23,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
           GOOS: linux
+  release-linux-arm:
+    name: release linux/arm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: compile and release
+        uses: wuhan005/go-release.action@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GOARCH: arm
+          GOOS: linux
+  release-linux-arm64:
+    name: release linux/arm64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: compile and release
+        uses: wuhan005/go-release.action@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GOARCH: arm64
+          GOOS: linux
   release-darwin-386:
     name: release darwin/386
     runs-on: ubuntu-latest
@@ -66,4 +88,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
+          GOOS: windows
+  release-windows-arm:
+    name: release windows/arm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: compile and release
+        uses: wuhan005/go-release.action@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GOARCH: arm
           GOOS: windows
