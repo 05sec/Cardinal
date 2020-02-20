@@ -143,11 +143,11 @@ func (s *Service) timerProcess() {
 					// Calculate scores.
 					// Get the latest score record.
 					var latestScore Score
-					s.Mysql.Model(&Score{}).Order("`Round` DESC").Find(&latestScore)
+					s.Mysql.Model(&Score{}).Order("`round` DESC").Limit(1).Find(&latestScore)
 
-					// If Cardinal has been restart by unexpected error, get the latest round score and calculate the scores of previous round.
-					if latestScore.Round < s.Timer.NowRound{
-						s.CalculateRoundScore(s.Timer.NowRound - 1)
+					// If Cardinal has been restart by unexpected error, get the latest round score and chick if need calculate the scores of previous round.
+					if latestScore.Round < s.Timer.NowRound-1 {
+						go s.CalculateRoundScore(s.Timer.NowRound - 1)
 					}
 
 					fmt.Println(s.Timer.NowRound)
