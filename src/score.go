@@ -18,22 +18,19 @@ type Score struct {
 	Score     float64 `gorm:"index"`
 }
 
-// NewRoundCalculateScore will calculate the score of the previous round.
-func (s *Service) NewRoundCalculateScore() {
-	nowRound := s.Timer.NowRound
-	previousRound := nowRound - 1
-
+// CalculateRoundScore will calculate the score of the given round.
+func (s *Service) CalculateRoundScore(round int) {
 	startTime := time.Now().UnixNano()
 
 	// + Attacked score
-	s.AddAttack(previousRound)
+	s.AddAttack(round)
 	// - Been attacked score
-	s.MinusAttack(previousRound)
+	s.MinusAttack(round)
 
 	// - Been check down
-	s.MinusCheckDown(previousRound)
+	s.MinusCheckDown(round)
 	// + Service online
-	s.AddCheckDown(previousRound)
+	s.AddCheckDown(round)
 
 	// Calculate and update all the gameboxes' score.
 	s.CalculateGameBoxScore()
@@ -46,7 +43,7 @@ func (s *Service) NewRoundCalculateScore() {
 	s.SetRankList()
 
 	endTime := time.Now().UnixNano()
-	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", previousRound, float64(endTime-startTime)/float64(time.Second)))
+	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", round, float64(endTime-startTime)/float64(time.Second)))
 
 	// Do healthy check to make sure the score is correct.
 	s.HealthyCheck()
@@ -109,8 +106,8 @@ func (s *Service) AddAttack(round int) {
 // MinusAttack will minus scores from the victim.
 func (s *Service) MinusAttack(round int) {
 	var attackActions []struct {
-		GameBoxID uint		`gorm:"game_box_id"`
-		TeamID    uint		`gorm:"team_id"`
+		GameBoxID uint `gorm:"game_box_id"`
+		TeamID    uint `gorm:"team_id"`
 	}
 
 	// Every gamebox can only be deducted once in one round.

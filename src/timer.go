@@ -136,10 +136,20 @@ func (s *Service) timerProcess() {
 				if s.Timer.NowRound < nowRound {
 					s.Timer.NowRound = nowRound
 					// New round hook
+
 					// Clean the status of the gameboxes.
 					s.Mysql.Model(&GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
+
 					// Calculate scores.
-					go s.NewRoundCalculateScore()
+					// Get the latest score record.
+					var latestScore Score
+					s.Mysql.Model(&Score{}).Order("`round` DESC").Limit(1).Find(&latestScore)
+
+					// If Cardinal has been restart by unexpected error, get the latest round score and chick if need calculate the scores of previous round.
+					if latestScore.Round < s.Timer.NowRound-1 {
+						go s.CalculateRoundScore(s.Timer.NowRound - 1)
+					}
+
 					fmt.Println(s.Timer.NowRound)
 				}
 			}
@@ -149,11 +159,10 @@ func (s *Service) timerProcess() {
 			s.Timer.Status = "wait"
 		} else {
 			// Over.
-			// Calculate the score of the last round when the competition is ovet.
+			// Calculate the score of the last round when the competition is over.
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
-				s.Timer.NowRound = s.Timer.TotalRound + 1 // Set current round + 1, so it can calculate the last round score.
-				go s.NewRoundCalculateScore()
+				go s.CalculateRoundScore(s.Timer.TotalRound)
 				s.NewLog(IMPORTANT, "system", "比赛已结束")
 			}
 
