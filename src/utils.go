@@ -68,7 +68,7 @@ func InputString(str *string, hint string) {
 		stdin := bufio.NewReader(os.Stdin)
 		input, err = stdin.ReadString('\n')
 		input = strings.Trim(input, "\n")
-		if err != nil {
+		if err != nil || input == ""{
 			if *str != "" {
 				break
 			}
