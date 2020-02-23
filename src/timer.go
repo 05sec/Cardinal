@@ -41,7 +41,7 @@ func (s *Service) initTimer() {
 		RestTime:  s.Conf.Base.RestTime,
 		NowRound:  -1,
 	}
-	s.checkRestTimeConfig()
+	s.checkTimeConfig()
 
 	// Calculate the rest time cycle.
 	for i := 0; i < len(s.Timer.RestTime)-1; i++ {
@@ -97,6 +97,7 @@ func (s *Service) timerProcess() {
 
 	{
 		s.SetRankListTitle() // Refresh ranking list table header.
+		s.SetRankList()
 	}
 
 	for {
@@ -173,7 +174,11 @@ func (s *Service) timerProcess() {
 	}
 }
 
-func (s *Service) checkRestTimeConfig() {
+func (s *Service) checkTimeConfig() {
+	if s.Timer.BeginTime.Unix() > s.Timer.EndTime.Unix() {
+		log.Fatalln("比赛结束时间应大于开始时间！")
+	}
+
 	// Check the RestTime in config file is correct.
 	for key, dur := range s.Timer.RestTime {
 		if len(dur) != 2 {
