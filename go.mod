@@ -16,6 +16,7 @@ require (
 	github.com/qiniu/x v0.0.0-20190911131702-ec64d9399366
 	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
+	github.com/stretchr/testify v1.4.0
 	github.com/thanhpk/randstr v1.0.4
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
