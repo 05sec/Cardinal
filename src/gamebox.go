@@ -25,6 +25,10 @@ type GameBox struct {
 
 // GetSelfGameBoxes returns the gameboxes which belong to the team.
 func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
+	if s.Timer.Status == "wait" {
+		return s.makeSuccessJSON([]int{})
+	}
+
 	var gameBoxes []struct {
 		ChallengeID uint
 		Title       string
