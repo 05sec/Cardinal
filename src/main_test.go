@@ -10,6 +10,10 @@ import (
 
 var service *Service
 var managerToken string
+var teamPassword []struct {
+	Name     string `json:"Name"`
+	Password string `json:"Password"`
+}
 
 func init() {
 	fmt.Println("BEGIN")
@@ -41,6 +45,11 @@ func init() {
 	service.initTimer()
 
 	managerToken = service.generateToken()
+	teamPassword = make([]struct {
+		Name     string `json:"Name"`
+		Password string `json:"Password"`
+	}, 0)
+
 	// Test manager account e99:qwe1qwe2qwe3
 	service.Mysql.Create(&Manager{
 		Name:     "e99",
