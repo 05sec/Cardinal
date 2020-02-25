@@ -10,9 +10,10 @@ import (
 
 var service *Service
 var managerToken string
-var teamPassword []struct {
+var team []struct {
 	Name     string `json:"Name"`
 	Password string `json:"Password"`
+	Token    string `json:"token"`
 }
 
 func init() {
@@ -24,7 +25,7 @@ func init() {
 			Title:          "HCTF",
 			BeginTime:      time.Now(),
 			RestTime:       nil,
-			EndTime:        time.Now(),
+			EndTime:        time.Now().Add(12 * time.Hour),
 			Duration:       10,
 			Port:           ":19999",
 			Salt:           randstr.String(64),
@@ -45,9 +46,10 @@ func init() {
 	service.initTimer()
 
 	managerToken = service.generateToken()
-	teamPassword = make([]struct {
+	team = make([]struct {
 		Name     string `json:"Name"`
 		Password string `json:"Password"`
+		Token    string `json:"token"`
 	}, 0)
 
 	// Test manager account e99:qwe1qwe2qwe3

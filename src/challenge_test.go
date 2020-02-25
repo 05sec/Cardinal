@@ -33,6 +33,16 @@ func TestService_NewChallenge(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	jsonData, _ = json.Marshal(map[string]interface{}{
+		"Title":     "Pwn2",
+		"BaseScore": 1000,
+	})
+	req, _ = http.NewRequest("POST", "/manager/challenge", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"Title":     "Pwn1",
 		"BaseScore": 1000,
 	})
@@ -108,7 +118,6 @@ func TestService_GetAllChallenges(t *testing.T) {
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
-
 
 func TestService_DeleteChallenge(t *testing.T) {
 	// error id
