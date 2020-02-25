@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/thanhpk/randstr"
 	"os"
@@ -11,6 +12,7 @@ var service *Service
 var managerToken string
 
 func init() {
+	fmt.Println("BEGIN")
 	gin.SetMode(gin.ReleaseMode)
 	service = new(Service)
 	service.Conf = &Config{
