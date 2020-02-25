@@ -134,10 +134,34 @@ func TestService_DeleteChallenge(t *testing.T) {
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
-	// success
+	// success delete 2
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/manager/challenge?id=2", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
+}
+
+func TestService_SetVisible(t *testing.T) {
+	// payload error
+	w := httptest.NewRecorder()
+	jsonData, _ := json.Marshal(map[string]interface{}{
+		"ID":      1,
+		"Visible": "true",
+	})
+	req, _ := http.NewRequest("POST", "/manager/challenge/visible", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 400, w.Code)
+
+	// challenge not found
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"ID":      2,
+		"Visible": true,
+	})
+	req, _ = http.NewRequest("POST", "/manager/challenge/visible", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 404, w.Code)
 }

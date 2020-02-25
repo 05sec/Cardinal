@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -460,6 +462,29 @@ func TestService_NewGameBoxes(t *testing.T) {
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
+
+	// Set gamebox visible
+	// set challenge id 1
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"ID":      1,
+		"Visible": true,
+	})
+	req, _ = http.NewRequest("POST", "/manager/challenge/visible", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+
+	// set challenge id 3
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"ID":      3,
+		"Visible": true,
+	})
+	req, _ = http.NewRequest("POST", "/manager/challenge/visible", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
 }
 
 func TestService_EditGameBox(t *testing.T) {
@@ -590,12 +615,16 @@ func TestService_GetFlags(t *testing.T) {
 // Vidar -> e99 pwn1	flag2
 // e99 -> Vidar pwn1	flag3
 func TestService_SubmitFlag(t *testing.T) {
+	service.Timer.NowRound = 1
+
 	var flag1 Flag
 	service.Mysql.Model(&Flag{}).Where(&Flag{
 		TeamID:      2,
 		ChallengeID: 1,
 		Round:       1,
 	}).Find(&flag1)
+	fmt.Println(flag1)
+	assert.NotEqual(t, flag1.Flag, "")
 
 	var flag2 Flag
 	service.Mysql.Model(&Flag{}).Where(&Flag{
@@ -603,6 +632,8 @@ func TestService_SubmitFlag(t *testing.T) {
 		ChallengeID: 3,
 		Round:       1,
 	}).Find(&flag2)
+	fmt.Println(flag2)
+	assert.NotEqual(t, flag2.Flag, "")
 
 	var flag3 Flag
 	service.Mysql.Model(&Flag{}).Where(&Flag{
@@ -610,6 +641,8 @@ func TestService_SubmitFlag(t *testing.T) {
 		ChallengeID: 3,
 		Round:       1,
 	}).Find(&flag3)
+	fmt.Println(flag3)
+	assert.NotEqual(t, flag3.Flag, "")
 
 	// not begin
 	service.Timer.Status = "wait"
@@ -673,6 +706,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
+	fmt.Println("flag1", w.Body.String())
 
 	// success flag2
 	w = httptest.NewRecorder()
@@ -683,6 +717,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
+	fmt.Println("flag2", w.Body.String())
 
 	// success flag3
 	w = httptest.NewRecorder()
@@ -693,6 +728,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[1].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
+	fmt.Println("flag3", w.Body.String())
 
 	// repeat submit
 	w = httptest.NewRecorder()
@@ -703,4 +739,80 @@ func TestService_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
+}
+
+// e99 pwn1 ID:4
+func TestService_CheckDown(t *testing.T) {
+	// not begin
+	service.Timer.Status = "wait"
+	w := httptest.NewRecorder()
+	jsonData, _ := json.Marshal(map[string]interface{}{
+		"GameBoxID": 4,
+	})
+	req, _ := http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 403, w.Code)
+
+	service.Timer.Status = "on"
+	// payload error
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"GameBoxID": "4",
+	})
+	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 400, w.Code)
+
+	// gamebox not found
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"GameBoxID": 233,
+	})
+	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 403, w.Code)
+
+	// success
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"GameBoxID": 4,
+	})
+	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+	fmt.Println("checkdown", w.Body.String())
+
+	// repeat
+	w = httptest.NewRecorder()
+	jsonData, _ = json.Marshal(map[string]interface{}{
+		"GameBoxID": 4,
+	})
+	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 403, w.Code)
+}
+
+func TestService_CalculateRoundScore(t *testing.T) {
+
+	service.CalculateRoundScore(1)
+	// Check team score
+	var vidar Team
+	service.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: 1}}).Find(&vidar)
+	var e99 Team
+	service.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: 2}}).Find(&e99)
+	assert.Equal(t, 2020.0, vidar.Score)
+	assert.Equal(t, 1980.0, e99.Score)
+
+	// Check gamebox score
+	var gameboxes []GameBox
+	service.Mysql.Model(&GameBox{}).Order("`id` ASC").Find(&gameboxes)
+	assert.Equal(t, 1010.0, gameboxes[0].Score)
+	assert.Equal(t, 990.0, gameboxes[1].Score)
+	assert.Equal(t, 1010.0, gameboxes[2].Score)
+	assert.Equal(t, 990.0, gameboxes[3].Score)
 }
