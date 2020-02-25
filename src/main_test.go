@@ -37,6 +37,7 @@ func init() {
 		},
 	}
 	service.initMySQL()
+	service.initStore()
 
 	managerToken = service.generateToken()
 	// Test manager account e99:qwe1qwe2qwe3
