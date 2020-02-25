@@ -120,18 +120,20 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	tmpTeamName := make(map[string]int)
 	for _, item := range inputForm {
 		tmpTeamName[item.Name] = 0
-	}
-	if len(tmpTeamName) != len(inputForm) {
-		return s.makeErrJSON(400, 40001, "传入数据中存在重复数据")
-	}
 
-	// Check if the team name repeat in the database.
-	for _, item := range inputForm {
+		// Check if the team name repeat in the database.
 		var count int
 		s.Mysql.Model(Team{}).Where(&Team{Name: item.Name}).Count(&count)
 		if count != 0 {
 			return s.makeErrJSON(400, 40001, "存在重复添加数据")
 		}
+		// Team name can't be empty.
+		if item.Name == "" {
+			return s.makeErrJSON(400, 40001, "队伍名不能为空")
+		}
+	}
+	if len(tmpTeamName) != len(inputForm) {
+		return s.makeErrJSON(400, 40001, "传入数据中存在重复数据")
 	}
 
 	type resultItem struct {

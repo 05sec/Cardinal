@@ -19,7 +19,10 @@ func (s *Service) init() {
 	s.install()
 	s.initConfig()
 	s.initMySQL()
+	s.initManager()
 	s.initStore()
 	s.initTimer()
-	s.initRouter()
+	s.Router = s.initRouter()
+
+	panic(s.Router.Run(s.Conf.Base.Port))
 }

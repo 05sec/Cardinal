@@ -67,7 +67,7 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	}
 
 	var checkBulletin Bulletin
-	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: checkBulletin.ID}}).Find(&checkBulletin)
+	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
 		return s.makeErrJSON(404, 40400, "公告不存在")
 	}
@@ -98,7 +98,7 @@ func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	}
 
 	var checkBulletin Bulletin
-	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: checkBulletin.ID}}).Find(&checkBulletin)
+	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
 		return s.makeErrJSON(404, 40400, "公告不存在")
 	}

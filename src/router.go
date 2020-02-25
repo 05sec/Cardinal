@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Service) initRouter() {
+func (s *Service) initRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"},
@@ -192,8 +192,7 @@ func (s *Service) initRouter() {
 		c.JSON(s.makeErrJSON(405, 40500, "method not allowed"))
 	})
 
-	s.Router = r
-	panic(r.Run(s.Conf.Base.Port))
+	return r
 }
 
 // TeamAuthRequired is the team permission check middleware.

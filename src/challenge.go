@@ -135,6 +135,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
+	fmt.Println(checkChallenge)
 	if checkChallenge.Title == "" {
 		return s.makeErrJSON(404, 40400, "Challenge 不存在")
 	}
