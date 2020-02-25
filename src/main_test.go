@@ -11,9 +11,10 @@ import (
 var service *Service
 var managerToken string
 var team []struct {
-	Name     string `json:"Name"`
-	Password string `json:"Password"`
-	Token    string `json:"token"`
+	Name      string `json:"Name"`
+	Password  string `json:"Password"`
+	Token     string `json:"token"`
+	AccessKey string `json:"access_key"` //submit flag
 }
 
 func init() {
@@ -47,9 +48,10 @@ func init() {
 
 	managerToken = service.generateToken()
 	team = make([]struct {
-		Name     string `json:"Name"`
-		Password string `json:"Password"`
-		Token    string `json:"token"`
+		Name      string `json:"Name"`
+		Password  string `json:"Password"`
+		Token     string `json:"token"`
+		AccessKey string `json:"access_key"`
 	}, 0)
 
 	// Test manager account e99:qwe1qwe2qwe3
