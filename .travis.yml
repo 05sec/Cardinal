@@ -16,4 +16,5 @@ before_install:
 
 script:
   - "go test -v ./..."
-  - "go build ./src"
+  - "cd src"
+  - "go build"
