@@ -8,7 +8,7 @@ service:
   - mysql
 
 env:
-  - TEST_DB_NAME=Cardinal
+  - TEST_DB_NAME=Cardinal GO111MODULE="on"
 
 before_install:
   - mysql -e 'CREATE DATABASE Cardinal;'
