@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"strconv"
@@ -27,13 +26,17 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
-		return s.makeErrJSON(404, 40400, "Challenge 不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+		)
 	}
 
 	s.Mysql.Model(&GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
@@ -45,12 +48,14 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	// Refresh the ranking list teams' scores.
 	s.SetRankList()
 
-	status := "不"
+	status := "invisible"
 	if inputForm.Visible {
-		status = ""
+		status = "visible"
 	}
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("设置 Challenge [ %s ] 状态为%s可见", checkChallenge.Title, status))
-	return s.makeSuccessJSON("修改 GameBox 可见状态成功")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.set_challenge_"+status, gin.H{"challenge": checkChallenge.Title})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "gamebox.visibility_success"))
 }
 
 // GetAllChallenges get all challenges from the database.
@@ -94,7 +99,9 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	newChallenge := &Challenge{
@@ -105,18 +112,24 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 
 	s.Mysql.Model(&Challenge{}).Where(&Challenge{Title: newChallenge.Title}).Find(&checkChallenge)
 	if checkChallenge.Title != "" {
-		return s.makeErrJSON(403, 40300, "重复添加")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "general.post_repeat"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Create(newChallenge).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "添加 Challenge 失败！")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "challenge.post_error"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("新的 Challenge [ %s ] 被创建", newChallenge.Title))
-	return s.makeSuccessJSON("添加 Challenge 成功！")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"challenge": checkChallenge.Title})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "challenge.post_success"))
 }
 
 // EditChallenge is edit challenge handler for manager.
@@ -130,14 +143,17 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
-	fmt.Println(checkChallenge)
 	if checkChallenge.Title == "" {
-		return s.makeErrJSON(404, 40400, "Challenge 不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+		)
 	}
 
 	newChallenge := &Challenge{
@@ -147,7 +163,9 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newChallenge).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001, "修改 Challenge 失败！")
+		return s.makeErrJSON(500, 50001,
+			s.I18n.T(c.GetString("lang"), "challenge.put_error"),
+		)
 	}
 	tx.Commit()
 
@@ -166,24 +184,30 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 		s.SetRankListTitle()
 	}
 
-	return s.makeSuccessJSON("修改 Challenge 成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "challenge.post_success"))
 }
 
 // DeleteChallenge is delete challenge handler for manager.
 func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000, "Error query")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Query must be number")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
 	}
 
 	var challenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: uint(id)}}).Find(&challenge)
 	if challenge.Title == "" {
-		return s.makeErrJSON(404, 40400, "Challenge 不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
@@ -191,10 +215,14 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	tx.Where("challenge_id = ?", uint(id)).Delete(&GameBox{})
 	if tx.Where("id = ?", uint(id)).Delete(&Challenge{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50002, "删除 Challenge 失败！")
+		return s.makeErrJSON(500, 50002,
+			s.I18n.T(c.GetString("lang"), "challenge.delete_error"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("Challenge [ %s ] 被删除", challenge.Title))
-	return s.makeSuccessJSON("删除 Challenge 成功！")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.delete_challenge", gin.H{"challenge": challenge.Title})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "challenge.delete_success"))
 }

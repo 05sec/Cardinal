@@ -2,6 +2,7 @@ zh-CN:
   general:
     error_payload: "请求体格式错误！"
     error_query: "请求参数不正确！"
+    post_repeat: "重复添加！"
     must_be_number: "参数 {{.key}} 必须为数字！"
 
   bulletin:
@@ -12,5 +13,23 @@ zh-CN:
     delete_error: "删除公告失败！"
     delete_success: "删除公告成功！"
     not_found: "公告不存在！"
+
+  challenge:
+    post_error: "添加题目失败！"
+    post_success: "添加题目成功！"
+    put_error: "修改题目信息失败！"
+    put_success: "修改题目信息成功！"
+    delete_error: "删除题目失败！"
+    delete_success: "删除题目成功！"
+    not_found: "题目不存在！"
+
+  gamebox:
+    visibility_success: "修改靶机可见状态成功！"
+
+  log:
+    new_challenge: "新的题目 [{{.title}}] 被创建"
+    delete_challenge: "题目 [{{.title}}] 被删除"
+    set_challenge_visible: "设置题目 [{{.challenge}}] 状态为可见"
+    set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
 
 
