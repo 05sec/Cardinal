@@ -23,6 +23,7 @@ func (s *Service) I18nMiddleware() gin.HandlerFunc {
 		if err != nil || len(languages) == 0 {
 			c.Set("lang", "")
 			c.Next()
+			return
 		}
 
 		// Only get the first language, ignore the rest.
