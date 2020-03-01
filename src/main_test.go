@@ -40,6 +40,7 @@ func init() {
 			DBName:     os.Getenv("TEST_DB_NAME"),
 		},
 	}
+	service.initI18n()
 	service.initMySQL()
 	service.initStore()
 	service.initTimer()

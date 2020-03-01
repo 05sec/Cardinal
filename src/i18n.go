@@ -21,11 +21,13 @@ func (s *Service) I18nMiddleware() gin.HandlerFunc {
 		acceptLanguages := c.GetHeader("Accept-Language")
 		languages, _, err := language.ParseAcceptLanguage(acceptLanguages)
 		if err != nil || len(languages) == 0 {
-			c.Set("lang", "zh_CN")
+			c.Set("lang", "")
+			c.Next()
 			return
 		}
 
 		// Only get the first language, ignore the rest.
 		c.Set("lang", languages[0].String())
+		c.Next()
 	}
 }
