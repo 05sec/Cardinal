@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
@@ -28,7 +27,9 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	var formData ManagerLoginForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var manager Manager
@@ -40,12 +41,16 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 		tx := s.Mysql.Begin()
 		if tx.Model(&Manager{}).Where(&Manager{Name: manager.Name}).Updates(&Manager{Token: token}).RowsAffected != 1 {
 			tx.Rollback()
-			return s.makeErrJSON(500, 50000, "Server error")
+			return s.makeErrJSON(500, 50000,
+				s.I18n.T(c.GetString("lang"), "general.server_error"),
+			)
 		}
 		tx.Commit()
 		return s.makeSuccessJSON(token)
 	}
-	return s.makeErrJSON(403, 40300, "账号或密码错误！")
+	return s.makeErrJSON(403, 40300,
+		s.I18n.T(c.GetString("lang"), "manager.login_error"),
+	)
 }
 
 // ManagerLogout is the manager logout handler.
@@ -54,7 +59,9 @@ func (s *Service) ManagerLogout(c *gin.Context) (int, interface{}) {
 	if token != "" {
 		s.Mysql.Model(&Manager{}).Where("token = ?", token).Delete(&Token{})
 	}
-	return s.makeSuccessJSON("登出成功！")
+	return s.makeSuccessJSON(
+		s.I18n.T(c.GetString("lang"), "manager.logout_success"),
+	)
 }
 
 // GetAllManager returns all the manager.
@@ -73,13 +80,17 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	var formData InputForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var checkManager Manager
 	s.Mysql.Model(&Manager{}).Where(&Manager{Name: formData.Name}).Find(&checkManager)
 	if checkManager.ID != 0 {
-		return s.makeErrJSON(400, 40001, "管理员名称重复")
+		return s.makeErrJSON(400, 40001,
+			s.I18n.T(c.GetString("lang"), "manager.repeat"),
+		)
 	}
 
 	manager := Manager{
@@ -89,12 +100,16 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Create(&manager).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "添加管理员失败！")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "manager.post_error"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("新的管理员账号 [ %s ] 被添加", manager.Name))
-	return s.makeSuccessJSON("添加管理员成功！")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.new_manager", gin.H{"name": manager.Name})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "manager.post_success"))
 }
 
 // RefreshManagerToken can refresh a manager's token.
@@ -102,11 +117,15 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000, "Error query")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Query must be number")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
 	}
 
 	tx := s.Mysql.Begin()
@@ -115,11 +134,15 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 		Token: token,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "更新管理员 Token 失败！")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "manager.update_token_fail"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("管理员 [ ID: %d ] Token 已刷新", id))
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.manager_token", gin.H{"id": id})),
+	)
 	return s.makeSuccessJSON(token)
 }
 
@@ -127,11 +150,15 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000, "Error query")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Query must be number")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
 	}
 
 	tx := s.Mysql.Begin()
@@ -140,11 +167,15 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 		Password: s.addSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "修改管理员密码失败！")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "manager.update_password_fail"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("管理员 [ ID: %d ] 密码已修改", id))
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.manager_password", gin.H{"id": id})),
+	)
 	return s.makeSuccessJSON(password)
 }
 
@@ -152,20 +183,28 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000, "Error query")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Query must be number")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Model(&Manager{}).Where("id = ?", id).Delete(&Manager{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "删除管理员失败")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "manager.delete_error"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("管理员 [ ID: %d ] 已删除", id))
-	return s.makeSuccessJSON("删除管理员成功")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.delete_manager", gin.H{"id": id})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "manager.delete_success"))
 }

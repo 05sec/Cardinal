@@ -55,6 +55,21 @@ zh-CN:
   team:
     not_found: "队伍不存在！"
 
+  healthy:
+    previous_round_non_zero_error: "上一轮分数非零和，请检查！"
+    total_score_non_zero_error: "总分数非零和，请检查！"
+
+  manager:
+    login_error: "账号或密码错误！"
+    logout_success: "登出成功！"
+    post_error: "添加管理员账号失败！"
+    post_success: "添加管理员成功！"
+    delete_error: "删除管理员失败！"
+    delete_success: "删除管理员成功！"
+    repeat: "管理员名称重复"
+    update_token_fail: "更新管理员 Token 失败！"
+    update_password_fail: "修改管理员密码失败！"
+
   log:
     new_challenge: "新的题目 [{{.title}}] 被创建"
     delete_challenge: "题目 [{{.title}}] 被删除"
@@ -62,4 +77,7 @@ zh-CN:
     set_challenge_visible: "设置题目 [{{.challenge}}] 状态为可见"
     set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
     generate_flag: "生成 Flag 完成！共 {{.total}} 个。耗时 {{.time}} s。"
-
+    new_manager: "新的管理员账号 [ {{.name}} ] 被添加"
+    delete_manager: "管理员 [ ID: {{.id}} ] 已删除"
+    manager_token: "管理员 [ ID: {{.id}} ] Token 已刷新"
+    manager_password: "管理员 [ ID: {{.id}} ] 密码已修改"
