@@ -1,0 +1,16 @@
+zh-CN:
+  general:
+    error_payload: "请求体格式错误！"
+    error_query: "请求参数不正确！"
+    must_be_number: "参数 {{.key}} 必须为数字！"
+
+  bulletin:
+    post_error: "添加公告失败！"
+    post_success: "添加公告成功！"
+    put_error: "修改公告失败！"
+    put_success: "修改公告成功！"
+    delete_error: "删除公告失败！"
+    delete_success: "删除公告成功！"
+    not_found: "公告不存在！"
+
+

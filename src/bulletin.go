@@ -38,7 +38,9 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
@@ -47,10 +49,12 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 		Content: inputForm.Content,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "添加公告失败！")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "bulletin.post_error"),
+		)
 	}
 	tx.Commit()
-	return s.makeSuccessJSON("添加公告成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "bulletin.post_success"))
 }
 
 // EditBulletin is edit new bulletin handler for manager.
@@ -63,13 +67,17 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var checkBulletin Bulletin
 	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
-		return s.makeErrJSON(404, 40400, "公告不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "bulletin.not_found"),
+		)
 	}
 
 	newBulletin := &Bulletin{
@@ -79,35 +87,45 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Bulletin{}).Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001, "修改公告失败！")
+		return s.makeErrJSON(500, 50001,
+			s.I18n.T(c.GetString("lang"), "bulletin.put_error"),
+		)
 	}
 	tx.Commit()
 
-	return s.makeSuccessJSON("修改公告成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "bulletin.put_success"))
 }
 
 // DeleteBulletin is delete new bulletin handler for manager.
 func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000, "Error query")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Query must be number")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
 	}
 
 	var checkBulletin Bulletin
 	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
-		return s.makeErrJSON(404, 40400, "公告不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "bulletin.not_found"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Where("id = ?", id).Delete(&Bulletin{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50002, "删除公告失败！")
+		return s.makeErrJSON(500, 50002,
+			s.I18n.T(c.GetString("lang"), "bulletin.delete_error"),
+		)
 	}
 	tx.Commit()
-	return s.makeSuccessJSON("删除公告成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "bulletin.delete_success"))
 }

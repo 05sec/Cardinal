@@ -13,6 +13,8 @@ func (s *Service) initRouter() *gin.Engine {
 		AllowOrigins: []string{"*"},
 	}))
 
+	r.Use(s.I18nMiddleware())
+
 	// Cardinal basic info
 	r.Any("/", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON("Cardinal"))
