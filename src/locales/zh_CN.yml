@@ -1,9 +1,12 @@
 zh-CN:
   general:
+    success: "成功"
     error_payload: "请求体格式错误！"
     error_query: "请求参数不正确！"
-    post_repeat: "重复添加！"
     must_be_number: "参数 {{.key}} 必须为数字！"
+    post_repeat: "重复添加！"
+    not_begin: "比赛未开始"
+    server_error: "后端程序错误！"
 
   bulletin:
     post_error: "添加公告失败！"
@@ -23,8 +26,12 @@ zh-CN:
     delete_success: "删除题目成功！"
     not_found: "题目不存在！"
 
+  check:
+    repeat: "重复 Check，已忽略"
+
   gamebox:
     visibility_success: "修改靶机可见状态成功！"
+    not_found: "靶机不存在！"
 
   log:
     new_challenge: "新的题目 [{{.title}}] 被创建"

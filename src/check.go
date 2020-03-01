@@ -19,7 +19,9 @@ type DownAction struct {
 func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	// Check down is forbidden if the competition isn't start.
 	if s.Timer.Status != "on" {
-		return s.makeErrJSON(403, 40300, "比赛未开始")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "general.not_begin"),
+		)
 	}
 
 	type InputForm struct {
@@ -28,7 +30,9 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	// Does it check down one gamebox repeatedly in one round?
@@ -38,14 +42,18 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		Round:     s.Timer.NowRound,
 	}).Find(&repeatCheck)
 	if repeatCheck.ID != 0 {
-		return s.makeErrJSON(403, 40300, "重复 Check down，已忽略")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "check.repeat"),
+		)
 	}
 
 	// Check the gamebox is existed or not.
 	var gameBox GameBox
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
 	if gameBox.ID == 0 {
-		return s.makeErrJSON(403, 40300, "GameBox 不存在！")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "gamebox.not_found"),
+		)
 	}
 
 	// No problem! Update the gamebox status to down.
@@ -59,12 +67,14 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		Round:       s.Timer.NowRound,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "Server error")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "general.server_error"),
+		)
 	}
 	tx.Commit()
 
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
 
-	return s.makeSuccessJSON("success")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "general.success"))
 }
