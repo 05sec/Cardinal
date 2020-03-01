@@ -44,13 +44,22 @@ zh-CN:
     generate_success: "生成 Flag 成功！"
 
   gamebox:
+    post_error: "添加靶机失败！"
+    post_success: "添加靶机成功！"
+    put_error: "修改靶机信息失败！"
+    put_success: "修改靶机信息成功！"
     visibility_success: "修改靶机可见状态成功！"
+    repeat: "存在重复添加的靶机，请检查"
     not_found: "靶机不存在！"
+
+  team:
+    not_found: "队伍不存在！"
 
   log:
     new_challenge: "新的题目 [{{.title}}] 被创建"
     delete_challenge: "题目 [{{.title}}] 被删除"
+    new_gamebox: "共 {{.count}} 个靶机被创建"
     set_challenge_visible: "设置题目 [{{.challenge}}] 状态为可见"
     set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
-    generate_flag: "生成 Flag 完成！共 {{.Total}} 个。耗时 {{.Time}} s。"
+    generate_flag: "生成 Flag 完成！共 {{.total}} 个。耗时 {{.time}} s。"
 

@@ -172,7 +172,7 @@ func (s *Service) GenerateFlag(c *gin.Context) (int, interface{}) {
 	s.Mysql.Model(&Flag{}).Count(&count)
 	endTime := time.Now().UnixNano()
 	s.NewLog(WARNING, "system",
-		string(s.I18n.T(c.GetString("lang"), "log.generate_flag", gin.H{"Total": count, "Time": float64(endTime-startTime) / float64(time.Second)})),
+		string(s.I18n.T(c.GetString("lang"), "log.generate_flag", gin.H{"total": count, "time": float64(endTime-startTime) / float64(time.Second)})),
 	)
 	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "flag.generate_success"))
 }
