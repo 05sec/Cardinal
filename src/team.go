@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
@@ -38,7 +37,9 @@ func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
 	var formData TeamLoginForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var team Team
@@ -50,12 +51,16 @@ func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
 		tx := s.Mysql.Begin()
 		if tx.Create(&Token{TeamID: team.ID, Token: token}).RowsAffected != 1 {
 			tx.Rollback()
-			return s.makeErrJSON(500, 50000, "Server error")
+			return s.makeErrJSON(500, 50000,
+				s.I18n.T(c.GetString("lang"), "general.server_error"),
+			)
 		}
 		tx.Commit()
 		return s.makeSuccessJSON(token)
 	}
-	return s.makeErrJSON(403, 40300, "账号或密码错误！")
+	return s.makeErrJSON(403, 40300,
+		s.I18n.T(c.GetString("lang"), "team.login_error"),
+	)
 }
 
 // TeamLogout is the team logout handler.
@@ -64,14 +69,16 @@ func (s *Service) TeamLogout(c *gin.Context) (int, interface{}) {
 	if token != "" {
 		s.Mysql.Model(&Token{}).Where("token = ?", token).Delete(&Token{})
 	}
-	return s.makeSuccessJSON("登出成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "team.logout_success"))
 }
 
 // GetTeamInfo returns the team its info.
 func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}) {
 	teamID, ok := c.Get("teamID")
 	if !ok {
-		return s.makeErrJSON(500, 50000, "Server error")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "general.server_error"),
+		)
 	}
 
 	var teamInfo Team
@@ -113,7 +120,9 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	var inputForm []InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	// Check if the team name repeat in the form.
@@ -125,15 +134,21 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 		var count int
 		s.Mysql.Model(Team{}).Where(&Team{Name: item.Name}).Count(&count)
 		if count != 0 {
-			return s.makeErrJSON(400, 40001, "存在重复添加数据")
+			return s.makeErrJSON(400, 40001,
+				s.I18n.T(c.GetString("lang"), "team.repeat"),
+			)
 		}
 		// Team name can't be empty.
 		if item.Name == "" {
-			return s.makeErrJSON(400, 40001, "队伍名不能为空")
+			return s.makeErrJSON(400, 40001,
+				s.I18n.T(c.GetString("lang"), "team.team_name_empty"),
+			)
 		}
 	}
 	if len(tmpTeamName) != len(inputForm) {
-		return s.makeErrJSON(400, 40001, "传入数据中存在重复数据")
+		return s.makeErrJSON(400, 40001,
+			s.I18n.T(c.GetString("lang"), "team.repeat"),
+		)
 	}
 
 	type resultItem struct {
@@ -154,7 +169,9 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 		}
 		if tx.Create(newTeam).RowsAffected != 1 {
 			tx.Rollback()
-			return s.makeErrJSON(500, 50000, "添加 Team 失败！")
+			return s.makeErrJSON(500, 50000,
+				s.I18n.T(c.GetString("lang"), "team.post_error"),
+			)
 		}
 		resultData = append(resultData, resultItem{
 			Name:     item.Name,
@@ -164,7 +181,12 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("%d 个新的 Team [ %s ] 被创建", len(inputForm), teamName))
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.new_team", gin.H{
+			"count":    len(inputForm),
+			"teamName": teamName,
+		})),
+	)
 	return s.makeSuccessJSON(resultData)
 }
 
@@ -178,21 +200,27 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	// Check the team existed or not.
 	var count int
 	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
 	if count == 0 {
-		return s.makeErrJSON(404, 40400, "Team 不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "team.not_found"),
+		)
 	}
 
 	// Check the team name repeated or not.
 	var repeatCheckTeam Team
 	s.Mysql.Model(Team{}).Where(&Team{Name: inputForm.Name}).Find(&repeatCheckTeam)
 	if repeatCheckTeam.Name != "" && repeatCheckTeam.ID != inputForm.ID {
-		return s.makeErrJSON(400, 40001, "Team 重复")
+		return s.makeErrJSON(400, 40001,
+			s.I18n.T(c.GetString("lang"), "team.repeat"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
@@ -201,39 +229,53 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 		"Logo": inputForm.Logo,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001, "修改 Team 失败！")
+		return s.makeErrJSON(500, 50001,
+			s.I18n.T(c.GetString("lang"), "team.put_error"),
+		)
 	}
 	tx.Commit()
 
-	return s.makeSuccessJSON("修改 Team 成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "team.put_success"))
 }
 
 // DeleteTeam is delete a team handler.
 func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000, "Error query")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Query must be number")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
 	}
 
 	var team Team
 	s.Mysql.Where(&Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
 	if team.Name == "" {
-		return s.makeErrJSON(404, 40400, "Team 不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "team.not_found"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Where("id = ?", uint(id)).Delete(&Team{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50002, "删除 Team 失败！")
+		return s.makeErrJSON(500, 50002,
+			s.I18n.T(c.GetString("lang"), "team.delete_error"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("Team [ %s ] 被删除", team.Name))
-	return s.makeSuccessJSON("删除 Team 成功！")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.delete_team", gin.H{
+			"teamName": team.Name,
+		})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "team.delete_success"))
 }
 
 // ResetTeamPassword will reset a team's password. The new password is a random string.
@@ -244,24 +286,34 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	// Check the team existed or not.
 	var checkTeam Team
 	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
 	if checkTeam.Name == "" {
-		return s.makeErrJSON(404, 40400, "Team 不存在")
+		return s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "team.not_found"),
+		)
 	}
 
 	newPassword := randstr.String(16)
 	tx := s.Mysql.Begin()
 	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&Team{Password: s.addSalt(newPassword)}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001, "重置密码失败！")
+		return s.makeErrJSON(500, 50001,
+			s.I18n.T(c.GetString("lang"), "team.reset_password_error"),
+		)
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("Team [ %s ] 登录密码已重置", checkTeam.Name))
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.team_reset_password", gin.H{
+			"teamName": checkTeam.Name,
+		})),
+	)
 	return s.makeSuccessJSON(newPassword)
 }

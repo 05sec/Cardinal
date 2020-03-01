@@ -8,6 +8,9 @@ zh-CN:
     not_begin: "比赛未开始"
     server_error: "后端程序错误！"
     invalid_token: "Token 无效"
+    no_auth: "未授权访问"
+    not_found: "资源不存在"
+    method_not_allow: "请求方法不允许"
 
   bulletin:
     post_error: "添加公告失败！"
@@ -53,6 +56,16 @@ zh-CN:
     not_found: "靶机不存在！"
 
   team:
+    post_error: "添加队伍失败！"
+    put_error: "修改队伍信息失败！"
+    put_success: "修改队伍信息成功！"
+    delete_error: "删除队伍失败！"
+    delete_success: "删除队伍成功！"
+    login_error: "账号或密码错误！"
+    logout_success: "登出成功！"
+    repeat: "存在重复添加的队伍，请检查"
+    team_name_empty: "队伍名不能为空"
+    reset_password_error: "重置密码失败！"
     not_found: "队伍不存在！"
 
   healthy:
@@ -81,3 +94,6 @@ zh-CN:
     delete_manager: "管理员 [ ID: {{.id}} ] 已删除"
     manager_token: "管理员 [ ID: {{.id}} ] Token 已刷新"
     manager_password: "管理员 [ ID: {{.id}} ] 密码已修改"
+    new_team: "{{.count}} 个新的队伍 [ {{.teamName}} ] 被创建"
+    delete_team: "Team [ {{.teamName}} ] 被删除"
+    team_reset_password: "队伍 [ {{.teamName}} ] 登录密码已重置"
