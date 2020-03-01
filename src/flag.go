@@ -36,18 +36,24 @@ type Flag struct {
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	// Submit flag is forbidden if the competition isn't start.
 	if s.Timer.Status != "on" {
-		return s.makeErrJSON(403, 40300, "比赛未开始")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "general.not_begin"),
+		)
 	}
 
 	secretKey := c.GetHeader("Authorization")
 	if secretKey == "" {
-		return s.makeErrJSON(403, 40300, "Token 无效")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "general.invalid_token"),
+		)
 	}
 	var team Team
 	s.Mysql.Model(&Team{}).Where(&Team{SecretKey: secretKey}).Find(&team)
 	teamID := team.ID
 	if teamID == 0 {
-		return s.makeErrJSON(403, 40300, "Token 无效")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "general.invalid_token"),
+		)
 	}
 
 	type InputForm struct {
@@ -56,13 +62,17 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	var flagData Flag
 	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
 	if flagData.ID == 0 || teamID == flagData.TeamID {                                                 // 注意不允许提交自己的 flag
-		return s.makeErrJSON(403, 40300, "Flag 错误！")
+		return s.makeErrJSON(403, 40300,
+			s.I18n.T(c.GetString("lang"), "flag.error"),
+		)
 	}
 
 	// Check if the flag has been submitted by the team before.
@@ -74,7 +84,9 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		Round:          flagData.Round,
 	}).Find(&repeatAttackCheck)
 	if repeatAttackCheck.ID != 0 {
-		return s.makeErrJSON(403, 40301, "请勿重复提交 Flag")
+		return s.makeErrJSON(403, 40301,
+			s.I18n.T(c.GetString("lang"), "flag.repeat"),
+		)
 	}
 
 	// Update the victim's gamebox status to `down`.
@@ -90,14 +102,16 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		Round:          flagData.Round,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000, "提交失败！")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "flag.submit_error"),
+		)
 	}
 	tx.Commit()
 
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
 
-	return s.makeSuccessJSON("提交成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "flag.submit_success"))
 }
 
 // GetFlags get flags from the database for backstage manager.
@@ -107,12 +121,16 @@ func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
-		return s.makeErrJSON(400, 40000, "page 参数错误")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 
 	per, err := strconv.Atoi(perStr)
 	if err != nil || per <= 0 || per >= 100 { // 限制每页最多 100 条
-		return s.makeErrJSON(400, 40001, "per 参数错误")
+		return s.makeErrJSON(400, 40001,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 
 	var total int
@@ -128,7 +146,7 @@ func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
 }
 
 // GenerateFlag is the generate flag handler for manager.
-func (s *Service) GenerateFlag() (int, interface{}) {
+func (s *Service) GenerateFlag(c *gin.Context) (int, interface{}) {
 	var gameBoxes []GameBox
 	s.Mysql.Model(&GameBox{}).Find(&gameBoxes)
 
@@ -153,6 +171,8 @@ func (s *Service) GenerateFlag() (int, interface{}) {
 	var count int
 	s.Mysql.Model(&Flag{}).Count(&count)
 	endTime := time.Now().UnixNano()
-	s.NewLog(WARNING, "system", fmt.Sprintf("重新生成 Flag 完成！共 %d 个。耗时 %f s。", count, float64(endTime-startTime)/float64(time.Second)))
-	return s.makeSuccessJSON("生成 Flag 成功！")
+	s.NewLog(WARNING, "system",
+		string(s.I18n.T(c.GetString("lang"), "log.generate_flag", gin.H{"Total": count, "Time": float64(endTime-startTime) / float64(time.Second)})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "flag.generate_success"))
 }

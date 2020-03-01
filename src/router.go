@@ -145,7 +145,7 @@ func (s *Service) initRouter() *gin.Engine {
 			c.JSON(s.GetFlags(c))
 		})
 		manager.POST("/flag/generate", func(c *gin.Context) {
-			c.JSON(s.GenerateFlag())
+			c.JSON(s.GenerateFlag(c))
 		})
 
 		// Check
