@@ -83,6 +83,23 @@ zh-CN:
     total_score_non_zero_error: "总分数非零和，请检查！"
 
   install:
+    greet: "Cardinal.toml 配置文件不存在，安装向导将带领您进行配置。"
+    input_title: "请输入比赛名称"
+    begin_time: "请输入比赛开始时间（格式 2020-02-17 12:00:00）"
+    end_time: "请输入比赛结束时间（格式 2020-02-17 12:00:00）"
+    duration: "请输入每轮长度（单位：分钟，默认值：2）"
+    port: "请输入后端服务器端口号（默认值：19999）"
+    flag_prefix: "请输入 Flag 前缀（默认值：hctf{）"
+    flag_suffix: "请输入 Flag 后缀（默认值：}）"
+    checkdown_score: "请输入每次 Checkdown 扣分（默认值：50）"
+    attack_score: "请输入每次攻击得分（默认值：50）"
+    db_host: "请输入数据库地址（默认值：localhost:3306）"
+    db_username: "请输入数据库账号："
+    db_password: "请输入数据库密码："
+    db_name: "请输入数据库表名（默认值：cardinal）"
+    manager_name: "请输入管理员账号："
+    manager_password: "请输入管理员密码："
+    manager_success: "添加管理员账号成功，请妥善保管您的账号密码信息！"
     create_config_success: "创建 Cardinal.toml 配置文件成功！"
 
   manager:
