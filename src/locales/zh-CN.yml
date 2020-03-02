@@ -82,6 +82,9 @@ zh-CN:
     previous_round_non_zero_error: "上一轮分数非零和，请检查！"
     total_score_non_zero_error: "总分数非零和，请检查！"
 
+  install:
+    create_config_success: "创建 Cardinal.toml 配置文件成功！"
+
   manager:
     login_error: "账号或密码错误！"
     logout_success: "登出成功！"

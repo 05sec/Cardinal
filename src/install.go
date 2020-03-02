@@ -8,6 +8,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -57,13 +60,51 @@ func (s *Service) install() {
 		}
 	}
 
+	// Check `locales` folder exist
+	if !IsExist("./locales") {
+		err := os.Mkdir("./locales", os.ModePerm)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	// Check language file exist
+	files, err := ioutil.ReadDir("./locales")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	languages := map[string]string{}
+	for index, file := range files {
+		if !file.IsDir() && filepath.Ext(file.Name()) == ".yml" {
+			languages[strconv.Itoa(index+1)] = strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+		}
+	}
+	if len(languages) == 0 {
+		log.Fatalln("Can not find the language file!")
+	}
+
 	if !IsExist("./conf/Cardinal.toml") {
+		log.Println("Please select a preferred language for the installation guide:")
+		for index, lang := range languages {
+			fmt.Printf("%s - %s\n", index, lang)
+		}
+		fmt.Println("")
+
+		// Select a language
+		index := "0"
+		var err = errors.New("")
+		for languages[index] == "" {
+			InputString(&index, "type 1, 2... to select")
+		}
+
 		content, err := s.GenerateConfigFileGuide()
 		if err != nil {
 			log.Fatalln(err)
 		}
-		ioutil.WriteFile("./conf/Cardinal.toml", content, 0644)
-		log.Println("创建 Cardinal.toml 配置文件成功！")
+		err = ioutil.WriteFile("./conf/Cardinal.toml", content, 0644)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 
