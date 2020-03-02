@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -43,7 +43,13 @@ func (s *Service) CalculateRoundScore(round int) {
 	s.SetRankList()
 
 	endTime := time.Now().UnixNano()
-	s.NewLog(WARNING, "system", fmt.Sprintf("第 %d 轮分数结算完成！耗时 %f s。", round, float64(endTime-startTime)/float64(time.Second)))
+	s.NewLog(WARNING, "system", string(
+		s.I18n.T(s.Conf.Base.SystemLanguage, "log.score_success",
+			gin.H{
+				"round": round,
+				"time":  float64(endTime-startTime) / float64(time.Second),
+			}),
+	))
 
 	// Do healthy check to make sure the score is correct.
 	s.HealthyCheck()

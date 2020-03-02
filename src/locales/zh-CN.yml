@@ -68,6 +68,16 @@ zh-CN:
     reset_password_error: "重置密码失败！"
     not_found: "队伍不存在！"
 
+  timer:
+    total_round: "比赛总轮数：{{.round}}"
+    total_time: "比赛总时长：{{.time}}  分钟"
+    end: "比赛已结束"
+    start_time_error: "比赛结束时间应大于开始时间！"
+    single_rest_time_error: "RestTime 单个时间周期配置错误！"
+    rest_time_start_error: "RestTime 配置错误！前一时间应在后一时间点之前。[ {{.from}} - {{.to}} ]"
+    rest_time_overflow_error: "RestTime 配置错误！不能在比赛开始时间之前或比赛结束时间之后。[ {{.from}} - {{.to}} ]"
+    rest_time_order_error: "RestTime 需要按开始时间顺序输入！[ {{.from}} - {{.to}} ]"
+
   healthy:
     previous_round_non_zero_error: "上一轮分数非零和，请检查！"
     total_score_non_zero_error: "总分数非零和，请检查！"
@@ -90,6 +100,7 @@ zh-CN:
     set_challenge_visible: "设置题目 [{{.challenge}}] 状态为可见"
     set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
     generate_flag: "生成 Flag 完成！共 {{.total}} 个。耗时 {{.time}} s。"
+    score_success: "第 {{.round}} 轮分数结算完成！耗时 {{.time}} s。"
     new_manager: "新的管理员账号 [ {{.name}} ] 被添加"
     delete_manager: "管理员 [ ID: {{.id}} ] 已删除"
     manager_token: "管理员 [ ID: {{.id}} ] Token 已刷新"
@@ -97,3 +108,4 @@ zh-CN:
     new_team: "{{.count}} 个新的队伍 [ {{.teamName}} ] 被创建"
     delete_team: "Team [ {{.teamName}} ] 被删除"
     team_reset_password: "队伍 [ {{.teamName}} ] 登录密码已重置"
+    rank_list_success: "更新排行榜标题成功"

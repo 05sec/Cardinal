@@ -14,29 +14,30 @@ import (
 
 const configTemplate = `
 [base]
-Title="{{ .Title }}"    # 比赛名称
-BeginTime="{{ .BeginTime }}"   # 比赛开始时间
+Title="{{ .Title }}"
+SystemLanguage="zh-CN"
+BeginTime="{{ .BeginTime }}"
 RestTime=[
-#    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],      # 中途暂停区间
+#    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],
 ]
-EndTime="{{ .EndTime }}"      # 比赛结束时间
-Duration={{ .Duration }}    # 每轮长度（分钟）
+EndTime="{{ .EndTime }}"
+Duration={{ .Duration }}
 
-Salt="{{ .Salt }}"    # 务必改成一个谁也猜不到的随机字符串！！
+Salt="{{ .Salt }}"
 
-Port=":{{ .Port }}"       # 平台后端服务端口
+Port=":{{ .Port }}"
 
-FlagPrefix="{{ .FlagPrefix }}"  # Flag 前缀
-FlagSuffix="{{ .FlagSuffix }}"      # Flag 后缀
+FlagPrefix="{{ .FlagPrefix }}"
+FlagSuffix="{{ .FlagSuffix }}"
 
-CheckDownScore={{ .CheckDownScore }}   # 每次 CheckDown 扣分
-AttackScore={{ .AttackScore }}      # 每次攻击得分
+CheckDownScore={{ .CheckDownScore }}
+AttackScore={{ .AttackScore }}
 
-[mysql]     # 数据库配置信息
-DBHost="{{ .DBHost }}" # 数据库地址
-DBUsername="{{ .DBUsername }}"       # 数据库账号
-DBPassword="{{ .DBPassword }}"       # 数据库密码
-DBName="{{ .DBName }}"       # 数据库表名
+[mysql]
+DBHost="{{ .DBHost }}"
+DBUsername="{{ .DBUsername }}"
+DBPassword="{{ .DBPassword }}"
+DBName="{{ .DBName }}"
 `
 
 func (s *Service) install() {

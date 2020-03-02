@@ -51,8 +51,8 @@ func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 
 // GetGameBoxes returns the gameboxes for manager.
 func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
-	pageStr := c.Query("page")   // 当前页
-	perPageStr := c.Query("per") // 每页数量
+	pageStr := c.Query("page")
+	perPageStr := c.Query("per")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
