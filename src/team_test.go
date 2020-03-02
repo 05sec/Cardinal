@@ -816,3 +816,49 @@ func TestService_CalculateRoundScore(t *testing.T) {
 	assert.Equal(t, 1010.0, gameboxes[2].Score)
 	assert.Equal(t, 990.0, gameboxes[3].Score)
 }
+
+// Healthy check
+func TestService_PreviousRoundScore(t *testing.T) {
+	assert.Equal(t, service.PreviousRoundScore(), float64(0))
+}
+
+func TestService_TotalScore(t *testing.T) {
+	assert.Equal(t, service.TotalScore(), float64(0))
+}
+
+func TestService_GetAllBulletins2(t *testing.T) {
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/team/bulletins", nil)
+	req.Header.Set("Authorization", team[0].Token)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+}
+
+// Rank
+func TestService_GetRankList(t *testing.T) {
+	assert.Equal(t, len(service.GetRankList()), 2)
+	assert.Equal(t, service.GetRankList()[0].TeamName, "Vidar")
+	assert.Equal(t, service.GetRankList()[1].TeamName, "E99")
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/manager/rank", nil)
+	req.Header.Set("Authorization", managerToken)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+
+	w = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/team/rank", nil)
+	req.Header.Set("Authorization", team[0].Token)
+	service.Router.ServeHTTP(w, req)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestService_GetManagerRankList(t *testing.T) {
+	assert.Equal(t, len(service.GetRankList()), 2)
+	assert.Equal(t, service.GetManagerRankList()[0].TeamName, "Vidar")
+	assert.Equal(t, service.GetManagerRankList()[1].TeamName, "E99")
+}
+
+func TestService_GetRankListTitle(t *testing.T) {
+	assert.Equal(t, len(service.GetRankList()), 2)
+}
