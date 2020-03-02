@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"math"
-	"strconv"
 	"time"
 )
 
@@ -84,8 +83,13 @@ func (s *Service) initTimer() {
 	}
 	s.Timer.TotalRound = int(totalTime / 60 / int64(s.Timer.Duration))
 
-	log.Println("比赛总轮数：" + strconv.Itoa(s.Timer.TotalRound))
-	log.Println("比赛总时长：" + strconv.Itoa(int(totalTime/60)) + " 分钟")
+	log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.total_round", gin.H{
+		"round": s.Timer.TotalRound,
+	}))
+
+	log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.total_time", gin.H{
+		"time": int(totalTime / 60),
+	}))
 
 	go s.timerProcess()
 }
@@ -164,7 +168,7 @@ func (s *Service) timerProcess() {
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
 				go s.CalculateRoundScore(s.Timer.TotalRound)
-				s.NewLog(IMPORTANT, "system", "比赛已结束")
+				s.NewLog(IMPORTANT, "system", string(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.end")))
 			}
 
 			s.Timer.Status = "end"
@@ -176,23 +180,38 @@ func (s *Service) timerProcess() {
 
 func (s *Service) checkTimeConfig() {
 	if s.Timer.BeginTime.Unix() > s.Timer.EndTime.Unix() {
-		log.Fatalln("比赛结束时间应大于开始时间！")
+		log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.start_time_error"))
 	}
 
 	// Check the RestTime in config file is correct.
 	for key, dur := range s.Timer.RestTime {
 		if len(dur) != 2 {
-			log.Fatalln("RestTime 单个时间周期配置错误！")
+			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.single_rest_time_error"))
 		}
 		if dur[0].Unix() >= dur[1].Unix() {
-			log.Fatalln("RestTime 配置错误！前一时间应在后一时间点之前。[ " + dur[0].String() + " - " + dur[1].String() + " ]")
+			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.rest_time_start_error",
+				gin.H{
+					"from": dur[0].String(),
+					"to":   dur[1].String(),
+				},
+			))
 		}
 		if dur[0].Unix() <= s.Timer.BeginTime.Unix() || dur[1].Unix() >= s.Timer.EndTime.Unix() {
-			log.Fatalln("RestTime 配置错误！不能在比赛开始时间之前或比赛结束时间之后。[ " + dur[0].String() + " - " + dur[1].String() + " ]")
+			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.rest_time_overflow_error",
+				gin.H{
+					"from": dur[0].String(),
+					"to":   dur[1].String(),
+				},
+			))
 		}
-		// 配置数据按开始时间顺序输入，方便后面计算
+		// RestTime should in order.
 		if key != 0 && dur[0].Unix() <= s.Timer.RestTime[key-1][0].Unix() {
-			log.Fatalln("RestTime 需要按开始时间顺序输入！[ " + dur[0].String() + " - " + dur[1].String() + " ]")
+			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.rest_time_order_error",
+				gin.H{
+					"from": dur[0].String(),
+					"to":   dur[1].String(),
+				},
+			))
 		}
 	}
 }

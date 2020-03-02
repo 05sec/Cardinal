@@ -38,7 +38,7 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
 
 ### 编译安装
 
-* 部署前端
+#### 部署前端
 ```
 git clone https://github.com/vidar-team/Cardinal_frontend.git
 git clone https://github.com/vidar-team/Cardinal_manager_frontend.git
@@ -48,7 +48,8 @@ git clone https://github.com/vidar-team/Cardinal_manager_frontend.git
 yarn build
 ```
 
-* 部署后端
+#### 部署后端
+* 编译安装
 ```
 git clone https://github.com/vidar-team/Cardinal.git
 cd Cardinal/src
@@ -57,10 +58,11 @@ go build -o Cardinal
 ```
 运行编译后的二进制文件即可。
 
-### Release 安装
+* Release 安装
 
-TODO
-### Docker 安装
+GitHub Releases 下载对应架构的压缩包即可。
+
+* Docker 安装
 
 TODO
 

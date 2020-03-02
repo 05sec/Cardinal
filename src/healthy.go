@@ -16,7 +16,9 @@ func (s *Service) HealthyCheck() {
 		// If the previous round total score is not equal zero, maybe all the teams were checked down.
 		if previousRoundScore != float64(-s.Conf.CheckDownScore*teamCount) {
 			// Maybe there are some mistakes in previous round score.
-			s.NewLog(IMPORTANT, "healthy_check", "上一轮分数非零和，请检查！")
+			s.NewLog(IMPORTANT, "healthy_check",
+				string(s.I18n.T(s.Conf.Base.SystemLanguage, "healthy.previous_round_non_zero_error")),
+			)
 		}
 	}
 
@@ -25,7 +27,9 @@ func (s *Service) HealthyCheck() {
 		// If sum all the scores but it is not equal zero, maybe all the teams were checked down in some rounds.
 		if int(totalScore)%(s.Conf.CheckDownScore*teamCount) != 0 {
 			// Maybe there are some mistakes.
-			s.NewLog(IMPORTANT, "healthy_check", "总分数非零和，请检查！")
+			s.NewLog(IMPORTANT, "healthy_check",
+				string(s.I18n.T(s.Conf.Base.SystemLanguage, "healthy.total_score_non_zero_error")),
+			)
 		}
 	}
 }

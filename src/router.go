@@ -13,6 +13,8 @@ func (s *Service) initRouter() *gin.Engine {
 		AllowOrigins: []string{"*"},
 	}))
 
+	r.Use(s.I18nMiddleware())
+
 	// Cardinal basic info
 	r.Any("/", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON("Cardinal"))
@@ -143,7 +145,7 @@ func (s *Service) initRouter() *gin.Engine {
 			c.JSON(s.GetFlags(c))
 		})
 		manager.POST("/flag/generate", func(c *gin.Context) {
-			c.JSON(s.GenerateFlag())
+			c.JSON(s.GenerateFlag(c))
 		})
 
 		// Check
@@ -184,12 +186,16 @@ func (s *Service) initRouter() *gin.Engine {
 
 	// 404
 	r.NoRoute(func(c *gin.Context) {
-		c.JSON(s.makeErrJSON(404, 40400, "not found"))
+		c.JSON(s.makeErrJSON(404, 40400,
+			s.I18n.T(c.GetString("lang"), "general.not_found"),
+		))
 	})
 
 	// 405
 	r.NoMethod(func(c *gin.Context) {
-		c.JSON(s.makeErrJSON(405, 40500, "method not allowed"))
+		c.JSON(s.makeErrJSON(405, 40500,
+			s.I18n.T(c.GetString("lang"), "general.method_not_allow"),
+		))
 	})
 
 	return r
@@ -200,7 +206,9 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(s.makeErrJSON(403, 40300, "未授权访问"))
+			c.JSON(s.makeErrJSON(403, 40300,
+				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			))
 			c.Abort()
 			return
 		}
@@ -208,7 +216,9 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 		var tokenData Token
 		s.Mysql.Where(&Token{Token: token}).Find(&tokenData)
 		if tokenData.ID == 0 {
-			c.JSON(s.makeErrJSON(401, 40100, "未授权访问"))
+			c.JSON(s.makeErrJSON(401, 40100,
+				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			))
 			c.Abort()
 			return
 		}
@@ -223,7 +233,9 @@ func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(s.makeErrJSON(403, 40300, "未授权访问"))
+			c.JSON(s.makeErrJSON(403, 40300,
+				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			))
 			c.Abort()
 			return
 		}
@@ -231,7 +243,9 @@ func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 		var managerData Manager
 		s.Mysql.Where(&Manager{Token: token}).Find(&managerData)
 		if managerData.ID == 0 {
-			c.JSON(s.makeErrJSON(401, 40100, "未授权访问"))
+			c.JSON(s.makeErrJSON(401, 40100,
+				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			))
 			c.Abort()
 			return
 		}

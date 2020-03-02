@@ -9,7 +9,9 @@ import (
 func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 	file, err := c.FormFile("picture")
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "请选择图片文件！")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "file.select_picture"),
+		)
 	}
 	fileExt := map[string]string{
 		"image/png":  ".png",
@@ -24,7 +26,9 @@ func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 
 	err = c.SaveUploadedFile(file, "./uploads/"+fileName)
 	if err != nil {
-		return s.makeErrJSON(500, 50000, "Server error")
+		return s.makeErrJSON(500, 50000,
+			s.I18n.T(c.GetString("lang"), "general.server_error"),
+		)
 	}
 	return s.makeSuccessJSON(fileName)
 }

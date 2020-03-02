@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -70,7 +69,7 @@ func (s *Service) SetRankListTitle() {
 	}
 	s.Store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // Save challenge title into cache.
 
-	s.NewLog(NORMAL, "system", fmt.Sprintf("更新排行榜标题成功"))
+	s.NewLog(NORMAL, "system", string(s.I18n.T(s.Conf.Base.SystemLanguage, "log.rank_list_success")))
 }
 
 // SetRankList will calculate the ranking list.
@@ -120,5 +119,4 @@ func (s *Service) SetRankList() {
 	s.Store.Set("rankList", rankList, cache.NoExpiration)
 	// Save the ranking list for manager into cache.
 	s.Store.Set("rankManagerList", managerRankList, cache.NoExpiration)
-	//s.NewLog(NORMAL, "system", fmt.Sprintf("更新总排行榜成功！"))
 }

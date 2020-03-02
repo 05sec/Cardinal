@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"math"
@@ -52,16 +51,20 @@ func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 
 // GetGameBoxes returns the gameboxes for manager.
 func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
-	pageStr := c.Query("page")   // 当前页
-	perPageStr := c.Query("per") // 每页数量
+	pageStr := c.Query("page")
+	perPageStr := c.Query("per")
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
-		return s.makeErrJSON(400, 40002, "Error Query")
+		return s.makeErrJSON(400, 40002,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 	perPage, err := strconv.Atoi(perPageStr)
 	if err != nil || perPage <= 0 {
-		return s.makeErrJSON(400, 40002, "Error Query")
+		return s.makeErrJSON(400, 40002,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 
 	var total int
@@ -88,7 +91,9 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	var inputForm []InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
 	}
 
 	for _, item := range inputForm {
@@ -97,20 +102,26 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		// Check the ChallengeID
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Count(&count)
 		if count != 1 {
-			return s.makeErrJSON(400, 40001, "Challenge 不存在")
+			return s.makeErrJSON(400, 40001,
+				s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+			)
 		}
 
 		// Check the TeamID
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: item.TeamID}}).Count(&count)
 		if count != 1 {
-			return s.makeErrJSON(400, 40001, "Team 不存在")
+			return s.makeErrJSON(400, 40001,
+				s.I18n.T(c.GetString("lang"), "team.not_found"),
+			)
 		}
 
 		// Check if the gamebox is existed by challenge ID and team ID,
 		// since every team should have only one gamebox for each challenge.
 		s.Mysql.Model(GameBox{}).Where(&GameBox{ChallengeID: item.ChallengeID, TeamID: item.TeamID}).Count(&count)
 		if count != 0 {
-			return s.makeErrJSON(400, 40001, "存在重复添加数据")
+			return s.makeErrJSON(400, 40001,
+				s.I18n.T(c.GetString("lang"), "gamebox.repeat"),
+			)
 		}
 	}
 
@@ -125,13 +136,17 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		}
 		if tx.Create(newGameBox).RowsAffected != 1 {
 			tx.Rollback()
-			return s.makeErrJSON(500, 50000, "添加 GameBox 失败！")
+			return s.makeErrJSON(500, 50000,
+				s.I18n.T(c.GetString("lang"), "gamebox.post_error"),
+			)
 		}
 	}
 	tx.Commit()
 
-	s.NewLog(NORMAL, "manager_operate", fmt.Sprintf("共 %d 个 GameBox 被创建", len(inputForm)))
-	return s.makeSuccessJSON("添加 GameBox 成功！")
+	s.NewLog(NORMAL, "manager_operate",
+		string(s.I18n.T(c.GetString("lang"), "log.new_gamebox", gin.H{"count": len(inputForm)})),
+	)
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "gamebox.post_success"))
 }
 
 // EditGameBox is edit gamebox handler for manager.
@@ -146,7 +161,9 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000, "Error payload")
+		return s.makeErrJSON(400, 40000,
+			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
 	}
 
 	tx := s.Mysql.Begin()
@@ -156,9 +173,11 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 		Description: inputForm.Description,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001, "修改 GameBox 失败！")
+		return s.makeErrJSON(500, 50001,
+			s.I18n.T(c.GetString("lang"), "gamebox.put_error"),
+		)
 	}
 	tx.Commit()
 
-	return s.makeSuccessJSON("修改 GameBox 成功！")
+	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "gamebox.put_success"))
 }

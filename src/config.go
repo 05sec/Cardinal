@@ -15,6 +15,7 @@ type Config struct {
 // Base is the basic config of the cardinal.
 type Base struct {
 	Title          string
+	SystemLanguage string
 	BeginTime      time.Time
 	RestTime       [][]time.Time
 	EndTime        time.Time
@@ -44,5 +45,5 @@ func (s *Service) initConfig() {
 	}
 
 	s.Conf = conf
-	log.Println("加载配置文件成功")
+	log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "config.load_success"))
 }

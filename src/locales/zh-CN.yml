@@ -1,0 +1,131 @@
+zh-CN:
+  general:
+    success: "成功"
+    error_payload: "请求体格式错误！"
+    error_query: "请求参数不正确！"
+    must_be_number: "参数 {{.key}} 必须为数字！"
+    post_repeat: "重复添加！"
+    not_begin: "比赛未开始"
+    server_error: "后端程序错误！"
+    invalid_token: "Token 无效"
+    no_auth: "未授权访问"
+    not_found: "资源不存在"
+    method_not_allow: "请求方法不允许"
+
+  bulletin:
+    post_error: "添加公告失败！"
+    post_success: "添加公告成功！"
+    put_error: "修改公告失败！"
+    put_success: "修改公告成功！"
+    delete_error: "删除公告失败！"
+    delete_success: "删除公告成功！"
+    not_found: "公告不存在！"
+
+  challenge:
+    post_error: "添加题目失败！"
+    post_success: "添加题目成功！"
+    put_error: "修改题目信息失败！"
+    put_success: "修改题目信息成功！"
+    delete_error: "删除题目失败！"
+    delete_success: "删除题目成功！"
+    not_found: "题目不存在！"
+
+  check:
+    repeat: "重复 Check，已忽略"
+
+  config:
+    load_success: "加载配置文件成功"
+
+  file:
+    select_picture: "请选择图片文件！"
+
+  flag:
+    wrong: "Flag 错误！"
+    submit_error: "提交失败！"
+    submit_success: "提交成功！"
+    repeat: "请勿重复提交 Flag"
+    generate_success: "生成 Flag 成功！"
+
+  gamebox:
+    post_error: "添加靶机失败！"
+    post_success: "添加靶机成功！"
+    put_error: "修改靶机信息失败！"
+    put_success: "修改靶机信息成功！"
+    visibility_success: "修改靶机可见状态成功！"
+    repeat: "存在重复添加的靶机，请检查"
+    not_found: "靶机不存在！"
+
+  team:
+    post_error: "添加队伍失败！"
+    put_error: "修改队伍信息失败！"
+    put_success: "修改队伍信息成功！"
+    delete_error: "删除队伍失败！"
+    delete_success: "删除队伍成功！"
+    login_error: "账号或密码错误！"
+    logout_success: "登出成功！"
+    repeat: "存在重复添加的队伍，请检查"
+    team_name_empty: "队伍名不能为空"
+    reset_password_error: "重置密码失败！"
+    not_found: "队伍不存在！"
+
+  timer:
+    total_round: "比赛总轮数：{{.round}}"
+    total_time: "比赛总时长：{{.time}}  分钟"
+    end: "比赛已结束"
+    start_time_error: "比赛结束时间应大于开始时间！"
+    single_rest_time_error: "RestTime 单个时间周期配置错误！"
+    rest_time_start_error: "RestTime 配置错误！前一时间应在后一时间点之前。[ {{.from}} - {{.to}} ]"
+    rest_time_overflow_error: "RestTime 配置错误！不能在比赛开始时间之前或比赛结束时间之后。[ {{.from}} - {{.to}} ]"
+    rest_time_order_error: "RestTime 需要按开始时间顺序输入！[ {{.from}} - {{.to}} ]"
+
+  healthy:
+    previous_round_non_zero_error: "上一轮分数非零和，请检查！"
+    total_score_non_zero_error: "总分数非零和，请检查！"
+
+  install:
+    greet: "Cardinal.toml 配置文件不存在，安装向导将带领您进行配置。"
+    input_title: "请输入比赛名称"
+    begin_time: "请输入比赛开始时间（格式 2020-02-17 12:00:00）"
+    end_time: "请输入比赛结束时间（格式 2020-02-17 12:00:00）"
+    duration: "请输入每轮长度（单位：分钟，默认值：2）"
+    port: "请输入后端服务器端口号（默认值：19999）"
+    flag_prefix: "请输入 Flag 前缀（默认值：hctf{）"
+    flag_suffix: "请输入 Flag 后缀（默认值：}）"
+    checkdown_score: "请输入每次 Checkdown 扣分（默认值：50）"
+    attack_score: "请输入每次攻击得分（默认值：50）"
+    db_host: "请输入数据库地址（默认值：localhost:3306）"
+    db_username: "请输入数据库账号："
+    db_password: "请输入数据库密码："
+    db_name: "请输入数据库表名（默认值：cardinal）"
+    manager_name: "请输入管理员账号："
+    manager_password: "请输入管理员密码："
+    manager_success: "添加管理员账号成功，请妥善保管您的账号密码信息！"
+    create_config_success: "创建 Cardinal.toml 配置文件成功！"
+
+  manager:
+    login_error: "账号或密码错误！"
+    logout_success: "登出成功！"
+    post_error: "添加管理员账号失败！"
+    post_success: "添加管理员成功！"
+    delete_error: "删除管理员失败！"
+    delete_success: "删除管理员成功！"
+    repeat: "管理员名称重复"
+    update_token_fail: "更新管理员 Token 失败！"
+    update_password_fail: "修改管理员密码失败！"
+
+  log:
+    new_challenge: "新的题目 [{{.title}}] 被创建"
+    delete_challenge: "题目 [{{.title}}] 被删除"
+    new_gamebox: "共 {{.count}} 个靶机被创建"
+    set_challenge_visible: "设置题目 [{{.challenge}}] 状态为可见"
+    set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
+    generate_flag: "生成 Flag 完成！共 {{.total}} 个。耗时 {{.time}} s。"
+    score_success: "第 {{.round}} 轮分数结算完成！耗时 {{.time}} s。"
+    new_manager: "新的管理员账号 [ {{.name}} ] 被添加"
+    delete_manager: "管理员 [ ID: {{.id}} ] 已删除"
+    manager_token: "管理员 [ ID: {{.id}} ] Token 已刷新"
+    manager_password: "管理员 [ ID: {{.id}} ] 密码已修改"
+    new_team: "{{.count}} 个新的队伍 [ {{.teamName}} ] 被创建"
+    delete_team: "Team [ {{.teamName}} ] 被删除"
+    team_reset_password: "队伍 [ {{.teamName}} ] 登录密码已重置"
+    rank_list_success: "更新排行榜标题成功"
