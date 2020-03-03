@@ -10,7 +10,7 @@
 
 Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本程序可以作为 CTF 线下比赛平台，亦可用于团队内部 AWD 模拟练习。
 
-![Cardinal Frontend](https://img.cdn.n3ko.co/lsky/2020/03/03/40484c0830b60.png)
+![Cardinal Frontend](https://img.cdn.n3ko.co/lsky/2020/03/03/a7ccd8a8fbd43.png)
 
 ![Cardinal Backend](https://img.cdn.n3ko.co/lsky/2020/03/03/7b6161f88fb94.png)
 
