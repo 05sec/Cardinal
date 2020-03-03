@@ -72,6 +72,8 @@ TODO
 
 十分欢迎您和我们一起改进 Cardinal，您可以改进现有程序，加入新功能，完善文档，优化代码等。
 
+[![Contributors](http://ergatejs.implements.io/badges/contributors/vidar-team/Cardinal_1280_96_10.jpeg)](https://github.com/vidar-team/Cardinal/graphs/contributors)
+
 ## 协议与许可
 
 © Vidar-Team
