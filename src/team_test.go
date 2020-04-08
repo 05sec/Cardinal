@@ -24,7 +24,7 @@ func TestService_NewTeams(t *testing.T) {
 		"Name": "vidar",
 		"Logo": "",
 	})
-	req, _ := http.NewRequest("POST", "/manager/teams", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -34,7 +34,7 @@ func TestService_NewTeams(t *testing.T) {
 	jsonData, _ = json.Marshal([]map[string]interface{}{{
 		"Logo": "",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/teams", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -48,7 +48,7 @@ func TestService_NewTeams(t *testing.T) {
 		"Name": "vidar",
 		"Logo": "test",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/teams", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -66,7 +66,7 @@ func TestService_NewTeams(t *testing.T) {
 		"Logo": "test_image123.png",
 	},
 	})
-	req, _ = http.NewRequest("POST", "/manager/teams", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -106,7 +106,7 @@ func TestService_NewTeams(t *testing.T) {
 		"Name": "E99",
 		"Logo": "test_image.png",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/teams", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -114,7 +114,7 @@ func TestService_NewTeams(t *testing.T) {
 
 func TestService_GetAllTeams(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/manager/teams", nil)
+	req, _ := http.NewRequest("GET", "/api/manager/teams", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -127,7 +127,7 @@ func TestService_EditTeam(t *testing.T) {
 		"Name": "vidar",
 		"Logo": "",
 	})
-	req, _ := http.NewRequest("PUT", "/manager/team", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -139,7 +139,7 @@ func TestService_EditTeam(t *testing.T) {
 		"Name": "vidar",
 		"Logo": "",
 	})
-	req, _ = http.NewRequest("PUT", "/manager/team", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
@@ -151,7 +151,7 @@ func TestService_EditTeam(t *testing.T) {
 		"Name": "vidar",
 		"Logo": "",
 	})
-	req, _ = http.NewRequest("PUT", "/manager/team", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -163,7 +163,7 @@ func TestService_EditTeam(t *testing.T) {
 		"Name": "Vidar",
 		"Logo": "",
 	})
-	req, _ = http.NewRequest("PUT", "/manager/team", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -175,7 +175,7 @@ func TestService_ResetTeamPassword(t *testing.T) {
 	jsonData, _ := json.Marshal(map[string]interface{}{
 		"IDd": 3,
 	})
-	req, _ := http.NewRequest("POST", "/manager/team/resetPassword", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("POST", "/api/manager/team/resetPassword", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -185,7 +185,7 @@ func TestService_ResetTeamPassword(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID": 233,
 	})
-	req, _ = http.NewRequest("POST", "/manager/team/resetPassword", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/team/resetPassword", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
@@ -195,7 +195,7 @@ func TestService_ResetTeamPassword(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID": 3,
 	})
-	req, _ = http.NewRequest("POST", "/manager/team/resetPassword", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/team/resetPassword", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -204,21 +204,21 @@ func TestService_ResetTeamPassword(t *testing.T) {
 func TestService_DeleteTeam(t *testing.T) {
 	// error id
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("DELETE", "/manager/team?id=asdfg", nil)
+	req, _ := http.NewRequest("DELETE", "/api/manager/team?id=asdfg", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// id not exist
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/manager/team?id=233", nil)
+	req, _ = http.NewRequest("DELETE", "/api/manager/team?id=233", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// success
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/manager/team?id=3", nil)
+	req, _ = http.NewRequest("DELETE", "/api/manager/team?id=3", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -231,7 +231,7 @@ func TestService_TeamLogin(t *testing.T) {
 		"Name":     123123,
 		"Password": "",
 	})
-	req, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -242,7 +242,7 @@ func TestService_TeamLogin(t *testing.T) {
 		"Name":     team[1].Name,
 		"Password": "aaa",
 	})
-	req, _ = http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -253,7 +253,7 @@ func TestService_TeamLogin(t *testing.T) {
 		"Name":     team[0].Name,
 		"Password": team[0].Password,
 	})
-	req, _ = http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -272,7 +272,7 @@ func TestService_TeamLogin(t *testing.T) {
 		"Name":     team[1].Name,
 		"Password": team[1].Password,
 	})
-	req, _ = http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -289,7 +289,7 @@ func TestService_TeamLogin(t *testing.T) {
 func TestService_GetTeamInfo(t *testing.T) {
 	// Team1 Vidar
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/team/info", nil)
+	req, _ := http.NewRequest("GET", "/api/team/info", nil)
 	req.Header.Set("Authorization", team[0].Token)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -311,7 +311,7 @@ func TestService_GetTeamInfo(t *testing.T) {
 
 	// Team2 e99
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/team/info", nil)
+	req, _ = http.NewRequest("GET", "/api/team/info", nil)
 	req.Header.Set("Authorization", team[1].Token)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -334,7 +334,7 @@ func TestService_GetTeamInfo(t *testing.T) {
 
 func TestService_TeamLogout(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/logout", nil)
+	req, _ := http.NewRequest("GET", "/api/logout", nil)
 	req.Header.Set("Authorization", team[0].Token)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -345,7 +345,7 @@ func TestService_TeamLogout(t *testing.T) {
 		"Name":     team[0].Name,
 		"Password": team[0].Password,
 	})
-	req, _ = http.NewRequest("POST", "/login", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -370,7 +370,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	})
-	req, _ := http.NewRequest("POST", "/manager/gameboxes", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -384,7 +384,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/gameboxes", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -398,7 +398,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/gameboxes", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -412,7 +412,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/gameboxes", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -444,7 +444,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"Port":        "2345",
 		"Description": "pwn1 for E99",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/gameboxes", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -458,7 +458,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	}})
-	req, _ = http.NewRequest("POST", "/manager/gameboxes", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -470,7 +470,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"ID":      1,
 		"Visible": true,
 	})
-	req, _ = http.NewRequest("POST", "/manager/challenge/visible", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/challenge/visible", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -481,7 +481,7 @@ func TestService_NewGameBoxes(t *testing.T) {
 		"ID":      3,
 		"Visible": true,
 	})
-	req, _ = http.NewRequest("POST", "/manager/challenge/visible", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/challenge/visible", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -496,7 +496,7 @@ func TestService_EditGameBox(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	})
-	req, _ := http.NewRequest("PUT", "/manager/gamebox", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("PUT", "/api/manager/gamebox", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -509,7 +509,7 @@ func TestService_EditGameBox(t *testing.T) {
 		"Port":        "1234",
 		"Description": "web1 for Vidar",
 	})
-	req, _ = http.NewRequest("PUT", "/manager/gamebox", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("PUT", "/api/manager/gamebox", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 500, w.Code)
@@ -522,7 +522,7 @@ func TestService_EditGameBox(t *testing.T) {
 		"Port":        "12345",
 		"Description": "Web1 for Vidar",
 	})
-	req, _ = http.NewRequest("PUT", "/manager/gamebox", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("PUT", "/api/manager/gamebox", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -531,31 +531,31 @@ func TestService_EditGameBox(t *testing.T) {
 func TestService_GetGameBoxes(t *testing.T) {
 	// error query
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/manager/gameboxes", nil)
+	req, _ := http.NewRequest("GET", "/api/manager/gameboxes", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/gameboxes?page=asda&per=skfdnj", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=asda&per=skfdnj", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/gameboxes?page=0&per=1", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=0&per=1", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/gameboxes?page=1&per=0", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=1&per=0", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/gameboxes?page=1&per=1", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=1&per=1", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -563,7 +563,7 @@ func TestService_GetGameBoxes(t *testing.T) {
 
 func TestService_GetSelfGameBoxes(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/team/gameboxes", nil)
+	req, _ := http.NewRequest("GET", "/api/team/gameboxes", nil)
 	req.Header.Set("Authorization", team[0].Token)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -572,7 +572,7 @@ func TestService_GetSelfGameBoxes(t *testing.T) {
 // Flag Test
 func TestService_GenerateFlag(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/manager/flag/generate", nil)
+	req, _ := http.NewRequest("POST", "/api/manager/flag/generate", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -581,31 +581,31 @@ func TestService_GenerateFlag(t *testing.T) {
 func TestService_GetFlags(t *testing.T) {
 	// error query
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/manager/flags", nil)
+	req, _ := http.NewRequest("GET", "/api/manager/flags", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/flags?page=asda&per=skfdnj", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/flags?page=asda&per=skfdnj", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/flags?page=0&per=1", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/flags?page=0&per=1", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/flags?page=1&per=0", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/flags?page=1&per=0", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/manager/flags?page=1&per=1", nil)
+	req, _ = http.NewRequest("GET", "/api/manager/flags?page=1&per=1", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -650,7 +650,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ := json.Marshal(map[string]interface{}{
 		"flag": flag1.Flag,
 	})
-	req, _ := http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -662,7 +662,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"flag": flag1.Flag,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", "")
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -672,7 +672,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"flag": flag1.Flag,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", "errortoken")
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -682,7 +682,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"flag": 12312312,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -692,7 +692,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]string{
 		"flag": "hctf{here is a error flag}",
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -702,7 +702,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]string{
 		"flag": flag1.Flag,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -713,7 +713,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]string{
 		"flag": flag2.Flag,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -724,7 +724,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]string{
 		"flag": flag3.Flag,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[1].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -735,7 +735,7 @@ func TestService_SubmitFlag(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]string{
 		"flag": flag1.Flag,
 	})
-	req, _ = http.NewRequest("POST", "/flag", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", team[0].AccessKey)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -749,7 +749,7 @@ func TestService_CheckDown(t *testing.T) {
 	jsonData, _ := json.Marshal(map[string]interface{}{
 		"GameBoxID": 4,
 	})
-	req, _ := http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -760,7 +760,7 @@ func TestService_CheckDown(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"GameBoxID": "4",
 	})
-	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
@@ -770,7 +770,7 @@ func TestService_CheckDown(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"GameBoxID": 233,
 	})
-	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -780,7 +780,7 @@ func TestService_CheckDown(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"GameBoxID": 4,
 	})
-	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -791,7 +791,7 @@ func TestService_CheckDown(t *testing.T) {
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"GameBoxID": 4,
 	})
-	req, _ = http.NewRequest("POST", "/manager/checkDown", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
@@ -828,7 +828,7 @@ func TestService_TotalScore(t *testing.T) {
 
 func TestService_GetAllBulletins2(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/team/bulletins", nil)
+	req, _ := http.NewRequest("GET", "/api/team/bulletins", nil)
 	req.Header.Set("Authorization", team[0].Token)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
@@ -841,13 +841,13 @@ func TestService_GetRankList(t *testing.T) {
 	assert.Equal(t, service.GetRankList()[1].TeamName, "E99")
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/manager/rank", nil)
+	req, _ := http.NewRequest("GET", "/api/manager/rank", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", "/team/rank", nil)
+	req, _ = http.NewRequest("GET", "/api/team/rank", nil)
 	req.Header.Set("Authorization", team[0].Token)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)

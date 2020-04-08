@@ -21,7 +21,8 @@ func (s *Service) I18nMiddleware() gin.HandlerFunc {
 		acceptLanguages := c.GetHeader("Accept-Language")
 		languages, _, err := language.ParseAcceptLanguage(acceptLanguages)
 		if err != nil || len(languages) == 0 {
-			c.Set("lang", "")
+			// Set en-US as default language.
+			c.Set("lang", "en-US")
 			c.Next()
 			return
 		}

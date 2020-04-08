@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,41 +14,45 @@ func (s *Service) initRouter() *gin.Engine {
 		AllowOrigins: []string{"*"},
 	}))
 
-	r.Use(s.I18nMiddleware())
+	api := r.Group("/api")
+	api.Use(s.I18nMiddleware())
+
+	// Frontend
+	r.Use(static.Serve("/", frontendFS()))
 
 	// Cardinal basic info
-	r.Any("/", func(c *gin.Context) {
+	api.Any("/", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON("Cardinal"))
 	})
 
-	r.GET("/base", func(c *gin.Context) {
+	api.GET("/base", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON(gin.H{
 			"Title": s.Conf.Title,
 		}))
 	})
-	r.GET("/time", func(c *gin.Context) {
+	api.GET("/time", func(c *gin.Context) {
 		c.JSON(s.getTime())
 	})
 
 	// Static files
-	r.Static("/uploads", "./uploads")
+	api.Static("/uploads", "./uploads")
 
 	// Team login
-	r.POST("/login", func(c *gin.Context) {
+	api.POST("/login", func(c *gin.Context) {
 		c.JSON(s.TeamLogin(c))
 	})
 	// Team logout
-	r.GET("/logout", func(c *gin.Context) {
+	api.GET("/logout", func(c *gin.Context) {
 		c.JSON(s.TeamLogout(c))
 	})
 
 	// Submit flag
-	r.POST("/flag", func(c *gin.Context) {
+	api.POST("/flag", func(c *gin.Context) {
 		c.JSON(s.SubmitFlag(c))
 	})
 
 	// For team
-	team := r.Group("/team")
+	team := api.Group("/team")
 	team.Use(s.TeamAuthRequired())
 	{
 		team.GET("/info", func(c *gin.Context) {
@@ -65,17 +70,17 @@ func (s *Service) initRouter() *gin.Engine {
 	}
 
 	// Manager login
-	r.POST("/manager/login", func(c *gin.Context) {
+	api.POST("/manager/login", func(c *gin.Context) {
 		c.JSON(s.ManagerLogin(c))
 	})
 
 	// Manager logout
-	r.GET("/manager/logout", func(c *gin.Context) {
+	api.GET("/manager/logout", func(c *gin.Context) {
 		c.JSON(s.ManagerLogout(c))
 	})
 
 	// For manager
-	manager := r.Group("/manager")
+	manager := api.Group("/manager")
 	manager.Use(s.ManagerAuthRequired())
 	{
 		// Challenge
