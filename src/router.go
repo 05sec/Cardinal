@@ -20,7 +20,6 @@ func (s *Service) initRouter() *gin.Engine {
 	// Frontend
 	r.Use(static.Serve("/", frontendFS()))
 
-
 	// Cardinal basic info
 	api.Any("/", func(c *gin.Context) {
 		c.JSON(s.makeSuccessJSON("Cardinal"))
