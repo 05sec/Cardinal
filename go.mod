@@ -8,6 +8,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elazarl/goproxy v0.0.0-20191011121108-aa519ddbe484 // indirect
 	github.com/gin-contrib/cors v1.3.0
+	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.5.0
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
@@ -34,6 +35,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/thanhpk/randstr v1.0.4
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
+	github.com/vidar-team/Cardinal_frontend v0.0.0-20200408105230-89ca4c2e48db
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	golang.org/x/text v0.3.0
