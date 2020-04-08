@@ -36,39 +36,46 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
 * 前后端分离，前端开源可定制
 
 ## 安装
+### Release 安装
 
-**由于 Cardinal 目前还处于开发中，会不断进行更新迭代。请选择 GitHub Releases 或 master 分支程序 / 代码。
-切勿将 dev 分支的代码用于生产环境中。** 
+[下载](https://github.com/vidar-team/Cardinal/releases)适用于您目标机器的架构程序，运行即可。
+
+```
+# 解压程序包
+tar -zxvf Cardinal_VERSION_OS_ARCH.tar.gz
+
+# 赋予执行权限
+chmod +x ./Cardinal
+
+# 运行
+./Cardinal
+```
 
 ### 编译安装
 
-#### 部署前端
-```
-git clone https://github.com/vidar-team/Cardinal_frontend.git
-git clone https://github.com/vidar-team/Cardinal_manager_frontend.git
-```
-分别修改两个前端`utils.js`文件中的`baseURL`为后端接口地址。
-```
-yarn build
-```
+克隆代码，编译后运行生成的二进制文件即可。
 
-#### 部署后端
-* 编译安装
 ```
+# 克隆代码
 git clone https://github.com/vidar-team/Cardinal.git
+
+# 切换目录
 cd Cardinal/src
+
+# 编译
 go build -o Cardinal
+
+# 赋予执行权限
+chmod +x ./Cardinal
+
+# 运行
 ./Cardinal
 ```
-运行编译后的二进制文件即可。
 
-* Release 安装
-
-GitHub Releases 下载对应架构的压缩包即可。
-
-* Docker 安装
-
-TODO
+## 开始使用
+默认端口： `19999`
+* 选手端 `http://localhost:19999/`
+* 后端管理 `http://localhost:19999/manager`
 
 ## 贡献
 
