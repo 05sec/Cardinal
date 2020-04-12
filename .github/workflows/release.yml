@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: "386"
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: arm
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: arm64
@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: "386"
@@ -62,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
@@ -73,7 +73,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: "386"
@@ -84,19 +84,8 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
+        uses: wuhan005/cardinal_release_action@v0.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           GOARCH: amd64
-          GOOS: windows
-  release-windows-arm:
-    name: release windows/arm
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: compile and release
-        uses: wuhan005/cardinal_release_action@v0.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          GOARCH: arm
           GOOS: windows
