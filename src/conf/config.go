@@ -18,7 +18,8 @@ func init() {
 
 		log.Println(locales.I18n.T(conf.SystemLanguage, "config.load_success"))
 	} else {
-		// Travis CI Test
+		// Travis CI Test, set the config in test code.
+		conf = new(Config)
 		log.Println("Test mode")
 	}
 }
