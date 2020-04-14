@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"math"
 	"strconv"
 )
@@ -25,7 +27,7 @@ type GameBox struct {
 // GetSelfGameBoxes returns the gameboxes which belong to the team.
 func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 	if s.Timer.Status == "wait" {
-		return s.makeSuccessJSON([]int{})
+		return utils.MakeSuccessJSON([]int{})
 	}
 
 	var gameBoxes []struct {
@@ -46,7 +48,7 @@ func (s *Service) GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
 		gameBoxes[index].Title = challenge.Title
 	}
-	return s.makeSuccessJSON(gameBoxes)
+	return utils.MakeSuccessJSON(gameBoxes)
 }
 
 // GetGameBoxes returns the gameboxes for manager.
@@ -56,14 +58,14 @@ func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
-		return s.makeErrJSON(400, 40002,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40002,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	perPage, err := strconv.Atoi(perPageStr)
 	if err != nil || perPage <= 0 {
-		return s.makeErrJSON(400, 40002,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40002,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 
@@ -72,7 +74,7 @@ func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
 	var gameBox []GameBox
 	s.Mysql.Model(&GameBox{}).Offset((page - 1) * perPage).Limit(perPage).Find(&gameBox)
 
-	return s.makeSuccessJSON(gin.H{
+	return utils.MakeSuccessJSON(gin.H{
 		"Data":      gameBox,
 		"Total":     total,
 		"TotalPage": math.Ceil(float64(total / perPage)),
@@ -91,8 +93,8 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	var inputForm []InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 
@@ -102,16 +104,16 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		// Check the ChallengeID
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Count(&count)
 		if count != 1 {
-			return s.makeErrJSON(400, 40001,
-				s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+			return utils.MakeErrJSON(400, 40001,
+				locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 			)
 		}
 
 		// Check the TeamID
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: item.TeamID}}).Count(&count)
 		if count != 1 {
-			return s.makeErrJSON(400, 40001,
-				s.I18n.T(c.GetString("lang"), "team.not_found"),
+			return utils.MakeErrJSON(400, 40001,
+				locales.I18n.T(c.GetString("lang"), "team.not_found"),
 			)
 		}
 
@@ -119,8 +121,8 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		// since every team should have only one gamebox for each challenge.
 		s.Mysql.Model(GameBox{}).Where(&GameBox{ChallengeID: item.ChallengeID, TeamID: item.TeamID}).Count(&count)
 		if count != 0 {
-			return s.makeErrJSON(400, 40001,
-				s.I18n.T(c.GetString("lang"), "gamebox.repeat"),
+			return utils.MakeErrJSON(400, 40001,
+				locales.I18n.T(c.GetString("lang"), "gamebox.repeat"),
 			)
 		}
 	}
@@ -136,17 +138,17 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		}
 		if tx.Create(newGameBox).RowsAffected != 1 {
 			tx.Rollback()
-			return s.makeErrJSON(500, 50000,
-				s.I18n.T(c.GetString("lang"), "gamebox.post_error"),
+			return utils.MakeErrJSON(500, 50000,
+				locales.I18n.T(c.GetString("lang"), "gamebox.post_error"),
 			)
 		}
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.new_gamebox", gin.H{"count": len(inputForm)})),
+		string(locales.I18n.T(c.GetString("lang"), "log.new_gamebox", gin.H{"count": len(inputForm)})),
 	)
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "gamebox.post_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.post_success"))
 }
 
 // EditGameBox is edit gamebox handler for manager.
@@ -161,8 +163,8 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
@@ -173,11 +175,11 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 		Description: inputForm.Description,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001,
-			s.I18n.T(c.GetString("lang"), "gamebox.put_error"),
+		return utils.MakeErrJSON(500, 50001,
+			locales.I18n.T(c.GetString("lang"), "gamebox.put_error"),
 		)
 	}
 	tx.Commit()
 
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "gamebox.put_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.put_success"))
 }

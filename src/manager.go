@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"strconv"
 )
 
@@ -27,29 +29,29 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	var formData ManagerLoginForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	var manager Manager
 	s.Mysql.Where(&Manager{Name: formData.Name}).Find(&manager)
 
-	if manager.Name != "" && s.checkPassword(formData.Password, manager.Password) {
+	if manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) {
 		// Login successfully
-		token := s.generateToken()
+		token := utils.GenerateToken()
 		tx := s.Mysql.Begin()
 		if tx.Model(&Manager{}).Where(&Manager{Name: manager.Name}).Updates(&Manager{Token: token}).RowsAffected != 1 {
 			tx.Rollback()
-			return s.makeErrJSON(500, 50000,
-				s.I18n.T(c.GetString("lang"), "general.server_error"),
+			return utils.MakeErrJSON(500, 50000,
+				locales.I18n.T(c.GetString("lang"), "general.server_error"),
 			)
 		}
 		tx.Commit()
-		return s.makeSuccessJSON(token)
+		return utils.MakeSuccessJSON(token)
 	}
-	return s.makeErrJSON(403, 40300,
-		s.I18n.T(c.GetString("lang"), "manager.login_error"),
+	return utils.MakeErrJSON(403, 40300,
+		locales.I18n.T(c.GetString("lang"), "manager.login_error"),
 	)
 }
 
@@ -59,8 +61,8 @@ func (s *Service) ManagerLogout(c *gin.Context) (int, interface{}) {
 	if token != "" {
 		s.Mysql.Model(&Manager{}).Where("token = ?", token).Delete(&Token{})
 	}
-	return s.makeSuccessJSON(
-		s.I18n.T(c.GetString("lang"), "manager.logout_success"),
+	return utils.MakeSuccessJSON(
+		locales.I18n.T(c.GetString("lang"), "manager.logout_success"),
 	)
 }
 
@@ -68,7 +70,7 @@ func (s *Service) ManagerLogout(c *gin.Context) (int, interface{}) {
 func (s *Service) GetAllManager() (int, interface{}) {
 	var manager []Manager
 	s.Mysql.Model(&Manager{}).Find(&manager)
-	return s.makeSuccessJSON(manager)
+	return utils.MakeSuccessJSON(manager)
 }
 
 // NewManager is add a new manager handler.
@@ -80,36 +82,36 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	var formData InputForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	var checkManager Manager
 	s.Mysql.Model(&Manager{}).Where(&Manager{Name: formData.Name}).Find(&checkManager)
 	if checkManager.ID != 0 {
-		return s.makeErrJSON(400, 40001,
-			s.I18n.T(c.GetString("lang"), "manager.repeat"),
+		return utils.MakeErrJSON(400, 40001,
+			locales.I18n.T(c.GetString("lang"), "manager.repeat"),
 		)
 	}
 
 	manager := Manager{
 		Name:     formData.Name,
-		Password: s.addSalt(formData.Password),
+		Password: utils.AddSalt(formData.Password),
 	}
 	tx := s.Mysql.Begin()
 	if tx.Create(&manager).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "manager.post_error"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "manager.post_error"),
 		)
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.new_manager", gin.H{"name": manager.Name})),
+		string(locales.I18n.T(c.GetString("lang"), "log.new_manager", gin.H{"name": manager.Name})),
 	)
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "manager.post_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "manager.post_success"))
 }
 
 // RefreshManagerToken can refresh a manager's token.
@@ -117,94 +119,94 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
 
 	tx := s.Mysql.Begin()
-	token := s.generateToken()
+	token := utils.GenerateToken()
 	if tx.Model(&Manager{}).Where(&Manager{Model: gorm.Model{ID: uint(id)}}).Update(&Manager{
 		Token: token,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "manager.update_token_fail"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "manager.update_token_fail"),
 		)
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.manager_token", gin.H{"id": id})),
+		string(locales.I18n.T(c.GetString("lang"), "log.manager_token", gin.H{"id": id})),
 	)
-	return s.makeSuccessJSON(token)
+	return utils.MakeSuccessJSON(token)
 }
 
 // ChangeManagerPassword will change a manager's password to a random string.
 func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
 
 	tx := s.Mysql.Begin()
 	password := randstr.String(16)
 	if tx.Model(&Manager{}).Where(&Manager{Model: gorm.Model{ID: uint(id)}}).Update(&Manager{
-		Password: s.addSalt(password),
+		Password: utils.AddSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "manager.update_password_fail"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "manager.update_password_fail"),
 		)
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.manager_password", gin.H{"id": id})),
+		string(locales.I18n.T(c.GetString("lang"), "log.manager_password", gin.H{"id": id})),
 	)
-	return s.makeSuccessJSON(password)
+	return utils.MakeSuccessJSON(password)
 }
 
 // DeleteManager is delete manager handler.
 func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Model(&Manager{}).Where("id = ?", id).Delete(&Manager{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "manager.delete_error"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "manager.delete_error"),
 		)
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.delete_manager", gin.H{"id": id})),
+		string(locales.I18n.T(c.GetString("lang"), "log.delete_manager", gin.H{"id": id})),
 	)
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "manager.delete_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "manager.delete_success"))
 }

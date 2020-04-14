@@ -1,12 +1,8 @@
-package main
+package conf
 
-import (
-	"github.com/BurntSushi/toml"
-	"log"
-	"time"
-)
+import "time"
 
-// Config is the `cardinal.toml` config file struct.
+// Config is the config of the cardinal.
 type Config struct {
 	Base  `toml:"base"`
 	MySQL `toml:"mysql"`
@@ -34,16 +30,4 @@ type MySQL struct {
 	DBUsername string
 	DBPassword string
 	DBName     string
-}
-
-// initConfig will decode the config file and put it into `s.Conf`, so we can get the config globally.
-func (s *Service) initConfig() {
-	var conf *Config
-	_, err := toml.DecodeFile("./conf/Cardinal.toml", &conf)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	s.Conf = conf
-	log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "config.load_success"))
 }

@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"os"
 	"time"
 )
@@ -19,8 +21,9 @@ var team []struct {
 func init() {
 	gin.SetMode(gin.ReleaseMode)
 	service = new(Service)
-	service.Conf = &Config{
-		Base: Base{
+	config := conf.Get()
+	*config = conf.Config{
+		Base: conf.Base{
 			Title:          "HCTF",
 			BeginTime:      time.Now(),
 			RestTime:       nil,
@@ -33,19 +36,18 @@ func init() {
 			CheckDownScore: 10,
 			AttackScore:    10,
 		},
-		MySQL: MySQL{
+		MySQL: conf.MySQL{
 			DBHost:     "127.0.0.1:3306",
 			DBUsername: "root",
 			DBPassword: os.Getenv("TEST_DB_PASSWORD"),
 			DBName:     os.Getenv("TEST_DB_NAME"),
 		},
 	}
-	service.initI18n()
 	service.initMySQL()
 	service.initStore()
 	service.initTimer()
 
-	managerToken = service.generateToken()
+	managerToken = utils.GenerateToken()
 	team = make([]struct {
 		Name      string `json:"Name"`
 		Password  string `json:"Password"`
@@ -56,7 +58,7 @@ func init() {
 	// Test manager account e99:qwe1qwe2qwe3
 	service.Mysql.Create(&Manager{
 		Name:     "e99",
-		Password: service.addSalt("qwe1qwe2qwe3"),
+		Password: utils.AddSalt("qwe1qwe2qwe3"),
 		Token:    managerToken,
 	})
 

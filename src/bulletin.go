@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"strconv"
 )
 
@@ -26,7 +28,7 @@ type BulletinRead struct {
 func (s *Service) GetAllBulletins() (int, interface{}) {
 	var bulletins []Bulletin
 	s.Mysql.Model(&Bulletin{}).Order("`id` DESC").Find(&bulletins)
-	return s.makeSuccessJSON(bulletins)
+	return utils.MakeSuccessJSON(bulletins)
 }
 
 // NewBulletin is post new bulletin handler for manager.
@@ -38,8 +40,8 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
@@ -49,12 +51,12 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 		Content: inputForm.Content,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "bulletin.post_error"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "bulletin.post_error"),
 		)
 	}
 	tx.Commit()
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "bulletin.post_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "bulletin.post_success"))
 }
 
 // EditBulletin is edit new bulletin handler for manager.
@@ -67,16 +69,16 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	var checkBulletin Bulletin
 	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
-		return s.makeErrJSON(404, 40400,
-			s.I18n.T(c.GetString("lang"), "bulletin.not_found"),
+		return utils.MakeErrJSON(404, 40400,
+			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
 
@@ -87,45 +89,45 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Bulletin{}).Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001,
-			s.I18n.T(c.GetString("lang"), "bulletin.put_error"),
+		return utils.MakeErrJSON(500, 50001,
+			locales.I18n.T(c.GetString("lang"), "bulletin.put_error"),
 		)
 	}
 	tx.Commit()
 
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "bulletin.put_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "bulletin.put_success"))
 }
 
 // DeleteBulletin is delete new bulletin handler for manager.
 func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
 
 	var checkBulletin Bulletin
 	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
-		return s.makeErrJSON(404, 40400,
-			s.I18n.T(c.GetString("lang"), "bulletin.not_found"),
+		return utils.MakeErrJSON(404, 40400,
+			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Where("id = ?", id).Delete(&Bulletin{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50002,
-			s.I18n.T(c.GetString("lang"), "bulletin.delete_error"),
+		return utils.MakeErrJSON(500, 50002,
+			locales.I18n.T(c.GetString("lang"), "bulletin.delete_error"),
 		)
 	}
 	tx.Commit()
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "bulletin.delete_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "bulletin.delete_success"))
 }

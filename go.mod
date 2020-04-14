@@ -1,4 +1,4 @@
-module Cardinal
+module github.com/vidar-team/Cardinal
 
 go 1.13
 
