@@ -40,6 +40,7 @@ require (
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	golang.org/x/text v0.3.0
+	golang.org/x/tools v0.0.0-20190328211700-ab21143f2384
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
 	moul.io/http2curl v1.0.0 // indirect
