@@ -3,8 +3,8 @@ package conf
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/vidar-team/Cardinal/src/locales"
-	"golang.org/x/tools/go/ssa/interp/testdata/src/os"
 	"log"
+	"os"
 )
 
 var conf *Config
