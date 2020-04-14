@@ -12,8 +12,10 @@ import (
 // Challenge is a gorm model for database table `challenges`, used to store the challenges like Web1, Pwn1.
 type Challenge struct {
 	gorm.Model
-	Title     string
-	BaseScore int
+	Title           string
+	BaseScore       int
+	AutoRefreshFlag bool
+	Command         string
 }
 
 // SetVisible is setting challenge visible status handler.
@@ -65,11 +67,13 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Find(&challenges)
 	type resultStruct struct {
-		ID        uint
-		CreatedAt time.Time
-		Title     string
-		Visible   bool
-		BaseScore int
+		ID              uint
+		CreatedAt       time.Time
+		Title           string
+		Visible         bool
+		BaseScore       int
+		AutoRefreshFlag bool
+		Command         string
 	}
 
 	var res []resultStruct
@@ -81,11 +85,13 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 		s.Mysql.Where(&GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
 
 		res = append(res, resultStruct{
-			ID:        v.ID,
-			CreatedAt: v.CreatedAt,
-			Title:     v.Title,
-			Visible:   gameBox.Visible,
-			BaseScore: v.BaseScore,
+			ID:              v.ID,
+			CreatedAt:       v.CreatedAt,
+			Title:           v.Title,
+			Visible:         gameBox.Visible,
+			BaseScore:       v.BaseScore,
+			AutoRefreshFlag: v.AutoRefreshFlag,
+			Command:         v.Command,
 		})
 	}
 	return utils.MakeSuccessJSON(res)
@@ -94,8 +100,10 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 // NewChallenge is new challenge handler for manager.
 func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		Title     string `binding:"required"`
-		BaseScore int    `binding:"required"`
+		Title           string `binding:"required"`
+		BaseScore       int    `binding:"required"`
+		AutoRefreshFlag bool
+		Command         string
 	}
 
 	var inputForm InputForm
@@ -106,9 +114,20 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 		)
 	}
 
+	if inputForm.AutoRefreshFlag && inputForm.Command == "" {
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "challenge.empty_command"))
+	}
+
+	if !inputForm.AutoRefreshFlag {
+		inputForm.Command = ""
+	}
+
 	newChallenge := &Challenge{
-		Title:     inputForm.Title,
-		BaseScore: inputForm.BaseScore,
+		Title:           inputForm.Title,
+		BaseScore:       inputForm.BaseScore,
+		AutoRefreshFlag: inputForm.AutoRefreshFlag,
+		Command:         inputForm.Command,
 	}
 	var checkChallenge Challenge
 
@@ -137,9 +156,11 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 // EditChallenge is edit challenge handler for manager.
 func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID        uint   `binding:"required"`
-		Title     string `binding:"required"`
-		BaseScore int    `binding:"required"`
+		ID              uint   `binding:"required"`
+		Title           string `binding:"required"`
+		BaseScore       int    `binding:"required"`
+		AutoRefreshFlag bool
+		Command         string
 	}
 
 	var inputForm InputForm
@@ -150,6 +171,16 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 		)
 	}
 
+	if inputForm.AutoRefreshFlag && inputForm.Command == "" {
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "challenge.empty_command"))
+	}
+
+	// True off auto refresh flag, clean the command.
+	if !inputForm.AutoRefreshFlag {
+		inputForm.Command = ""
+	}
+
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
@@ -158,12 +189,15 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	newChallenge := &Challenge{
-		Title:     inputForm.Title,
-		BaseScore: inputForm.BaseScore,
+	// For the `AutoRefreshFlag` is a boolean value, use map here.
+	editChallenge := map[string]interface{}{
+		"Title":           inputForm.Title,
+		"BaseScore":       inputForm.BaseScore,
+		"AutoRefreshFlag": inputForm.AutoRefreshFlag,
+		"Command":         inputForm.Command,
 	}
 	tx := s.Mysql.Begin()
-	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newChallenge).RowsAffected != 1 {
+	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(editChallenge).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50001,
 			locales.I18n.T(c.GetString("lang"), "challenge.put_error"),
