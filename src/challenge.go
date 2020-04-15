@@ -148,7 +148,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(locales.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"challenge": checkChallenge.Title})),
+		string(locales.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"title": checkChallenge.Title})),
 	)
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.post_success"))
 }
@@ -220,7 +220,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 		s.SetRankListTitle()
 	}
 
-	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.post_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.put_success"))
 }
 
 // DeleteChallenge is delete challenge handler for manager.
@@ -258,7 +258,7 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(locales.I18n.T(c.GetString("lang"), "log.delete_challenge", gin.H{"challenge": challenge.Title})),
+		string(locales.I18n.T(c.GetString("lang"), "log.delete_challenge", gin.H{"title": challenge.Title})),
 	)
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.delete_success"))
 }

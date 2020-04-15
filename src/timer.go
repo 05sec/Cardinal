@@ -158,6 +158,9 @@ func (s *Service) timerProcess() {
 						go s.CalculateRoundScore(s.Timer.NowRound - 1)
 					}
 
+					// Auto refresh flag
+					go s.refreshFlag()
+					
 					fmt.Println(s.Timer.NowRound)
 				}
 			}

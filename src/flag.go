@@ -8,6 +8,7 @@ import (
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -179,4 +180,34 @@ func (s *Service) GenerateFlag(c *gin.Context) (int, interface{}) {
 		string(locales.I18n.T(c.GetString("lang"), "log.generate_flag", gin.H{"total": count, "time": float64(endTime-startTime) / float64(time.Second)})),
 	)
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "flag.generate_success"))
+}
+
+func (s *Service) refreshFlag() {
+	// Get the auto refresh flag challenges.
+	var challenges []Challenge
+	s.Mysql.Model(&Challenge{}).Where(&Challenge{AutoRefreshFlag: true}).Find(&challenges)
+
+	for _, challenge := range challenges {
+		var gameboxes []GameBox
+		s.Mysql.Model(&GameBox{}).Where(&GameBox{ChallengeID: challenge.ID}).Find(&gameboxes)
+
+		for _, gamebox := range gameboxes {
+			go func(gamebox GameBox, challenge Challenge) {
+				var flag Flag
+				s.Mysql.Model(&Flag{}).Where(&Flag{
+					TeamID:    gamebox.TeamID,
+					GameBoxID: gamebox.ID,
+					Round:     s.Timer.NowRound,
+				}).Find(&flag)
+				// Replace the flag placeholder.
+				command := strings.ReplaceAll(challenge.Command, "{{FLAG}}", flag.Flag)
+				fmt.Println(command)
+				err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, command)
+				if err != nil {
+					s.NewLog(IMPORTANT, "ssh_error", fmt.Sprintf("Team:%d Gamebox:%d Round:%d SSH 更新 Flag 失败：%v", gamebox.TeamID, gamebox.ID, s.Timer.NowRound, err.Error()))
+				}
+
+			}(gamebox, challenge)
+		}
+	}
 }

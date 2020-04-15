@@ -9,9 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
 	"github.com/vidar-team/Cardinal/src/conf"
+	"golang.org/x/crypto/ssh"
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
 // MakeErrJSON makes the error response JSON for gin.
@@ -83,4 +85,28 @@ func InputString(str *string, hint string) {
 		}
 		*str = input
 	}
+}
+
+func SSHExecute(ip string, port string, user string, password string, command string) error {
+	client, err := ssh.Dial("tcp", ip+":"+port, &ssh.ClientConfig{
+		User:            user,
+		Auth:            []ssh.AuthMethod{ssh.Password(password)},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         5 * time.Second,
+	})
+	if err != nil {
+		return err
+	}
+
+	session, err := client.NewSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	err = session.Run(command)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
