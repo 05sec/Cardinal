@@ -17,6 +17,9 @@ type GameBox struct {
 
 	IP          string
 	Port        string
+	SSHPort     string
+	SSHUser     string
+	SSHPassword string
 	Description string
 	Visible     bool
 	Score       float64 // The score can be negative.
@@ -88,9 +91,14 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		TeamID      uint   `binding:"required"`
 		IP          string `binding:"required"`
 		Port        string `binding:"required"`
+		SSHPort     string
+		SSHUser     string
+		SSHPassword string
 		Description string `binding:"required"`
+
+		Score float64 // not for form
 	}
-	var inputForm []InputForm
+	var inputForm []*InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
 		return utils.MakeErrJSON(400, 40000,
@@ -102,11 +110,23 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		var count int
 
 		// Check the ChallengeID
-		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Count(&count)
-		if count != 1 {
+		var challenge Challenge
+		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Find(&challenge)
+		if challenge.ID == 0 {
 			return utils.MakeErrJSON(400, 40001,
 				locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 			)
+		}
+		// Set the default score.
+		item.Score = float64(challenge.BaseScore)
+
+		// Check SSH config
+		if challenge.AutoRefreshFlag {
+			if item.SSHPort == "" || item.SSHUser == "" || item.SSHPassword == "" {
+				return utils.MakeErrJSON(400, 40001,
+					locales.I18n.T(c.GetString("lang"), "gamebox.auto_refresh_flag_error"),
+				)
+			}
 		}
 
 		// Check the TeamID
@@ -134,6 +154,10 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 			TeamID:      item.TeamID,
 			IP:          item.IP,
 			Port:        item.Port,
+			SSHPort:     item.SSHPort,
+			SSHUser:     item.SSHUser,
+			SSHPassword: item.SSHPassword,
+			Score:       item.Score,
 			Description: item.Description,
 		}
 		if tx.Create(newGameBox).RowsAffected != 1 {
@@ -158,6 +182,9 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 
 		IP          string `binding:"required"`
 		Port        string `binding:"required"`
+		SSHPort     string
+		SSHUser     string
+		SSHPassword string
 		Description string `binding:"required"`
 	}
 	var inputForm InputForm
@@ -172,6 +199,9 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	if tx.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.ID}}).Updates(&GameBox{
 		IP:          inputForm.IP,
 		Port:        inputForm.Port,
+		SSHPort:     inputForm.SSHPort,
+		SSHUser:     inputForm.SSHUser,
+		SSHPassword: inputForm.SSHPassword,
 		Description: inputForm.Description,
 	}).RowsAffected != 1 {
 		tx.Rollback()
