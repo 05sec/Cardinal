@@ -9,6 +9,7 @@ import (
 	"github.com/vidar-team/Cardinal/src/utils"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -201,7 +202,6 @@ func (s *Service) refreshFlag() {
 				}).Find(&flag)
 				// Replace the flag placeholder.
 				command := strings.ReplaceAll(challenge.Command, "{{FLAG}}", flag.Flag)
-				fmt.Println(command)
 				err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, command)
 				if err != nil {
 					s.NewLog(IMPORTANT, "ssh_error", fmt.Sprintf("Team:%d Gamebox:%d Round:%d SSH 更新 Flag 失败：%v", gamebox.TeamID, gamebox.ID, s.Timer.NowRound, err.Error()))
@@ -210,4 +210,41 @@ func (s *Service) refreshFlag() {
 			}(gamebox, challenge)
 		}
 	}
+}
+
+func (s *Service) testSSH(c *gin.Context) (int, interface{}) {
+	var challenges []Challenge
+	s.Mysql.Model(&Challenge{}).Where(&Challenge{AutoRefreshFlag: true}).Find(&challenges)
+
+	type errorMessage struct {
+		TeamID      uint
+		ChallengeID uint
+		GameBoxID   uint
+		Error       string
+	}
+	var errs []errorMessage
+
+	wg := sync.WaitGroup{}
+	for _, challenge := range challenges {
+		var gameboxes []GameBox
+		s.Mysql.Model(&GameBox{}).Where(&GameBox{ChallengeID: challenge.ID}).Find(&gameboxes)
+
+		for _, gamebox := range gameboxes {
+			wg.Add(1)
+			go func(gamebox GameBox, challenge Challenge) {
+				defer wg.Done()
+				err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, "whoami")
+				if err != nil {
+					errs = append(errs, errorMessage{
+						TeamID:      gamebox.TeamID,
+						ChallengeID: challenge.ID,
+						GameBoxID:   gamebox.ID,
+						Error:       err.Error(),
+					})
+				}
+			}(gamebox, challenge)
+		}
+	}
+	wg.Wait()
+	return utils.MakeSuccessJSON(errs)
 }
