@@ -150,6 +150,22 @@ func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
 	})
 }
 
+// ExportFlag exports the flags of a challenge.
+func (s *Service) ExportFlag(c *gin.Context) (int, interface{}) {
+	challengeIDStr := c.DefaultQuery("id", "1")
+
+	challengeID, err := strconv.Atoi(challengeIDStr)
+	if err != nil || challengeID <= 0 {
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
+	}
+
+	var flags []Flag
+	s.Mysql.Model(&Flag{}).Where(&Flag{ChallengeID: uint(challengeID)}).Find(&flags)
+	return utils.MakeSuccessJSON(flags)
+}
+
 // GenerateFlag is the generate flag handler for manager.
 func (s *Service) GenerateFlag(c *gin.Context) (int, interface{}) {
 	var gameBoxes []GameBox

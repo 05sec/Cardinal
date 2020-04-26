@@ -159,6 +159,9 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.POST("/flag/generate", func(c *gin.Context) {
 			c.JSON(s.GenerateFlag(c))
 		})
+		manager.GET("/flag/export", func(c *gin.Context) {
+			c.JSON(s.ExportFlag(c))
+		})
 
 		// Check
 		manager.POST("/checkDown", func(c *gin.Context) {
