@@ -84,8 +84,9 @@ func (s *Service) initRouter() *gin.Engine {
 	})
 
 	// For manager
-	manager := api.Group("/manager")
-	manager.Use(s.ManagerAuthRequired())
+	admin := api.Group("/manager")
+	check := admin.Use(s.AdminAuthRequired())
+	manager := admin.Use(s.AdminAuthRequired(), s.ManagerRequired())
 	{
 		// Challenge
 		manager.GET("/challenges", func(c *gin.Context) {
@@ -164,7 +165,7 @@ func (s *Service) initRouter() *gin.Engine {
 		})
 
 		// Check
-		manager.POST("/checkDown", func(c *gin.Context) {
+		check.POST("/checkDown", func(c *gin.Context) {
 			c.JSON(s.CheckDown(c))
 		})
 
@@ -243,8 +244,8 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 	}
 }
 
-// ManagerAuthRequired is the manager permission check middleware.
-func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
+// AdminAuthRequired is the admin permission check middleware.
+func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
@@ -266,6 +267,21 @@ func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 		}
 
 		c.Set("managerData", managerData)
+		c.Set("isCheck", managerData.IsCheck)
+		c.Next()
+	}
+}
+
+// ManagerRequired make sure the account is the manager.
+func (s *Service) ManagerRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.GetBool("isCheck") {
+			c.JSON(utils.MakeErrJSON(401, 40100,
+				locales.I18n.T(c.GetString("lang"), "manager.manager_required"),
+			))
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

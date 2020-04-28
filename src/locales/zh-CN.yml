@@ -114,6 +114,7 @@ zh-CN:
     repeat: "管理员名称重复"
     update_token_fail: "更新管理员 Token 失败！"
     update_password_fail: "修改管理员密码失败！"
+    manager_required: "需要管理员权限账号"
 
   log:
     new_challenge: "新的题目 [{{.title}}] 被创建"

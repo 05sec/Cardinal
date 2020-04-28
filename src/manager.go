@@ -15,6 +15,7 @@ type Manager struct {
 
 	Name     string
 	Password string `json:"-"`
+	IsCheck  bool
 	Token    string // For single sign-on
 }
 
@@ -37,7 +38,8 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	var manager Manager
 	s.Mysql.Where(&Manager{Name: formData.Name}).Find(&manager)
 
-	if manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) {
+	// The check account can't login.
+	if manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) && !manager.IsCheck {
 		// Login successfully
 		token := utils.GenerateToken()
 		tx := s.Mysql.Begin()
@@ -59,7 +61,7 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 func (s *Service) ManagerLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
 	if token != "" {
-		s.Mysql.Model(&Manager{}).Where("token = ?", token).Delete(&Token{})
+		s.Mysql.Model(&Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Delete(&Token{})
 	}
 	return utils.MakeSuccessJSON(
 		locales.I18n.T(c.GetString("lang"), "manager.logout_success"),
@@ -76,14 +78,21 @@ func (s *Service) GetAllManager() (int, interface{}) {
 // NewManager is add a new manager handler.
 func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
+		IsCheck  bool   `json:"IsCheck"`
 		Name     string `json:"Name" binding:"required"`
-		Password string `json:"Password" binding:"required"`
+		Password string `json:"Password"` // The check account doesn't need the password.
 	}
 	var formData InputForm
 	err := c.BindJSON(&formData)
 	if err != nil {
 		return utils.MakeErrJSON(400, 40000,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
+	}
+
+	if !formData.IsCheck && formData.Password == "" {
+		return utils.MakeErrJSON(400, 40001,
+			locales.I18n.T(c.GetString("lang"), "manager.error_payload"),
 		)
 	}
 
@@ -97,6 +106,7 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 
 	manager := Manager{
 		Name:     formData.Name,
+		IsCheck:  formData.IsCheck,
 		Password: utils.AddSalt(formData.Password),
 	}
 	tx := s.Mysql.Begin()
@@ -165,7 +175,7 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 
 	tx := s.Mysql.Begin()
 	password := randstr.String(16)
-	if tx.Model(&Manager{}).Where(&Manager{Model: gorm.Model{ID: uint(id)}}).Update(&Manager{
+	if tx.Model(&Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Update(&Manager{
 		Password: utils.AddSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
