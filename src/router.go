@@ -84,9 +84,8 @@ func (s *Service) initRouter() *gin.Engine {
 	})
 
 	// For manager
-	admin := api.Group("/manager")
-	check := admin.Use(s.AdminAuthRequired())
-	manager := admin.Use(s.AdminAuthRequired(), s.ManagerRequired())
+	check := api.Group("/manager").Use(s.AdminAuthRequired())
+	manager := api.Group("/manager").Use(s.AdminAuthRequired(), s.ManagerRequired())
 	{
 		// Challenge
 		manager.GET("/challenges", func(c *gin.Context) {
