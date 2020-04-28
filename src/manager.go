@@ -60,8 +60,13 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 // ManagerLogout is the manager logout handler.
 func (s *Service) ManagerLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
+	tx := s.Mysql.Begin()
 	if token != "" {
-		s.Mysql.Model(&Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Delete(&Token{})
+		if tx.Model(&Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Update(map[string]interface{}{"token": ""}).RowsAffected != 1 {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
 	}
 	return utils.MakeSuccessJSON(
 		locales.I18n.T(c.GetString("lang"), "manager.logout_success"),

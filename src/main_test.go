@@ -61,6 +61,7 @@ func init() {
 		Name:     "e99",
 		Password: utils.AddSalt("qwe1qwe2qwe3"),
 		Token:    managerToken,
+		IsCheck:  false,
 	})
 
 	service.Router = service.initRouter()
