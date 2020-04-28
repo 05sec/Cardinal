@@ -11,6 +11,7 @@ import (
 
 var service *Service
 var managerToken string
+var checkToken string
 var team []struct {
 	Name      string `json:"Name"`
 	Password  string `json:"Password"`

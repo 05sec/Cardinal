@@ -15,6 +15,10 @@ func (s *Service) initMySQL() {
 		conf.Get().DBHost,
 		conf.Get().DBName,
 	))
+
+	db.DB().SetMaxIdleConns(128)
+	db.DB().SetMaxOpenConns(256)
+
 	if err != nil {
 		log.Fatalln(err)
 	}
