@@ -25,6 +25,7 @@ func TestService_ManagerLogin(t *testing.T) {
 	assert.Equal(t, 400, w.Code)
 
 	// Login fail
+	w = httptest.NewRecorder()
 	jsonData, _ := json.Marshal(map[string]interface{}{
 		"Name":     "e99",
 		"Password": "123456",
@@ -70,6 +71,7 @@ func TestService_NewManager(t *testing.T) {
 	assert.Equal(t, 400, w.Code)
 
 	// repeat manager
+	w = httptest.NewRecorder()
 	jsonData, _ := json.Marshal(map[string]interface{}{
 		"Name":     "e99",
 		"Password": "123456",
@@ -80,6 +82,7 @@ func TestService_NewManager(t *testing.T) {
 	assert.Equal(t, 400, w.Code)
 
 	// Wrong check account
+	w = httptest.NewRecorder()
 	jsonData, _ = json.Marshal(map[string]interface{}{
 		"Name":     "e99pppp",
 		"Password": "",

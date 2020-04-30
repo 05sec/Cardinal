@@ -39,7 +39,7 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	s.Mysql.Where(&Manager{Name: formData.Name}).Find(&manager)
 
 	// The check account can't login.
-	if manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) && !manager.IsCheck {
+	if manager.ID != 0 && manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) && !manager.IsCheck {
 		// Login successfully
 		token := utils.GenerateToken()
 		tx := s.Mysql.Begin()
