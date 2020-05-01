@@ -1,0 +1,27 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "wuhan005",
+      "name": "John Wu",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/12731778?v=4",
+      "profile": "https://github.red",
+      "contributions": [
+        "code",
+        "design",
+        "doc",
+        "maintenance"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "Cardinal",
+  "projectOwner": "vidar-team",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
