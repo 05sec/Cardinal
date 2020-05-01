@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"strconv"
 	"time"
 )
@@ -10,8 +12,10 @@ import (
 // Challenge is a gorm model for database table `challenges`, used to store the challenges like Web1, Pwn1.
 type Challenge struct {
 	gorm.Model
-	Title     string
-	BaseScore int
+	Title           string
+	BaseScore       int
+	AutoRefreshFlag bool
+	Command         string
 }
 
 // SetVisible is setting challenge visible status handler.
@@ -26,16 +30,16 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
-		return s.makeErrJSON(404, 40400,
-			s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+		return utils.MakeErrJSON(404, 40400,
+			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
 
@@ -53,9 +57,9 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 		status = "visible"
 	}
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.set_challenge_"+status, gin.H{"challenge": checkChallenge.Title})),
+		string(locales.I18n.T(c.GetString("lang"), "log.set_challenge_"+status, gin.H{"challenge": checkChallenge.Title})),
 	)
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "gamebox.visibility_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.visibility_success"))
 }
 
 // GetAllChallenges get all challenges from the database.
@@ -63,11 +67,13 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Find(&challenges)
 	type resultStruct struct {
-		ID        uint
-		CreatedAt time.Time
-		Title     string
-		Visible   bool
-		BaseScore int
+		ID              uint
+		CreatedAt       time.Time
+		Title           string
+		Visible         bool
+		BaseScore       int
+		AutoRefreshFlag bool
+		Command         string
 	}
 
 	var res []resultStruct
@@ -79,92 +85,122 @@ func (s *Service) GetAllChallenges() (int, interface{}) {
 		s.Mysql.Where(&GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
 
 		res = append(res, resultStruct{
-			ID:        v.ID,
-			CreatedAt: v.CreatedAt,
-			Title:     v.Title,
-			Visible:   gameBox.Visible,
-			BaseScore: v.BaseScore,
+			ID:              v.ID,
+			CreatedAt:       v.CreatedAt,
+			Title:           v.Title,
+			Visible:         gameBox.Visible,
+			BaseScore:       v.BaseScore,
+			AutoRefreshFlag: v.AutoRefreshFlag,
+			Command:         v.Command,
 		})
 	}
-	return s.makeSuccessJSON(res)
+	return utils.MakeSuccessJSON(res)
 }
 
 // NewChallenge is new challenge handler for manager.
 func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		Title     string `binding:"required"`
-		BaseScore int    `binding:"required"`
+		Title           string `binding:"required"`
+		BaseScore       int    `binding:"required"`
+		AutoRefreshFlag bool
+		Command         string
 	}
 
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
+	if inputForm.AutoRefreshFlag && inputForm.Command == "" {
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "challenge.empty_command"))
+	}
+
+	if !inputForm.AutoRefreshFlag {
+		inputForm.Command = ""
+	}
+
 	newChallenge := &Challenge{
-		Title:     inputForm.Title,
-		BaseScore: inputForm.BaseScore,
+		Title:           inputForm.Title,
+		BaseScore:       inputForm.BaseScore,
+		AutoRefreshFlag: inputForm.AutoRefreshFlag,
+		Command:         inputForm.Command,
 	}
 	var checkChallenge Challenge
 
 	s.Mysql.Model(&Challenge{}).Where(&Challenge{Title: newChallenge.Title}).Find(&checkChallenge)
 	if checkChallenge.Title != "" {
-		return s.makeErrJSON(403, 40300,
-			s.I18n.T(c.GetString("lang"), "general.post_repeat"),
+		return utils.MakeErrJSON(403, 40300,
+			locales.I18n.T(c.GetString("lang"), "general.post_repeat"),
 		)
 	}
 
 	tx := s.Mysql.Begin()
 	if tx.Create(newChallenge).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "challenge.post_error"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "challenge.post_error"),
 		)
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"challenge": checkChallenge.Title})),
+		string(locales.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"title": checkChallenge.Title})),
 	)
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "challenge.post_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.post_success"))
 }
 
 // EditChallenge is edit challenge handler for manager.
 func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	type InputForm struct {
-		ID        uint   `binding:"required"`
-		Title     string `binding:"required"`
-		BaseScore int    `binding:"required"`
+		ID              uint   `binding:"required"`
+		Title           string `binding:"required"`
+		BaseScore       int    `binding:"required"`
+		AutoRefreshFlag bool
+		Command         string
 	}
 
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_payload"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
+	}
+
+	if inputForm.AutoRefreshFlag && inputForm.Command == "" {
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "challenge.empty_command"))
+	}
+
+	// True off auto refresh flag, clean the command.
+	if !inputForm.AutoRefreshFlag {
+		inputForm.Command = ""
 	}
 
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
-		return s.makeErrJSON(404, 40400,
-			s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+		return utils.MakeErrJSON(404, 40400,
+			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
 
-	newChallenge := &Challenge{
-		Title:     inputForm.Title,
-		BaseScore: inputForm.BaseScore,
+	// For the `AutoRefreshFlag` is a boolean value, use map here.
+	editChallenge := map[string]interface{}{
+		"Title":           inputForm.Title,
+		"BaseScore":       inputForm.BaseScore,
+		"AutoRefreshFlag": inputForm.AutoRefreshFlag,
+		"Command":         inputForm.Command,
 	}
 	tx := s.Mysql.Begin()
-	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newChallenge).RowsAffected != 1 {
+	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(editChallenge).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50001,
-			s.I18n.T(c.GetString("lang"), "challenge.put_error"),
+		return utils.MakeErrJSON(500, 50001,
+			locales.I18n.T(c.GetString("lang"), "challenge.put_error"),
 		)
 	}
 	tx.Commit()
@@ -184,29 +220,29 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 		s.SetRankListTitle()
 	}
 
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "challenge.post_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.put_success"))
 }
 
 // DeleteChallenge is delete challenge handler for manager.
 func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.error_query"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
 
 	var challenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: uint(id)}}).Find(&challenge)
 	if challenge.Title == "" {
-		return s.makeErrJSON(404, 40400,
-			s.I18n.T(c.GetString("lang"), "challenge.not_found"),
+		return utils.MakeErrJSON(404, 40400,
+			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
 
@@ -215,14 +251,14 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	tx.Where("challenge_id = ?", uint(id)).Delete(&GameBox{})
 	if tx.Where("id = ?", uint(id)).Delete(&Challenge{}).RowsAffected != 1 {
 		tx.Rollback()
-		return s.makeErrJSON(500, 50002,
-			s.I18n.T(c.GetString("lang"), "challenge.delete_error"),
+		return utils.MakeErrJSON(500, 50002,
+			locales.I18n.T(c.GetString("lang"), "challenge.delete_error"),
 		)
 	}
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(s.I18n.T(c.GetString("lang"), "log.delete_challenge", gin.H{"challenge": challenge.Title})),
+		string(locales.I18n.T(c.GetString("lang"), "log.delete_challenge", gin.H{"title": challenge.Title})),
 	)
-	return s.makeSuccessJSON(s.I18n.T(c.GetString("lang"), "challenge.delete_success"))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.delete_success"))
 }

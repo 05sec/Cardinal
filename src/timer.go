@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"log"
 	"math"
 	"time"
@@ -22,7 +25,7 @@ type Timer struct {
 }
 
 func (s *Service) getTime() (int, interface{}) {
-	return s.makeSuccessJSON(gin.H{
+	return utils.MakeSuccessJSON(gin.H{
 		"BeginTime":       s.Timer.BeginTime.Unix(),
 		"EndTime":         s.Timer.EndTime.Unix(),
 		"Duration":        s.Timer.Duration,
@@ -34,10 +37,10 @@ func (s *Service) getTime() (int, interface{}) {
 
 func (s *Service) initTimer() {
 	s.Timer = &Timer{
-		BeginTime: s.Conf.Base.BeginTime,
-		EndTime:   s.Conf.Base.EndTime,
-		Duration:  s.Conf.Base.Duration,
-		RestTime:  s.Conf.Base.RestTime,
+		BeginTime: conf.Get().BeginTime,
+		EndTime:   conf.Get().EndTime,
+		Duration:  conf.Get().Duration,
+		RestTime:  conf.Get().RestTime,
 		NowRound:  -1,
 	}
 	s.checkTimeConfig()
@@ -83,11 +86,11 @@ func (s *Service) initTimer() {
 	}
 	s.Timer.TotalRound = int(totalTime / 60 / int64(s.Timer.Duration))
 
-	log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.total_round", gin.H{
+	log.Println(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_round", gin.H{
 		"round": s.Timer.TotalRound,
 	}))
 
-	log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.total_time", gin.H{
+	log.Println(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_time", gin.H{
 		"time": int(totalTime / 60),
 	}))
 
@@ -155,6 +158,9 @@ func (s *Service) timerProcess() {
 						go s.CalculateRoundScore(s.Timer.NowRound - 1)
 					}
 
+					// Auto refresh flag
+					go s.refreshFlag()
+					
 					fmt.Println(s.Timer.NowRound)
 				}
 			}
@@ -168,7 +174,7 @@ func (s *Service) timerProcess() {
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
 				go s.CalculateRoundScore(s.Timer.TotalRound)
-				s.NewLog(IMPORTANT, "system", string(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.end")))
+				s.NewLog(IMPORTANT, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "timer.end")))
 			}
 
 			s.Timer.Status = "end"
@@ -180,16 +186,16 @@ func (s *Service) timerProcess() {
 
 func (s *Service) checkTimeConfig() {
 	if s.Timer.BeginTime.Unix() > s.Timer.EndTime.Unix() {
-		log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.start_time_error"))
+		log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.start_time_error"))
 	}
 
 	// Check the RestTime in config file is correct.
 	for key, dur := range s.Timer.RestTime {
 		if len(dur) != 2 {
-			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.single_rest_time_error"))
+			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.single_rest_time_error"))
 		}
 		if dur[0].Unix() >= dur[1].Unix() {
-			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.rest_time_start_error",
+			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_start_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
@@ -197,7 +203,7 @@ func (s *Service) checkTimeConfig() {
 			))
 		}
 		if dur[0].Unix() <= s.Timer.BeginTime.Unix() || dur[1].Unix() >= s.Timer.EndTime.Unix() {
-			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.rest_time_overflow_error",
+			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_overflow_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
@@ -206,7 +212,7 @@ func (s *Service) checkTimeConfig() {
 		}
 		// RestTime should in order.
 		if key != 0 && dur[0].Unix() <= s.Timer.RestTime[key-1][0].Unix() {
-			log.Fatalln(s.I18n.T(s.Conf.Base.SystemLanguage, "timer.rest_time_order_error",
+			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_order_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),

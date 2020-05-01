@@ -29,6 +29,7 @@ zh-CN:
     delete_error: "删除题目失败！"
     delete_success: "删除题目成功！"
     not_found: "题目不存在！"
+    empty_command: "命令不能为空！"
 
   check:
     repeat: "重复 Check，已忽略"
@@ -54,6 +55,7 @@ zh-CN:
     visibility_success: "修改靶机可见状态成功！"
     repeat: "存在重复添加的靶机，请检查"
     not_found: "靶机不存在！"
+    auto_refresh_flag_error: "靶机 SSH 设置为空"
 
   team:
     post_error: "添加队伍失败！"
@@ -112,6 +114,7 @@ zh-CN:
     repeat: "管理员名称重复"
     update_token_fail: "更新管理员 Token 失败！"
     update_password_fail: "修改管理员密码失败！"
+    manager_required: "需要管理员权限账号"
 
   log:
     new_challenge: "新的题目 [{{.title}}] 被创建"

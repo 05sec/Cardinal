@@ -1,4 +1,4 @@
-module Cardinal
+module github.com/vidar-team/Cardinal
 
 go 1.13
 
@@ -37,9 +37,11 @@ require (
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/vidar-team/Cardinal_frontend v0.0.0-20200408105230-89ca4c2e48db
 	github.com/vidar-team/Cardinal_manager_frontend v0.0.4
+	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	golang.org/x/text v0.3.0
+	golang.org/x/tools v0.0.0-20190328211700-ab21143f2384
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
 	moul.io/http2curl v1.0.0 // indirect

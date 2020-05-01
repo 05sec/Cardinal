@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/locales"
 	"math"
 	"strconv"
 )
@@ -14,10 +16,10 @@ func (s *Service) HealthyCheck() {
 	previousRoundScore := s.PreviousRoundScore()
 	if math.Abs(previousRoundScore) != 0 {
 		// If the previous round total score is not equal zero, maybe all the teams were checked down.
-		if previousRoundScore != float64(-s.Conf.CheckDownScore*teamCount) {
+		if previousRoundScore != float64(-conf.Get().CheckDownScore*teamCount) {
 			// Maybe there are some mistakes in previous round score.
 			s.NewLog(IMPORTANT, "healthy_check",
-				string(s.I18n.T(s.Conf.Base.SystemLanguage, "healthy.previous_round_non_zero_error")),
+				string(locales.I18n.T(conf.Get().SystemLanguage, "healthy.previous_round_non_zero_error")),
 			)
 		}
 	}
@@ -25,10 +27,10 @@ func (s *Service) HealthyCheck() {
 	totalScore := s.TotalScore()
 	if math.Abs(totalScore) != 0 {
 		// If sum all the scores but it is not equal zero, maybe all the teams were checked down in some rounds.
-		if int(totalScore)%(s.Conf.CheckDownScore*teamCount) != 0 {
+		if int(totalScore)%(conf.Get().CheckDownScore*teamCount) != 0 {
 			// Maybe there are some mistakes.
 			s.NewLog(IMPORTANT, "healthy_check",
-				string(s.I18n.T(s.Conf.Base.SystemLanguage, "healthy.total_score_non_zero_error")),
+				string(locales.I18n.T(conf.Get().SystemLanguage, "healthy.total_score_non_zero_error")),
 			)
 		}
 	}

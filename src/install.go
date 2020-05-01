@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"io/ioutil"
 	"log"
 	"os"
@@ -45,7 +48,7 @@ DBName="{{ .DBName }}"
 
 func (s *Service) install() {
 	// Check `uploads` folder exist
-	if !IsExist("./uploads") {
+	if !utils.FileIsExist("./uploads") {
 		err := os.Mkdir("./uploads", os.ModePerm)
 		if err != nil {
 			log.Fatalln(err)
@@ -53,7 +56,7 @@ func (s *Service) install() {
 	}
 
 	// Check `conf` folder exist
-	if !IsExist("./conf") {
+	if !utils.FileIsExist("./conf") {
 		err := os.Mkdir("./conf", os.ModePerm)
 		if err != nil {
 			log.Fatalln(err)
@@ -61,7 +64,7 @@ func (s *Service) install() {
 	}
 
 	// Check `locales` folder exist
-	if !IsExist("./locales") {
+	if !utils.FileIsExist("./locales") {
 		err := os.Mkdir("./locales", os.ModePerm)
 		if err != nil {
 			log.Fatalln(err)
@@ -83,7 +86,7 @@ func (s *Service) install() {
 		log.Fatalln("Can not find the language file!")
 	}
 
-	if !IsExist("./conf/Cardinal.toml") {
+	if !utils.FileIsExist("./conf/Cardinal.toml") {
 		log.Println("Please select a preferred language for the installation guide:")
 		for index, lang := range languages {
 			fmt.Printf("%s - %s\n", index, lang)
@@ -94,7 +97,7 @@ func (s *Service) install() {
 		index := "0"
 		var err = errors.New("")
 		for languages[index] == "" {
-			InputString(&index, "type 1, 2... to select")
+			utils.InputString(&index, "type 1, 2... to select")
 		}
 
 		content, err := s.GenerateConfigFileGuide(languages[index])
@@ -105,7 +108,7 @@ func (s *Service) install() {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		log.Println(s.I18n.T(languages[index], "install.create_config_success"))
+		log.Println(locales.I18n.T(languages[index], "install.create_config_success"))
 	}
 }
 
@@ -124,14 +127,14 @@ func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 		DBName:         "cardinal",
 	}
 
-	log.Println(s.I18n.T(lang, "install.greet"))
+	log.Println(locales.I18n.T(lang, "install.greet"))
 
-	InputString(&input.Title, string(s.I18n.T(lang, "install.input_title")))
+	utils.InputString(&input.Title, string(locales.I18n.T(lang, "install.input_title")))
 
 	var beginTime time.Time
 	err := errors.New("")
 	for err != nil {
-		InputString(&input.BeginTime, string(s.I18n.T(lang, "install.begin_time")))
+		utils.InputString(&input.BeginTime, string(locales.I18n.T(lang, "install.begin_time")))
 		beginTime, err = time.ParseInLocation("2006-01-02 15:04:05", input.BeginTime, time.Local)
 	}
 	input.BeginTime = beginTime.Format(time.RFC3339)
@@ -139,21 +142,21 @@ func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 	var endTime time.Time
 	err = errors.New("")
 	for err != nil {
-		InputString(&input.EndTime, string(s.I18n.T(lang, "install.end_time")))
+		utils.InputString(&input.EndTime, string(locales.I18n.T(lang, "install.end_time")))
 		endTime, err = time.ParseInLocation("2006-01-02 15:04:05 ", input.EndTime, time.Local)
 	}
 	input.EndTime = endTime.Format(time.RFC3339)
 
-	InputString(&input.Duration, string(s.I18n.T(lang, "install.duration")))
-	InputString(&input.Port, string(s.I18n.T(lang, "install.port")))
-	InputString(&input.FlagPrefix, string(s.I18n.T(lang, "install.flag_prefix")))
-	InputString(&input.FlagSuffix, string(s.I18n.T(lang, "install.flag_suffix")))
-	InputString(&input.CheckDownScore, string(s.I18n.T(lang, "install.checkdown_score")))
-	InputString(&input.AttackScore, string(s.I18n.T(lang, "install.attack_score")))
-	InputString(&input.DBHost, string(s.I18n.T(lang, "install.db_host")))
-	InputString(&input.DBUsername, string(s.I18n.T(lang, "install.db_username")))
-	InputString(&input.DBPassword, string(s.I18n.T(lang, "install.db_password")))
-	InputString(&input.DBName, string(s.I18n.T(lang, "install.db_name")))
+	utils.InputString(&input.Duration, string(locales.I18n.T(lang, "install.duration")))
+	utils.InputString(&input.Port, string(locales.I18n.T(lang, "install.port")))
+	utils.InputString(&input.FlagPrefix, string(locales.I18n.T(lang, "install.flag_prefix")))
+	utils.InputString(&input.FlagSuffix, string(locales.I18n.T(lang, "install.flag_suffix")))
+	utils.InputString(&input.CheckDownScore, string(locales.I18n.T(lang, "install.checkdown_score")))
+	utils.InputString(&input.AttackScore, string(locales.I18n.T(lang, "install.attack_score")))
+	utils.InputString(&input.DBHost, string(locales.I18n.T(lang, "install.db_host")))
+	utils.InputString(&input.DBUsername, string(locales.I18n.T(lang, "install.db_username")))
+	utils.InputString(&input.DBPassword, string(locales.I18n.T(lang, "install.db_password")))
+	utils.InputString(&input.DBName, string(locales.I18n.T(lang, "install.db_name")))
 
 	// Generate Salt
 	input.Salt = randstr.String(64)
@@ -176,13 +179,13 @@ func (s *Service) initManager() {
 	if managerCount == 0 {
 		// Create manager account if managers table is empty.
 		var managerName, managerPassword string
-		InputString(&managerName, string(s.I18n.T(s.Conf.Base.SystemLanguage, "install.manager_name")))
-		InputString(&managerPassword, string(s.I18n.T(s.Conf.Base.SystemLanguage, "install.manager_password")))
+		utils.InputString(&managerName, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_name")))
+		utils.InputString(&managerPassword, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_password")))
 		s.Mysql.Create(&Manager{
 			Name:     managerName,
-			Password: s.addSalt(managerPassword),
+			Password: utils.AddSalt(managerPassword),
 		})
-		s.NewLog(WARNING, "system", string(s.I18n.T(s.Conf.Base.SystemLanguage, "install.manager_success")))
-		log.Println(s.I18n.T(s.Conf.Base.SystemLanguage, "install.manager_success"))
+		s.NewLog(WARNING, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
+		log.Println(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success"))
 	}
 }

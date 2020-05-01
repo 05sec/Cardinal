@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/vidar-team/Cardinal/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"runtime"
@@ -35,7 +36,7 @@ func (s *Service) NewLog(level int, kind string, content string) {
 func (s *Service) GetLogs(c *gin.Context) (int, interface{}) {
 	var logs []Log
 	s.Mysql.Model(&Log{}).Order("`id` DESC").Limit(30).Find(&logs)
-	return s.makeSuccessJSON(logs)
+	return utils.MakeSuccessJSON(logs)
 }
 
 // Panel returns the system runtime status, which is used in backstage data panel.
@@ -48,11 +49,11 @@ func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 
 	m := new(runtime.MemStats)
 	runtime.ReadMemStats(m)
-	return s.makeSuccessJSON(gin.H{
+	return utils.MakeSuccessJSON(gin.H{
 		"SubmitFlag":         submitFlag,
 		"CheckDown":          checkDown,
-		"NumGoroutine":       runtime.NumGoroutine(),          // Goroutine number
-		"MemAllocated":       s.FileSize(int64(m.Alloc)),      // Allocated memory
+		"NumGoroutine":       runtime.NumGoroutine(),         // Goroutine number
+		"MemAllocated":       utils.FileSize(int64(m.Alloc)), // Allocated memory
 		"TotalScore":         s.TotalScore(),
 		"PreviousRoundScore": s.PreviousRoundScore(),
 	})

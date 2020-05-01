@@ -5,7 +5,9 @@
 [![Build](https://travis-ci.com/vidar-team/Cardinal.svg?branch=master)](https://travis-ci.org/vidar-team/Cardinal)
 [![GoReport](https://goreportcard.com/badge/github.com/vidar-team/Cardinal)](https://goreportcard.com/report/github.com/vidar-team/Cardinal)
 [![codecov](https://codecov.io/gh/vidar-team/Cardinal/branch/master/graph/badge.svg)](https://codecov.io/gh/vidar-team/Cardinal)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 ## 介绍
 
 Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本程序可以作为 CTF 线下比赛平台，亦可用于团队内部 AWD 模拟练习。
@@ -83,7 +85,13 @@ chmod +x ./Cardinal
 
 十分欢迎您和我们一起改进 Cardinal，您可以改进现有程序，加入新功能，完善文档，优化代码等。
 
-[![Contributors](http://ergatejs.implements.io/badges/contributors/vidar-team/Cardinal_1280_96_10.png)](https://github.com/vidar-team/Cardinal/graphs/contributors)
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## 协议与许可
 

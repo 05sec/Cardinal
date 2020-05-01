@@ -112,6 +112,7 @@ en-US:
     repeat: "Duplicated Admin Username"
     update_token_fail: "Update Admin Token Failed!"
     update_password_fail: "Edit Admin Password Failed!"
+    manager_required: "Manager Account Required"
 
   log:
     new_challenge: "New Challenge [{{.title}}] Created."

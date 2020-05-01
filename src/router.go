@@ -4,6 +4,10 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/frontend"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 )
 
 func (s *Service) initRouter() *gin.Engine {
@@ -15,19 +19,19 @@ func (s *Service) initRouter() *gin.Engine {
 	}))
 
 	api := r.Group("/api")
-	api.Use(s.I18nMiddleware())
+	api.Use(locales.Middleware())
 
 	// Frontend
-	r.Use(static.Serve("/", frontendFS()))
+	r.Use(static.Serve("/", frontend.FS()))
 
 	// Cardinal basic info
 	api.Any("/", func(c *gin.Context) {
-		c.JSON(s.makeSuccessJSON("Cardinal"))
+		c.JSON(utils.MakeSuccessJSON("Cardinal"))
 	})
 
 	api.GET("/base", func(c *gin.Context) {
-		c.JSON(s.makeSuccessJSON(gin.H{
-			"Title": s.Conf.Title,
+		c.JSON(utils.MakeSuccessJSON(gin.H{
+			"Title": conf.Get().Title,
 		}))
 	})
 	api.GET("/time", func(c *gin.Context) {
@@ -62,7 +66,7 @@ func (s *Service) initRouter() *gin.Engine {
 			c.JSON(s.GetSelfGameBoxes(c))
 		})
 		team.GET("/rank", func(c *gin.Context) {
-			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Rank": s.GetRankList()}))
+			c.JSON(utils.MakeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Rank": s.GetRankList()}))
 		})
 		team.GET("/bulletins", func(c *gin.Context) {
 			c.JSON(s.GetAllBulletins())
@@ -80,8 +84,8 @@ func (s *Service) initRouter() *gin.Engine {
 	})
 
 	// For manager
-	manager := api.Group("/manager")
-	manager.Use(s.ManagerAuthRequired())
+	check := api.Group("/manager").Use(s.AdminAuthRequired())
+	manager := api.Group("/manager").Use(s.AdminAuthRequired(), s.ManagerRequired())
 	{
 		// Challenge
 		manager.GET("/challenges", func(c *gin.Context) {
@@ -109,6 +113,9 @@ func (s *Service) initRouter() *gin.Engine {
 		})
 		manager.PUT("/gamebox", func(c *gin.Context) {
 			c.JSON(s.EditGameBox(c))
+		})
+		manager.GET("/gameboxes/sshTest", func(c *gin.Context) {
+			c.JSON(s.testSSH(c))
 		})
 
 		// Team
@@ -152,9 +159,12 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.POST("/flag/generate", func(c *gin.Context) {
 			c.JSON(s.GenerateFlag(c))
 		})
+		manager.GET("/flag/export", func(c *gin.Context) {
+			c.JSON(s.ExportFlag(c))
+		})
 
 		// Check
-		manager.POST("/checkDown", func(c *gin.Context) {
+		check.POST("/checkDown", func(c *gin.Context) {
 			c.JSON(s.CheckDown(c))
 		})
 
@@ -182,7 +192,7 @@ func (s *Service) initRouter() *gin.Engine {
 			c.JSON(s.GetLogs(c))
 		})
 		manager.GET("/rank", func(c *gin.Context) {
-			c.JSON(s.makeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Rank": s.GetManagerRankList()}))
+			c.JSON(utils.MakeSuccessJSON(gin.H{"Title": s.GetRankListTitle(), "Rank": s.GetManagerRankList()}))
 		})
 		manager.GET("/panel", func(c *gin.Context) {
 			c.JSON(s.Panel(c))
@@ -191,15 +201,15 @@ func (s *Service) initRouter() *gin.Engine {
 
 	// 404
 	r.NoRoute(func(c *gin.Context) {
-		c.JSON(s.makeErrJSON(404, 40400,
-			s.I18n.T(c.GetString("lang"), "general.not_found"),
+		c.JSON(utils.MakeErrJSON(404, 40400,
+			locales.I18n.T(c.GetString("lang"), "general.not_found"),
 		))
 	})
 
 	// 405
 	r.NoMethod(func(c *gin.Context) {
-		c.JSON(s.makeErrJSON(405, 40500,
-			s.I18n.T(c.GetString("lang"), "general.method_not_allow"),
+		c.JSON(utils.MakeErrJSON(405, 40500,
+			locales.I18n.T(c.GetString("lang"), "general.method_not_allow"),
 		))
 	})
 
@@ -211,8 +221,8 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(s.makeErrJSON(403, 40300,
-				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			c.JSON(utils.MakeErrJSON(403, 40300,
+				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
 			return
@@ -221,8 +231,8 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 		var tokenData Token
 		s.Mysql.Where(&Token{Token: token}).Find(&tokenData)
 		if tokenData.ID == 0 {
-			c.JSON(s.makeErrJSON(401, 40100,
-				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			c.JSON(utils.MakeErrJSON(401, 40100,
+				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
 			return
@@ -233,13 +243,13 @@ func (s *Service) TeamAuthRequired() gin.HandlerFunc {
 	}
 }
 
-// ManagerAuthRequired is the manager permission check middleware.
-func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
+// AdminAuthRequired is the admin permission check middleware.
+func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(s.makeErrJSON(403, 40300,
-				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			c.JSON(utils.MakeErrJSON(403, 40300,
+				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
 			return
@@ -248,14 +258,29 @@ func (s *Service) ManagerAuthRequired() gin.HandlerFunc {
 		var managerData Manager
 		s.Mysql.Where(&Manager{Token: token}).Find(&managerData)
 		if managerData.ID == 0 {
-			c.JSON(s.makeErrJSON(401, 40100,
-				s.I18n.T(c.GetString("lang"), "general.no_auth"),
+			c.JSON(utils.MakeErrJSON(401, 40100,
+				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
 			return
 		}
 
 		c.Set("managerData", managerData)
+		c.Set("isCheck", managerData.IsCheck)
+		c.Next()
+	}
+}
+
+// ManagerRequired make sure the account is the manager.
+func (s *Service) ManagerRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.GetBool("isCheck") {
+			c.JSON(utils.MakeErrJSON(401, 40100,
+				locales.I18n.T(c.GetString("lang"), "manager.manager_required"),
+			))
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

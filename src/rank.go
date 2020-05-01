@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/patrickmn/go-cache"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/locales"
 )
 
 // RankItem is used to create the ranking list.
@@ -69,7 +71,7 @@ func (s *Service) SetRankListTitle() {
 	}
 	s.Store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // Save challenge title into cache.
 
-	s.NewLog(NORMAL, "system", string(s.I18n.T(s.Conf.Base.SystemLanguage, "log.rank_list_success")))
+	s.NewLog(NORMAL, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "log.rank_list_success")))
 }
 
 // SetRankList will calculate the ranking list.

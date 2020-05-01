@@ -3,14 +3,16 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/src/locales"
+	"github.com/vidar-team/Cardinal/src/utils"
 )
 
 // UploadPicture is upload team logo handler for manager.
 func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 	file, err := c.FormFile("picture")
 	if err != nil {
-		return s.makeErrJSON(400, 40000,
-			s.I18n.T(c.GetString("lang"), "file.select_picture"),
+		return utils.MakeErrJSON(400, 40000,
+			locales.I18n.T(c.GetString("lang"), "file.select_picture"),
 		)
 	}
 	fileExt := map[string]string{
@@ -26,9 +28,9 @@ func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 
 	err = c.SaveUploadedFile(file, "./uploads/"+fileName)
 	if err != nil {
-		return s.makeErrJSON(500, 50000,
-			s.I18n.T(c.GetString("lang"), "general.server_error"),
+		return utils.MakeErrJSON(500, 50000,
+			locales.I18n.T(c.GetString("lang"), "general.server_error"),
 		)
 	}
-	return s.makeSuccessJSON(fileName)
+	return utils.MakeSuccessJSON(fileName)
 }

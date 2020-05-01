@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/locales"
 	"time"
 )
 
@@ -44,7 +46,7 @@ func (s *Service) CalculateRoundScore(round int) {
 
 	endTime := time.Now().UnixNano()
 	s.NewLog(WARNING, "system", string(
-		s.I18n.T(s.Conf.Base.SystemLanguage, "log.score_success",
+		locales.I18n.T(conf.Get().SystemLanguage, "log.score_success",
 			gin.H{
 				"round": round,
 				"time":  float64(endTime-startTime) / float64(time.Second),
@@ -90,7 +92,7 @@ func (s *Service) AddAttack(round int) {
 		var attackActions []AttackAction
 		s.Mysql.Model(&AttackAction{}).Where(&AttackAction{GameBoxID: gameBox.ID, Round: round}).Find(&attackActions)
 		if len(attackActions) != 0 {
-			score := float64(s.Conf.AttackScore) / float64(len(attackActions)) // Score which every attacker can get from this gamebox.
+			score := float64(conf.Get().AttackScore) / float64(len(attackActions)) // Score which every attacker can get from this gamebox.
 			// Add score to the attackers.
 			for _, action := range attackActions {
 				// Get the attacker's gamebox ID of this challenge.
@@ -125,7 +127,7 @@ func (s *Service) MinusAttack(round int) {
 			GameBoxID: action.GameBoxID,
 			Round:     round,
 			Reason:    "been_attacked",
-			Score:     float64(-s.Conf.AttackScore),
+			Score:     float64(-conf.Get().AttackScore),
 		})
 	}
 }
@@ -142,7 +144,7 @@ func (s *Service) MinusCheckDown(round int) {
 			GameBoxID: action.GameBoxID,
 			Round:     round,
 			Reason:    "checkdown",
-			Score:     float64(-s.Conf.CheckDownScore),
+			Score:     float64(-conf.Get().CheckDownScore),
 		})
 	}
 }
@@ -156,7 +158,7 @@ func (s *Service) AddCheckDown(round int) {
 		// Get the check down teams of this challenge.
 		var downActions []DownAction
 		s.Mysql.Model(&DownAction{}).Where(&DownAction{ChallengeID: challenge.ID, Round: round}).Find(&downActions)
-		totalScore := len(downActions) * s.Conf.CheckDownScore // Score which every online team can get from this challenge.
+		totalScore := len(downActions) * conf.Get().CheckDownScore // Score which every online team can get from this challenge.
 
 		// Get the service online teams' Gamebox ID of this challenge.
 		// For the score will be added separately into their **gameboxes**.

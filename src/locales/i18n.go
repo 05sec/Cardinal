@@ -1,4 +1,4 @@
-package main
+package locales
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,16 +7,17 @@ import (
 	"golang.org/x/text/language"
 )
 
-func (s *Service) initI18n() {
-	I18n := i18n.New(
+// I18n is the i18n constant.
+var I18n *i18n.I18n
+
+func init() {
+	I18n = i18n.New(
 		yaml.New("./locales"),
 	)
-
-	s.I18n = I18n
 }
 
-// I18nMiddleware is an i18n middleware. Get client language from Accept-Language header.
-func (s *Service) I18nMiddleware() gin.HandlerFunc {
+// Middleware is an i18n middleware. Get client language from Accept-Language header.
+func Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		acceptLanguages := c.GetHeader("Accept-Language")
 		languages, _, err := language.ParseAcceptLanguage(acceptLanguages)
