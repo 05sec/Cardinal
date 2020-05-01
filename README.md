@@ -1,6 +1,6 @@
 ![Cardinal Logo](https://img.cdn.n3ko.co/lsky/2020/02/16/e75b82afd0932.png)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
@@ -91,6 +91,7 @@ chmod +x ./Cardinal
   <tr>
     <td align="center"><a href="https://github.red"><img src="https://avatars3.githubusercontent.com/u/12731778?v=4" width="100px;" alt=""/><br /><sub><b>John Wu</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Code">💻</a> <a href="#design-wuhan005" title="Design">🎨</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Documentation">📖</a> <a href="#maintenance-wuhan005" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://github.com/Moesang"><img src="https://avatars2.githubusercontent.com/u/46858006?v=4" width="100px;" alt=""/><br /><sub><b>Moesang</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=Moesang" title="Code">💻</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=Moesang" title="Documentation">📖</a> <a href="#maintenance-Moesang" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/michaelfyc"><img src="https://avatars2.githubusercontent.com/u/45136049?v=4" width="100px;" alt=""/><br /><sub><b>michaelfyc</b></sub></a><br /><a href="#translation-michaelfyc" title="Translation">🌍</a></td>
   </tr>
 </table>
 
