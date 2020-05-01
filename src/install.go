@@ -77,9 +77,11 @@ func (s *Service) install() {
 		log.Fatalln(err)
 	}
 	languages := map[string]string{}
-	for index, file := range files {
+	index := 0 // Use a outside `index` variable instead of the loop `index`. Not all the files is `.yml`.
+	for _, file := range files {
 		if !file.IsDir() && filepath.Ext(file.Name()) == ".yml" {
-			languages[strconv.Itoa(index+1)] = strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+			index++
+			languages[strconv.Itoa(index)] = strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
 		}
 	}
 	if len(languages) == 0 {
@@ -95,7 +97,6 @@ func (s *Service) install() {
 
 		// Select a language
 		index := "0"
-		var err = errors.New("")
 		for languages[index] == "" {
 			utils.InputString(&index, "type 1, 2... to select")
 		}
