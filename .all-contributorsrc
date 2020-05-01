@@ -16,6 +16,17 @@
         "doc",
         "maintenance"
       ]
+    },
+    {
+      "login": "Moesang",
+      "name": "Moesang",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/46858006?v=4",
+      "profile": "https://github.com/Moesang",
+      "contributions": [
+        "code",
+        "doc",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
