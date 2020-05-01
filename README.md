@@ -1,4 +1,7 @@
 ![Cardinal Logo](https://img.cdn.n3ko.co/lsky/2020/02/16/e75b82afd0932.png)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -81,6 +84,18 @@ chmod +x ./Cardinal
 ## Contributors ✨
 
 [提交 Bug](https://github.com/vidar-team/Cardinal/issues/new) | [Fork & Pull Request](https://github.com/vidar-team/Cardinal/fork)
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.red"><img src="https://avatars3.githubusercontent.com/u/12731778?v=4" width="100px;" alt=""/><br /><sub><b>John Wu</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Code">💻</a> <a href="#design-wuhan005" title="Design">🎨</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Documentation">📖</a> <a href="#maintenance-wuhan005" title="Maintenance">🚧</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 十分欢迎您和我们一起改进 Cardinal，您可以改进现有程序，加入新功能，完善文档，优化代码等。
 
