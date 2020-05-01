@@ -6,7 +6,6 @@
 [![GoReport](https://goreportcard.com/badge/github.com/vidar-team/Cardinal)](https://goreportcard.com/report/github.com/vidar-team/Cardinal)
 [![codecov](https://codecov.io/gh/vidar-team/Cardinal/branch/master/graph/badge.svg)](https://codecov.io/gh/vidar-team/Cardinal)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ## 介绍
 
@@ -88,7 +87,6 @@ chmod +x ./Cardinal
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
-
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
