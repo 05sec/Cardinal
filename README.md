@@ -78,7 +78,7 @@ chmod +x ./Cardinal
 * 选手端 `http://localhost:19999/`
 * 后端管理 `http://localhost:19999/manager`
 
-## 贡献
+## Contributors ✨
 
 [提交 Bug](https://github.com/vidar-team/Cardinal/issues/new) | [Fork & Pull Request](https://github.com/vidar-team/Cardinal/fork)
 
