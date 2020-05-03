@@ -36,7 +36,7 @@ require (
 	github.com/thanhpk/randstr v1.0.4
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/vidar-team/Cardinal_frontend v0.0.0-20200408105230-89ca4c2e48db
-	github.com/vidar-team/Cardinal_manager_frontend v0.0.4
+	github.com/vidar-team/Cardinal_manager_frontend v0.0.5-rc1
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
