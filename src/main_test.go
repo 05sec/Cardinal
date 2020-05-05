@@ -22,6 +22,7 @@ var team []struct {
 func init() {
 	gin.SetMode(gin.ReleaseMode)
 	service = new(Service)
+	conf.Init()
 	config := conf.Get()
 	*config = conf.Config{
 		Base: conf.Base{

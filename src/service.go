@@ -17,6 +17,7 @@ type Service struct {
 
 func (s *Service) init() {
 	s.install()
+	conf.Init()
 	s.initMySQL()
 	s.initManager()
 	s.initStore()

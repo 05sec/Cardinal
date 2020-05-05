@@ -9,7 +9,8 @@ import (
 
 var conf *Config
 
-func init() {
+// Init, init the config file.
+func Init() {
 	if os.Getenv("TRAVIS") != "true" {
 		_, err := toml.DecodeFile("./conf/Cardinal.toml", &conf)
 		if err != nil {
