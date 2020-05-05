@@ -217,7 +217,8 @@ func (s *Service) refreshFlag() {
 					Round:     s.Timer.NowRound,
 				}).Find(&flag)
 				// Replace the flag placeholder.
-				command := strings.ReplaceAll(challenge.Command, "{{FLAG}}", flag.Flag)
+				// strings.ReplaceAll need Go 1.13+, so we use strings.Replace here.
+				command := strings.Replace(challenge.Command, "{{FLAG}}", flag.Flag, -1)
 				err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, command)
 				if err != nil {
 					s.NewLog(IMPORTANT, "ssh_error", fmt.Sprintf("Team:%d Gamebox:%d Round:%d SSH 更新 Flag 失败：%v", gamebox.TeamID, gamebox.ID, s.Timer.NowRound, err.Error()))
