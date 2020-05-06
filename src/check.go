@@ -51,7 +51,7 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 
 	// Check the gamebox is existed or not.
 	var gameBox GameBox
-	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}, Visible: true}).Find(&gameBox)
 	if gameBox.ID == 0 {
 		return utils.MakeErrJSON(403, 40300,
 			locales.I18n.T(c.GetString("lang"), "gamebox.not_found"),

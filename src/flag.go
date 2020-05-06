@@ -80,6 +80,15 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		)
 	}
 
+	// Check the challenge is visible or not.
+	var gamebox GameBox
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}, Visible: true}).Find(&gamebox)
+	if gamebox.ID == 0 {
+		return utils.MakeErrJSON(403, 40300,
+			locales.I18n.T(c.GetString("lang"), "flag.wrong"),
+		)
+	}
+
 	// Check if the flag has been submitted by the team before.
 	var repeatAttackCheck AttackAction
 	s.Mysql.Model(&AttackAction{}).Where(&AttackAction{
