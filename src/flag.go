@@ -76,7 +76,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
 	if flagData.ID == 0 || teamID == flagData.TeamID {                                                 // 注意不允许提交自己的 flag
 		return utils.MakeErrJSON(403, 40300,
-			locales.I18n.T(c.GetString("lang"), "flag.error"),
+			locales.I18n.T(c.GetString("lang"), "flag.wrong"),
 		)
 	}
 
