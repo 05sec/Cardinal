@@ -148,7 +148,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	tx.Commit()
 
 	s.NewLog(NORMAL, "manager_operate",
-		string(locales.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"title": checkChallenge.Title})),
+		string(locales.I18n.T(c.GetString("lang"), "log.new_challenge", gin.H{"title": newChallenge.Title})),
 	)
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "challenge.post_success"))
 }
