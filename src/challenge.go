@@ -30,7 +30,7 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40027,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -38,7 +38,7 @@ func (s *Service) SetVisible(c *gin.Context) (int, interface{}) {
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40402,
 			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
@@ -109,13 +109,13 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40028,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	if inputForm.AutoRefreshFlag && inputForm.Command == "" {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40029,
 			locales.I18n.T(c.GetString("lang"), "challenge.empty_command"))
 	}
 
@@ -133,7 +133,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 
 	s.Mysql.Model(&Challenge{}).Where(&Challenge{Title: newChallenge.Title}).Find(&checkChallenge)
 	if checkChallenge.Title != "" {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40313,
 			locales.I18n.T(c.GetString("lang"), "general.post_repeat"),
 		)
 	}
@@ -141,7 +141,7 @@ func (s *Service) NewChallenge(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Create(newChallenge).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50016,
 			locales.I18n.T(c.GetString("lang"), "challenge.post_error"),
 		)
 	}
@@ -166,13 +166,13 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40028,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	if inputForm.AutoRefreshFlag && inputForm.Command == "" {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40029,
 			locales.I18n.T(c.GetString("lang"), "challenge.empty_command"))
 	}
 
@@ -184,7 +184,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	var checkChallenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40403,
 			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
@@ -199,7 +199,7 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(editChallenge).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50001,
+		return utils.MakeErrJSON(500, 50017,
 			locales.I18n.T(c.GetString("lang"), "challenge.put_error"),
 		)
 	}
@@ -227,13 +227,13 @@ func (s *Service) EditChallenge(c *gin.Context) (int, interface{}) {
 func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40030,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40030,
 			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
@@ -241,7 +241,7 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	var challenge Challenge
 	s.Mysql.Where(&Challenge{Model: gorm.Model{ID: uint(id)}}).Find(&challenge)
 	if challenge.Title == "" {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40403,
 			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
@@ -251,7 +251,7 @@ func (s *Service) DeleteChallenge(c *gin.Context) (int, interface{}) {
 	tx.Where("challenge_id = ?", uint(id)).Delete(&GameBox{})
 	if tx.Where("id = ?", uint(id)).Delete(&Challenge{}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50002,
+		return utils.MakeErrJSON(500, 50018,
 			locales.I18n.T(c.GetString("lang"), "challenge.delete_error"),
 		)
 	}

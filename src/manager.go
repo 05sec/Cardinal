@@ -30,7 +30,7 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 	var formData ManagerLoginForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40008,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -45,14 +45,14 @@ func (s *Service) ManagerLogin(c *gin.Context) (int, interface{}) {
 		tx := s.Mysql.Begin()
 		if tx.Model(&Manager{}).Where(&Manager{Name: manager.Name}).Updates(&Manager{Token: token}).RowsAffected != 1 {
 			tx.Rollback()
-			return utils.MakeErrJSON(500, 50000,
+			return utils.MakeErrJSON(500, 50006,
 				locales.I18n.T(c.GetString("lang"), "general.server_error"),
 			)
 		}
 		tx.Commit()
 		return utils.MakeSuccessJSON(token)
 	}
-	return utils.MakeErrJSON(403, 40300,
+	return utils.MakeErrJSON(403, 40303,
 		locales.I18n.T(c.GetString("lang"), "manager.login_error"),
 	)
 }
@@ -90,13 +90,13 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	var formData InputForm
 	err := c.BindJSON(&formData)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40009,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
 
 	if !formData.IsCheck && formData.Password == "" {
-		return utils.MakeErrJSON(400, 40001,
+		return utils.MakeErrJSON(400, 40010,
 			locales.I18n.T(c.GetString("lang"), "manager.error_payload"),
 		)
 	}
@@ -104,7 +104,7 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	var checkManager Manager
 	s.Mysql.Model(&Manager{}).Where(&Manager{Name: formData.Name}).Find(&checkManager)
 	if checkManager.ID != 0 {
-		return utils.MakeErrJSON(400, 40001,
+		return utils.MakeErrJSON(400, 40011,
 			locales.I18n.T(c.GetString("lang"), "manager.repeat"),
 		)
 	}
@@ -117,7 +117,7 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Create(&manager).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50007,
 			locales.I18n.T(c.GetString("lang"), "manager.post_error"),
 		)
 	}
@@ -134,13 +134,13 @@ func (s *Service) NewManager(c *gin.Context) (int, interface{}) {
 func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40012,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40012,
 			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
@@ -151,7 +151,7 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 		Token: token,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50008,
 			locales.I18n.T(c.GetString("lang"), "manager.update_token_fail"),
 		)
 	}
@@ -167,13 +167,13 @@ func (s *Service) RefreshManagerToken(c *gin.Context) (int, interface{}) {
 func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40012,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40012,
 			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
@@ -184,7 +184,7 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 		Password: utils.AddSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50009,
 			locales.I18n.T(c.GetString("lang"), "manager.update_password_fail"),
 		)
 	}
@@ -200,13 +200,13 @@ func (s *Service) ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40012,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40012,
 			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
@@ -214,7 +214,7 @@ func (s *Service) DeleteManager(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Manager{}).Where("id = ?", id).Delete(&Manager{}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50010,
 			locales.I18n.T(c.GetString("lang"), "manager.delete_error"),
 		)
 	}

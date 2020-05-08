@@ -40,7 +40,7 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40031,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -51,7 +51,7 @@ func (s *Service) NewBulletin(c *gin.Context) (int, interface{}) {
 		Content: inputForm.Content,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50019,
 			locales.I18n.T(c.GetString("lang"), "bulletin.post_error"),
 		)
 	}
@@ -69,7 +69,7 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40031,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -77,7 +77,7 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	var checkBulletin Bulletin
 	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40404,
 			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
@@ -89,7 +89,7 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Bulletin{}).Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50001,
+		return utils.MakeErrJSON(500, 50020,
 			locales.I18n.T(c.GetString("lang"), "bulletin.put_error"),
 		)
 	}
@@ -102,13 +102,13 @@ func (s *Service) EditBulletin(c *gin.Context) (int, interface{}) {
 func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40032,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40032,
 			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
@@ -116,7 +116,7 @@ func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	var checkBulletin Bulletin
 	s.Mysql.Where(&Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40404,
 			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
@@ -124,7 +124,7 @@ func (s *Service) DeleteBulletin(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Where("id = ?", id).Delete(&Bulletin{}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50002,
+		return utils.MakeErrJSON(500, 50021,
 			locales.I18n.T(c.GetString("lang"), "bulletin.delete_error"),
 		)
 	}

@@ -248,7 +248,7 @@ func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(utils.MakeErrJSON(403, 40300,
+			c.JSON(utils.MakeErrJSON(403, 40302,
 				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
@@ -258,7 +258,7 @@ func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 		var managerData Manager
 		s.Mysql.Where(&Manager{Token: token}).Find(&managerData)
 		if managerData.ID == 0 {
-			c.JSON(utils.MakeErrJSON(401, 40100,
+			c.JSON(utils.MakeErrJSON(401, 40101,
 				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
@@ -275,7 +275,7 @@ func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 func (s *Service) ManagerRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.GetBool("isCheck") {
-			c.JSON(utils.MakeErrJSON(401, 40100,
+			c.JSON(utils.MakeErrJSON(401, 40102,
 				locales.I18n.T(c.GetString("lang"), "manager.manager_required"),
 			))
 			c.Abort()

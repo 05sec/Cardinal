@@ -61,13 +61,13 @@ func (s *Service) GetGameBoxes(c *gin.Context) (int, interface{}) {
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
-		return utils.MakeErrJSON(400, 40002,
+		return utils.MakeErrJSON(400, 40013,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	perPage, err := strconv.Atoi(perPageStr)
 	if err != nil || perPage <= 0 {
-		return utils.MakeErrJSON(400, 40002,
+		return utils.MakeErrJSON(400, 40014,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
@@ -101,7 +101,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 	var inputForm []*InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40015,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
@@ -113,7 +113,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		var challenge Challenge
 		s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Find(&challenge)
 		if challenge.ID == 0 {
-			return utils.MakeErrJSON(400, 40001,
+			return utils.MakeErrJSON(400, 40016,
 				locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 			)
 		}
@@ -123,7 +123,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		// Check SSH config
 		if challenge.AutoRefreshFlag {
 			if item.SSHPort == "" || item.SSHUser == "" || item.SSHPassword == "" {
-				return utils.MakeErrJSON(400, 40001,
+				return utils.MakeErrJSON(400, 40017,
 					locales.I18n.T(c.GetString("lang"), "gamebox.auto_refresh_flag_error"),
 				)
 			}
@@ -132,7 +132,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		// Check the TeamID
 		s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: item.TeamID}}).Count(&count)
 		if count != 1 {
-			return utils.MakeErrJSON(400, 40001,
+			return utils.MakeErrJSON(400, 40018,
 				locales.I18n.T(c.GetString("lang"), "team.not_found"),
 			)
 		}
@@ -141,7 +141,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		// since every team should have only one gamebox for each challenge.
 		s.Mysql.Model(GameBox{}).Where(&GameBox{ChallengeID: item.ChallengeID, TeamID: item.TeamID}).Count(&count)
 		if count != 0 {
-			return utils.MakeErrJSON(400, 40001,
+			return utils.MakeErrJSON(400, 40019,
 				locales.I18n.T(c.GetString("lang"), "gamebox.repeat"),
 			)
 		}
@@ -162,7 +162,7 @@ func (s *Service) NewGameBoxes(c *gin.Context) (int, interface{}) {
 		}
 		if tx.Create(newGameBox).RowsAffected != 1 {
 			tx.Rollback()
-			return utils.MakeErrJSON(500, 50000,
+			return utils.MakeErrJSON(500, 50011,
 				locales.I18n.T(c.GetString("lang"), "gamebox.post_error"),
 			)
 		}
@@ -190,7 +190,7 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40020,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -205,7 +205,7 @@ func (s *Service) EditGameBox(c *gin.Context) (int, interface{}) {
 		Description: inputForm.Description,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50001,
+		return utils.MakeErrJSON(500, 50012,
 			locales.I18n.T(c.GetString("lang"), "gamebox.put_error"),
 		)
 	}

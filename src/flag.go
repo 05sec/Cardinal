@@ -41,14 +41,14 @@ type Flag struct {
 func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	// Submit flag is forbidden if the competition isn't start.
 	if s.Timer.Status != "on" {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40304,
 			locales.I18n.T(c.GetString("lang"), "general.not_begin"),
 		)
 	}
 
 	secretKey := c.GetHeader("Authorization")
 	if secretKey == "" {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40305,
 			locales.I18n.T(c.GetString("lang"), "general.invalid_token"),
 		)
 	}
@@ -56,7 +56,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	s.Mysql.Model(&Team{}).Where(&Team{SecretKey: secretKey}).Find(&team)
 	teamID := team.ID
 	if teamID == 0 {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40306,
 			locales.I18n.T(c.GetString("lang"), "general.invalid_token"),
 		)
 	}
@@ -67,7 +67,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40021,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -75,7 +75,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	var flagData Flag
 	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
 	if flagData.ID == 0 || teamID == flagData.TeamID {                                                 // 注意不允许提交自己的 flag
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40307,
 			locales.I18n.T(c.GetString("lang"), "flag.wrong"),
 		)
 	}
@@ -84,7 +84,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 	var gamebox GameBox
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}, Visible: true}).Find(&gamebox)
 	if gamebox.ID == 0 {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40308,
 			locales.I18n.T(c.GetString("lang"), "flag.wrong"),
 		)
 	}
@@ -98,7 +98,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		Round:          flagData.Round,
 	}).Find(&repeatAttackCheck)
 	if repeatAttackCheck.ID != 0 {
-		return utils.MakeErrJSON(403, 40301,
+		return utils.MakeErrJSON(403, 40309,
 			locales.I18n.T(c.GetString("lang"), "flag.repeat"),
 		)
 	}
@@ -116,7 +116,7 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		Round:          flagData.Round,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50013,
 			locales.I18n.T(c.GetString("lang"), "flag.submit_error"),
 		)
 	}
@@ -135,14 +135,14 @@ func (s *Service) GetFlags(c *gin.Context) (int, interface{}) {
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40022,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 
 	per, err := strconv.Atoi(perStr)
 	if err != nil || per <= 0 || per >= 100 { // 限制每页最多 100 条
-		return utils.MakeErrJSON(400, 40001,
+		return utils.MakeErrJSON(400, 40023,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
@@ -165,7 +165,7 @@ func (s *Service) ExportFlag(c *gin.Context) (int, interface{}) {
 
 	challengeID, err := strconv.Atoi(challengeIDStr)
 	if err != nil || challengeID <= 0 {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40024,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
