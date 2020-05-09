@@ -93,6 +93,7 @@ en-US:
     flag_suffix: "Please specify Flag Suffix(default:})"
     checkdown_score: "Please specify Checkdown scores(default:50)"
     attack_score: "Please specify Attack scores(default:50)"
+    separate_frontend: "Whether to deploy the frontend separately？(true / false，default:false)"
     db_host: "Please input Database Address(default:localhost:3306)"
     db_username: "Please input Database Username:"
     db_password: "Please input Database Password:"

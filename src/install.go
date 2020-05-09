@@ -28,6 +28,7 @@ RestTime=[
 ]
 EndTime="{{ .EndTime }}"
 Duration={{ .Duration }}
+SeparateFrontend={{ .SeparateFrontend }}
 
 Salt="{{ .Salt }}"
 
@@ -116,16 +117,17 @@ func (s *Service) install() {
 // GenerateConfigFileGuide can lead the user to fill in the config file.
 func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 	input := struct {
-		Title, BeginTime, RestTime, EndTime, Duration, Port, Salt, FlagPrefix, FlagSuffix, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string
+		Title, BeginTime, RestTime, EndTime, SeparateFrontend, Duration, Port, Salt, FlagPrefix, FlagSuffix, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string
 	}{
-		Duration:       "2",
-		Port:           "19999",
-		FlagPrefix:     "hctf{",
-		FlagSuffix:     "}",
-		CheckDownScore: "50",
-		AttackScore:    "50",
-		DBHost:         "localhost:3306",
-		DBName:         "cardinal",
+		SeparateFrontend: "false",
+		Duration:         "2",
+		Port:             "19999",
+		FlagPrefix:       "hctf{",
+		FlagSuffix:       "}",
+		CheckDownScore:   "50",
+		AttackScore:      "50",
+		DBHost:           "localhost:3306",
+		DBName:           "cardinal",
 	}
 
 	log.Println(locales.I18n.T(lang, "install.greet"))
@@ -154,6 +156,7 @@ func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 	utils.InputString(&input.FlagSuffix, string(locales.I18n.T(lang, "install.flag_suffix")))
 	utils.InputString(&input.CheckDownScore, string(locales.I18n.T(lang, "install.checkdown_score")))
 	utils.InputString(&input.AttackScore, string(locales.I18n.T(lang, "install.attack_score")))
+	utils.InputString(&input.SeparateFrontend, string(locales.I18n.T(lang, "install.separate_frontend")))
 	utils.InputString(&input.DBHost, string(locales.I18n.T(lang, "install.db_host")))
 	utils.InputString(&input.DBUsername, string(locales.I18n.T(lang, "install.db_username")))
 	utils.InputString(&input.DBPassword, string(locales.I18n.T(lang, "install.db_password")))

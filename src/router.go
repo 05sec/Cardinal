@@ -22,7 +22,9 @@ func (s *Service) initRouter() *gin.Engine {
 	api.Use(locales.Middleware())
 
 	// Frontend
-	r.Use(static.Serve("/", frontend.FS()))
+	if !conf.Get().SeparateFrontend {
+		r.Use(static.Serve("/", frontend.FS()))
+	}
 
 	// Cardinal basic info
 	api.Any("/", func(c *gin.Context) {
