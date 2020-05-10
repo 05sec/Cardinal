@@ -199,6 +199,20 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.GET("/panel", func(c *gin.Context) {
 			c.JSON(s.Panel(c))
 		})
+
+		// WebHook
+		manager.GET("/webhooks", func(c *gin.Context) {
+			c.JSON(s.getWebHook(c))
+		})
+		manager.POST("/webhook", func(c *gin.Context) {
+			c.JSON(s.newWebHook(c))
+		})
+		manager.PUT("/webhook", func(c *gin.Context) {
+			c.JSON(s.editWebHook(c))
+		})
+		manager.DELETE("/webhook", func(c *gin.Context) {
+			c.JSON(s.deleteWebHook(c))
+		})
 	}
 
 	// 404

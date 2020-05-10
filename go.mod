@@ -19,6 +19,7 @@ require (
 	github.com/jinzhu/configor v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
+	github.com/parnurzeal/gorequest v0.2.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/qor/admin v0.0.0-20200229145930-e279f96c8c05 // indirect
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect
@@ -46,4 +47,5 @@ require (
 	golang.org/x/text v0.3.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
+	moul.io/http2curl v1.0.0 // indirect
 )

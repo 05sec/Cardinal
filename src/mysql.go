@@ -40,5 +40,6 @@ func (s *Service) initMySQL() {
 		&Score{},
 		&Flag{},
 		&Log{},
+		&WebHook{},
 	)
 }
