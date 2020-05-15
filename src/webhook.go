@@ -14,12 +14,12 @@ import (
 )
 
 const (
-	Any        string = "any"
-	NewRound   string = "new_round"
-	SubmitFlag string = "submit_flag"
-	Begin      string = "game_begin"
-	Pause      string = "game_pause"
-	End        string = "game_end"
+	ANY_HOOK         string = "any"
+	NEW_ROUND_HOOK   string = "new_round"
+	SUBMIT_FLAG_HOOK string = "submit_flag"
+	BEGIN_HOOK       string = "game_begin"
+	PAUSE_HOOK       string = "game_pause"
+	END_HOOK         string = "game_end"
 )
 
 // WebHook is a gorm model for database table `webhook`, used to store the webhook.
@@ -60,7 +60,7 @@ func (s *Service) newWebHook(c *gin.Context) (int, interface{}) {
 
 	// Check type
 	switch inputForm.Type {
-	case Any, NewRound, SubmitFlag, Begin, Pause, End:
+	case ANY_HOOK, NEW_ROUND_HOOK, SUBMIT_FLAG_HOOK, BEGIN_HOOK, PAUSE_HOOK, END_HOOK:
 	default:
 		return utils.MakeErrJSON(400, 40035,
 			locales.I18n.T(c.GetString("lang"), "webhook.error_type"),
@@ -120,7 +120,7 @@ func (s *Service) editWebHook(c *gin.Context) (int, interface{}) {
 
 	// Check type
 	switch inputForm.Type {
-	case Any, NewRound, SubmitFlag, Begin, Pause, End:
+	case ANY_HOOK, NEW_ROUND_HOOK, SUBMIT_FLAG_HOOK, BEGIN_HOOK, PAUSE_HOOK, END_HOOK:
 	default:
 		return utils.MakeErrJSON(400, 40035,
 			locales.I18n.T(c.GetString("lang"), "webhook.error_type"),
@@ -191,6 +191,14 @@ func (s *Service) refreshWebHookStore() {
 	s.Store.Set("webHook", webHooks, cache.NoExpiration)
 }
 
+// AddHook used to add a webhook.
+func (s *Service) AddHook(webHookType string, webHookData interface{}) {
+	s.sendWebHook(ANY_HOOK, webHookData)
+	if webHookType != ANY_HOOK {
+		s.sendWebHook(webHookType, webHookData)
+	}
+}
+
 func (s *Service) sendWebHook(webHookType string, webHookData interface{}) {
 	webHookStore, ok := s.Store.Get("webHook")
 	if !ok {
@@ -224,7 +232,7 @@ func (s *Service) sendWebHook(webHookType string, webHookData interface{}) {
 				resp, _, _ := req.End()
 
 				if resp == nil || resp.StatusCode != 200 {
-					s.NewLog(IMPORTANT, "webhook_cache", "WebHook 投递失败！")
+					s.NewLog(IMPORTANT, "webhook_cache", "WebHook 投递失败: "+webhook.URL)
 				}
 			}(v)
 		}

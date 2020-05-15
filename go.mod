@@ -21,6 +21,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pkg/errors v0.9.1
 	github.com/qor/admin v0.0.0-20200229145930-e279f96c8c05 // indirect
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect
 	github.com/qor/cache v0.0.0-20171031031927-c9d48d1f13ba // indirect
