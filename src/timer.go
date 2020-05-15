@@ -122,6 +122,9 @@ func (s *Service) timerProcess() {
 
 			if nowRunTimeIndex == -1 {
 				// Suspended
+				if s.Timer.Status != "pause" {
+					go s.AddHook(PAUSE_HOOK, nil)
+				}
 				s.Timer.Status = "pause"
 			} else {
 				// In progress
@@ -143,7 +146,13 @@ func (s *Service) timerProcess() {
 				// Check if it is a new round.
 				if s.Timer.NowRound < nowRound {
 					s.Timer.NowRound = nowRound
+					if s.Timer.NowRound == 1 {
+						// Game start hook
+						go s.AddHook(BEGIN_HOOK, nil)
+					}
+
 					// New round hook
+					go s.AddHook(NEW_ROUND_HOOK, s.Timer.NowRound)
 
 					// Clean the status of the gameboxes.
 					s.Mysql.Model(&GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
@@ -160,7 +169,7 @@ func (s *Service) timerProcess() {
 
 					// Auto refresh flag
 					go s.refreshFlag()
-					
+
 					fmt.Println(s.Timer.NowRound)
 				}
 			}
@@ -174,6 +183,8 @@ func (s *Service) timerProcess() {
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
 				go s.CalculateRoundScore(s.Timer.TotalRound)
+				// Game over hook
+				go s.AddHook(END_HOOK, nil)
 				s.NewLog(IMPORTANT, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "timer.end")))
 			}
 

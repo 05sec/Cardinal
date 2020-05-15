@@ -17,6 +17,7 @@ const (
 	ANY_HOOK         string = "any"
 	NEW_ROUND_HOOK   string = "new_round"
 	SUBMIT_FLAG_HOOK string = "submit_flag"
+	CHECK_DOWN_HOOK  string = "check_down"
 	BEGIN_HOOK       string = "game_begin"
 	PAUSE_HOOK       string = "game_pause"
 	END_HOOK         string = "game_end"
@@ -60,7 +61,7 @@ func (s *Service) newWebHook(c *gin.Context) (int, interface{}) {
 
 	// Check type
 	switch inputForm.Type {
-	case ANY_HOOK, NEW_ROUND_HOOK, SUBMIT_FLAG_HOOK, BEGIN_HOOK, PAUSE_HOOK, END_HOOK:
+	case ANY_HOOK, NEW_ROUND_HOOK, SUBMIT_FLAG_HOOK, CHECK_DOWN_HOOK, BEGIN_HOOK, PAUSE_HOOK, END_HOOK:
 	default:
 		return utils.MakeErrJSON(400, 40035,
 			locales.I18n.T(c.GetString("lang"), "webhook.error_type"),
@@ -120,7 +121,7 @@ func (s *Service) editWebHook(c *gin.Context) (int, interface{}) {
 
 	// Check type
 	switch inputForm.Type {
-	case ANY_HOOK, NEW_ROUND_HOOK, SUBMIT_FLAG_HOOK, BEGIN_HOOK, PAUSE_HOOK, END_HOOK:
+	case ANY_HOOK, NEW_ROUND_HOOK, SUBMIT_FLAG_HOOK, CHECK_DOWN_HOOK, BEGIN_HOOK, PAUSE_HOOK, END_HOOK:
 	default:
 		return utils.MakeErrJSON(400, 40035,
 			locales.I18n.T(c.GetString("lang"), "webhook.error_type"),

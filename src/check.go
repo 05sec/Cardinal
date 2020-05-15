@@ -75,6 +75,9 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	}
 	tx.Commit()
 
+	// Check down hook
+	go s.AddHook(CHECK_DOWN_HOOK, gin.H{"team": gameBox.TeamID, "gamebox": gameBox.ID})
+
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
 

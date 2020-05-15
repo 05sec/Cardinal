@@ -103,6 +103,8 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		)
 	}
 
+	go s.AddHook(SUBMIT_FLAG_HOOK, gin.H{"from": teamID, "to": gamebox.TeamID, "gamebox": gamebox.ID})
+
 	// Update the victim's gamebox status to `down`.
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&GameBox{IsAttacked: true})
 
