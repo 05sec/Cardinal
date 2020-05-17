@@ -178,21 +178,21 @@ func TestService_editWebHook(t *testing.T) {
 func TestService_deleteWebHook(t *testing.T) {
 	// missing param
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("DELETE", "/api/manager/webhook", bytes.NewBuffer(jsonData))
+	req, _ := http.NewRequest("DELETE", "/api/manager/webhook", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// param type error
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=aaa", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=aaa", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// not found
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=2333", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=2333", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
@@ -200,7 +200,7 @@ func TestService_deleteWebHook(t *testing.T) {
 	// success
 	// param type error
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=1", bytes.NewBuffer(jsonData))
+	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=1", nil))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
