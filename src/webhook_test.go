@@ -200,7 +200,7 @@ func TestService_deleteWebHook(t *testing.T) {
 	// success
 	// param type error
 	w = httptest.NewRecorder()
-	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=1", nil))
+	req, _ = http.NewRequest("DELETE", "/api/manager/webhook?id=1", nil)
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
