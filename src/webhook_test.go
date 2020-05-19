@@ -27,10 +27,10 @@ func TestService_newWebHook(t *testing.T) {
 
 	// error payload
 	w = httptest.NewRecorder()
-	jsonData, _ := json.Marshal([]map[string]interface{}{{
+	jsonData, _ := json.Marshal(map[string]interface{}{
 		"URL":  123123123,
 		"Type": 123123123,
-	}})
+	})
 	req, _ = http.NewRequest("POST", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -38,10 +38,10 @@ func TestService_newWebHook(t *testing.T) {
 
 	// missing param
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"URL":   "https://cardinal.ink",
 		"Token": "123123123123123",
-	}})
+	})
 	req, _ = http.NewRequest("POST", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -49,10 +49,10 @@ func TestService_newWebHook(t *testing.T) {
 
 	// type error
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"URL":  "https://cardinal.ink",
 		"Type": "asdadasdasda",
-	}})
+	})
 	req, _ = http.NewRequest("POST", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -60,22 +60,22 @@ func TestService_newWebHook(t *testing.T) {
 
 	// success
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"URL":  "https://cardinal.ink",
 		"Type": "any",
-	}})
+	})
 	req, _ = http.NewRequest("POST", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"URL":     "https://cardinal.ink",
 		"Type":    "any",
 		"Retry":   5,
 		"Timeout": 10,
-	}})
+	})
 	req, _ = http.NewRequest("POST", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -92,10 +92,10 @@ func TestService_editWebHook(t *testing.T) {
 
 	// error payload
 	w = httptest.NewRecorder()
-	jsonData, _ := json.Marshal([]map[string]interface{}{{
+	jsonData, _ := json.Marshal(map[string]interface{}{
 		"URL":  123123123,
 		"Type": 123123123,
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -103,11 +103,11 @@ func TestService_editWebHook(t *testing.T) {
 
 	// missing param
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID":    1,
 		"URL":   "https://cardinal.ink",
 		"Token": "123123123123123",
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -115,11 +115,11 @@ func TestService_editWebHook(t *testing.T) {
 
 	// missing id
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"URL":   "https://cardinal.ink",
 		"Type":  "any",
 		"Token": "123123123123123",
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -127,11 +127,11 @@ func TestService_editWebHook(t *testing.T) {
 
 	// type error
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID":   1,
 		"URL":  "https://cardinal.ink",
 		"Type": "asdadasdasda",
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -139,11 +139,11 @@ func TestService_editWebHook(t *testing.T) {
 
 	// not found
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID":   233,
 		"URL":  "https://cardinal.ink/aaaa",
 		"Type": "any",
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
@@ -151,24 +151,24 @@ func TestService_editWebHook(t *testing.T) {
 
 	// success
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID":   1,
 		"URL":  "https://cardinal.ink/aaaa",
 		"Type": "any",
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
-	jsonData, _ = json.Marshal([]map[string]interface{}{{
+	jsonData, _ = json.Marshal(map[string]interface{}{
 		"ID":      1,
 		"URL":     "https://cardinal.ink",
 		"Type":    "any",
 		"Retry":   5,
 		"Timeout": 10,
-	}})
+	})
 	req, _ = http.NewRequest("PUT", "/api/manager/webhook", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", managerToken)
 	service.Router.ServeHTTP(w, req)
