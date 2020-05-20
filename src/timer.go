@@ -156,6 +156,7 @@ func (s *Service) timerProcess() {
 
 					// Clean the status of the gameboxes.
 					s.Mysql.Model(&GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
+					go s.SetRankList()
 
 					// Calculate scores.
 					// Get the latest score record.
