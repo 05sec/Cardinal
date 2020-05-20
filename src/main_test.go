@@ -5,6 +5,7 @@ import (
 	"github.com/thanhpk/randstr"
 	"github.com/vidar-team/Cardinal/src/conf"
 	"github.com/vidar-team/Cardinal/src/utils"
+	"os"
 	"time"
 )
 
@@ -40,8 +41,8 @@ func init() {
 		MySQL: conf.MySQL{
 			DBHost:     "127.0.0.1:3306",
 			DBUsername: "root",
-			DBPassword: "root",
-			DBName:     "cardinal",
+			DBPassword: os.Getenv("TEST_DB_PASSWORD"),
+			DBName:     os.Getenv("TEST_DB_NAME"),
 		},
 	}
 	service.initMySQL()
