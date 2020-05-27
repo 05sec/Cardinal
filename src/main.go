@@ -1,7 +1,7 @@
 package main
 
 var (
-	VERSION    string
+	VERSION    = "v0.5.0"
 	COMMIT_SHA string
 	BUILD_TIME string
 )
