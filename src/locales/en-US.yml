@@ -29,6 +29,7 @@ en-US:
     delete_error: "Delete Challenge Failed!"
     delete_success: "Delete Challenge Succeeded!"
     not_found: "Challenge Not Found!"
+    empty_command: "Command should NOT be Empty!"
 
   check:
     repeat: "Duplicated Check Ignored."
@@ -54,6 +55,7 @@ en-US:
     visibility_success: "Edit Gamebox Visibility Succeeded!"
     repeat: "Duplicated Gamebox Found!"
     not_found: "Gamebox Not Found!"
+    auto_refresh_flag_error: "Missing GameBox SSH!"
 
   team:
     post_error: "Add Team Failed!"
