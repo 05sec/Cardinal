@@ -29,6 +29,7 @@ en-US:
     delete_error: "Delete Challenge Failed!"
     delete_success: "Delete Challenge Succeeded!"
     not_found: "Challenge Not Found!"
+    empty_command: "Command should NOT be Empty!"
 
   check:
     repeat: "Duplicated Check Ignored."
@@ -54,6 +55,7 @@ en-US:
     visibility_success: "Edit Gamebox Visibility Succeeded!"
     repeat: "Duplicated Gamebox Found!"
     not_found: "Gamebox Not Found!"
+    auto_refresh_flag_error: "Missing GameBox SSH!"
 
   team:
     post_error: "Add Team Failed!"
@@ -93,6 +95,7 @@ en-US:
     flag_suffix: "Please specify Flag Suffix(default:})"
     checkdown_score: "Please specify Checkdown scores(default:50)"
     attack_score: "Please specify Attack scores(default:50)"
+    separate_frontend: "Whether to deploy the frontend separately？(true / false，default:false)"
     db_host: "Please input Database Address(default:localhost:3306)"
     db_username: "Please input Database Username:"
     db_password: "Please input Database Password:"

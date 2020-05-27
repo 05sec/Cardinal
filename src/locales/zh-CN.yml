@@ -95,6 +95,7 @@ zh-CN:
     flag_suffix: "请输入 Flag 后缀（默认值：}）"
     checkdown_score: "请输入每次 Checkdown 扣分（默认值：50）"
     attack_score: "请输入每次攻击得分（默认值：50）"
+    separate_frontend: "是否自行另外部署前端？(true / false，默认值：false)"
     db_host: "请输入数据库地址（默认值：localhost:3306）"
     db_username: "请输入数据库账号："
     db_password: "请输入数据库密码："

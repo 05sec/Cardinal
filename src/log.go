@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/vidar-team/Cardinal/src/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/utils"
 	"runtime"
 )
 
@@ -56,5 +56,8 @@ func (s *Service) Panel(c *gin.Context) (int, interface{}) {
 		"MemAllocated":       utils.FileSize(int64(m.Alloc)), // Allocated memory
 		"TotalScore":         s.TotalScore(),
 		"PreviousRoundScore": s.PreviousRoundScore(),
+		"Version":            VERSION,
+		"CommitSHA":          COMMIT_SHA,
+		"BuildTime":          BUILD_TIME,
 	})
 }

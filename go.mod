@@ -19,7 +19,9 @@ require (
 	github.com/jinzhu/configor v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
+	github.com/parnurzeal/gorequest v0.2.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pkg/errors v0.9.1
 	github.com/qor/admin v0.0.0-20200229145930-e279f96c8c05 // indirect
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect
 	github.com/qor/cache v0.0.0-20171031031927-c9d48d1f13ba // indirect
@@ -39,11 +41,12 @@ require (
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
-	github.com/vidar-team/Cardinal_frontend v0.0.4
-	github.com/vidar-team/Cardinal_manager_frontend v0.0.5-rc1
+	github.com/vidar-team/Cardinal_frontend v0.5.0
+	github.com/vidar-team/Cardinal_manager_frontend v0.5.0
 	github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/text v0.3.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
+	moul.io/http2curl v1.0.0 // indirect
 )

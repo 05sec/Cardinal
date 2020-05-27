@@ -60,7 +60,7 @@ func (s *Service) TeamLogin(c *gin.Context) (int, interface{}) {
 		tx.Commit()
 		return utils.MakeSuccessJSON(token)
 	}
-	return utils.MakeErrJSON(403, 40300,
+	return utils.MakeErrJSON(403, 40301,
 		locales.I18n.T(c.GetString("lang"), "team.login_error"),
 	)
 }
@@ -78,7 +78,7 @@ func (s *Service) TeamLogout(c *gin.Context) (int, interface{}) {
 func (s *Service) GetTeamInfo(c *gin.Context) (int, interface{}) {
 	teamID, ok := c.Get("teamID")
 	if !ok {
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50001,
 			locales.I18n.T(c.GetString("lang"), "general.server_error"),
 		)
 	}
@@ -122,7 +122,7 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 	var inputForm []InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40001,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -136,19 +136,19 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 		var count int
 		s.Mysql.Model(Team{}).Where(&Team{Name: item.Name}).Count(&count)
 		if count != 0 {
-			return utils.MakeErrJSON(400, 40001,
+			return utils.MakeErrJSON(400, 40002,
 				locales.I18n.T(c.GetString("lang"), "team.repeat"),
 			)
 		}
 		// Team name can't be empty.
 		if item.Name == "" {
-			return utils.MakeErrJSON(400, 40001,
+			return utils.MakeErrJSON(400, 40003,
 				locales.I18n.T(c.GetString("lang"), "team.team_name_empty"),
 			)
 		}
 	}
 	if len(tmpTeamName) != len(inputForm) {
-		return utils.MakeErrJSON(400, 40001,
+		return utils.MakeErrJSON(400, 40004,
 			locales.I18n.T(c.GetString("lang"), "team.repeat"),
 		)
 	}
@@ -171,7 +171,7 @@ func (s *Service) NewTeams(c *gin.Context) (int, interface{}) {
 		}
 		if tx.Create(newTeam).RowsAffected != 1 {
 			tx.Rollback()
-			return utils.MakeErrJSON(500, 50000,
+			return utils.MakeErrJSON(500, 50002,
 				locales.I18n.T(c.GetString("lang"), "team.post_error"),
 			)
 		}
@@ -202,7 +202,7 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40005,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -211,7 +211,7 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	var count int
 	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
 	if count == 0 {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
 		)
 	}
@@ -220,7 +220,7 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 	var repeatCheckTeam Team
 	s.Mysql.Model(Team{}).Where(&Team{Name: inputForm.Name}).Find(&repeatCheckTeam)
 	if repeatCheckTeam.Name != "" && repeatCheckTeam.ID != inputForm.ID {
-		return utils.MakeErrJSON(400, 40001,
+		return utils.MakeErrJSON(400, 40004,
 			locales.I18n.T(c.GetString("lang"), "team.repeat"),
 		)
 	}
@@ -231,7 +231,7 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 		"Logo": inputForm.Logo,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50001,
+		return utils.MakeErrJSON(500, 50003,
 			locales.I18n.T(c.GetString("lang"), "team.put_error"),
 		)
 	}
@@ -244,13 +244,13 @@ func (s *Service) EditTeam(c *gin.Context) (int, interface{}) {
 func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
 	idStr, ok := c.GetQuery("id")
 	if !ok {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40006,
 			locales.I18n.T(c.GetString("lang"), "general.error_query"),
 		)
 	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40006,
 			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
 		)
 	}
@@ -258,7 +258,7 @@ func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
 	var team Team
 	s.Mysql.Where(&Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
 	if team.Name == "" {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
 		)
 	}
@@ -266,7 +266,7 @@ func (s *Service) DeleteTeam(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Where("id = ?", uint(id)).Delete(&Team{}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50002,
+		return utils.MakeErrJSON(500, 50004,
 			locales.I18n.T(c.GetString("lang"), "team.delete_error"),
 		)
 	}
@@ -288,7 +288,7 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40007,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -297,7 +297,7 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	var checkTeam Team
 	s.Mysql.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
 	if checkTeam.Name == "" {
-		return utils.MakeErrJSON(404, 40400,
+		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
 		)
 	}
@@ -306,7 +306,7 @@ func (s *Service) ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	tx := s.Mysql.Begin()
 	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&Team{Password: utils.AddSalt(newPassword)}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50001,
+		return utils.MakeErrJSON(500, 50005,
 			locales.I18n.T(c.GetString("lang"), "team.reset_password_error"),
 		)
 	}

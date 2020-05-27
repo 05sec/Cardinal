@@ -22,7 +22,9 @@ func (s *Service) initRouter() *gin.Engine {
 	api.Use(locales.Middleware())
 
 	// Frontend
-	r.Use(static.Serve("/", frontend.FS()))
+	if !conf.Get().SeparateFrontend {
+		r.Use(static.Serve("/", frontend.FS()))
+	}
 
 	// Cardinal basic info
 	api.Any("/", func(c *gin.Context) {
@@ -197,6 +199,20 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.GET("/panel", func(c *gin.Context) {
 			c.JSON(s.Panel(c))
 		})
+
+		// WebHook
+		manager.GET("/webhooks", func(c *gin.Context) {
+			c.JSON(s.getWebHook(c))
+		})
+		manager.POST("/webhook", func(c *gin.Context) {
+			c.JSON(s.newWebHook(c))
+		})
+		manager.PUT("/webhook", func(c *gin.Context) {
+			c.JSON(s.editWebHook(c))
+		})
+		manager.DELETE("/webhook", func(c *gin.Context) {
+			c.JSON(s.deleteWebHook(c))
+		})
 	}
 
 	// 404
@@ -248,7 +264,7 @@ func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
-			c.JSON(utils.MakeErrJSON(403, 40300,
+			c.JSON(utils.MakeErrJSON(403, 40302,
 				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
@@ -258,7 +274,7 @@ func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 		var managerData Manager
 		s.Mysql.Where(&Manager{Token: token}).Find(&managerData)
 		if managerData.ID == 0 {
-			c.JSON(utils.MakeErrJSON(401, 40100,
+			c.JSON(utils.MakeErrJSON(401, 40101,
 				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
 			))
 			c.Abort()
@@ -275,7 +291,7 @@ func (s *Service) AdminAuthRequired() gin.HandlerFunc {
 func (s *Service) ManagerRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.GetBool("isCheck") {
-			c.JSON(utils.MakeErrJSON(401, 40100,
+			c.JSON(utils.MakeErrJSON(401, 40102,
 				locales.I18n.T(c.GetString("lang"), "manager.manager_required"),
 			))
 			c.Abort()

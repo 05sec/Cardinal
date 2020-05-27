@@ -11,7 +11,7 @@ import (
 func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 	file, err := c.FormFile("picture")
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40025,
 			locales.I18n.T(c.GetString("lang"), "file.select_picture"),
 		)
 	}
@@ -28,7 +28,7 @@ func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {
 
 	err = c.SaveUploadedFile(file, "./uploads/"+fileName)
 	if err != nil {
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50014,
 			locales.I18n.T(c.GetString("lang"), "general.server_error"),
 		)
 	}

@@ -21,7 +21,7 @@ type DownAction struct {
 func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	// Check down is forbidden if the competition isn't start.
 	if s.Timer.Status != "on" {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40310,
 			locales.I18n.T(c.GetString("lang"), "general.not_begin"),
 		)
 	}
@@ -32,7 +32,7 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 	var inputForm InputForm
 	err := c.BindJSON(&inputForm)
 	if err != nil {
-		return utils.MakeErrJSON(400, 40000,
+		return utils.MakeErrJSON(400, 40026,
 			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
 		)
 	}
@@ -44,16 +44,16 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		Round:     s.Timer.NowRound,
 	}).Find(&repeatCheck)
 	if repeatCheck.ID != 0 {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40311,
 			locales.I18n.T(c.GetString("lang"), "check.repeat"),
 		)
 	}
 
 	// Check the gamebox is existed or not.
 	var gameBox GameBox
-	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
+	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}, Visible: true}).Find(&gameBox)
 	if gameBox.ID == 0 {
-		return utils.MakeErrJSON(403, 40300,
+		return utils.MakeErrJSON(403, 40312,
 			locales.I18n.T(c.GetString("lang"), "gamebox.not_found"),
 		)
 	}
@@ -69,11 +69,14 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 		Round:       s.Timer.NowRound,
 	}).RowsAffected != 1 {
 		tx.Rollback()
-		return utils.MakeErrJSON(500, 50000,
+		return utils.MakeErrJSON(500, 50015,
 			locales.I18n.T(c.GetString("lang"), "general.server_error"),
 		)
 	}
 	tx.Commit()
+
+	// Check down hook
+	go s.AddHook(CHECK_DOWN_HOOK, gin.H{"team": gameBox.TeamID, "gamebox": gameBox.ID})
 
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
