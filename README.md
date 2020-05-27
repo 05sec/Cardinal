@@ -14,9 +14,12 @@
 
 Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本程序可以作为 CTF 线下比赛平台，亦可用于团队内部 AWD 模拟练习。
 
-![Cardinal Frontend](https://img.cdn.n3ko.co/lsky/2020/03/03/7b6161f88fb94.png)
+![Cardinal Frontend](https://s1.ax1x.com/2020/05/28/tVPltI.png)
 
-![Cardinal Backend](https://img.cdn.n3ko.co/lsky/2020/03/03/a7ccd8a8fbd43.png#)
+![Cardinal Backend](https://s1.ax1x.com/2020/05/28/tVP1ht.png)
+
+![Asteroid](https://s1.ax1x.com/2020/05/28/tVP6jU.png)
+（该 AWD 实时 3D 攻击大屏为项目 [Asteroid](https://github.com/wuhan005/Asteroid)，已适配接入 Cardinal）
 
 ## 功能介绍
 * 管理员创建题目、分配题目靶机、参赛队伍、生成 Flag、发布公告
@@ -29,6 +32,8 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
     * 分数计算异常日志提醒
     * 自定义攻击、Checkdown 分数
     * 队伍平分靶机分数
+    * 【BETA】自动更新靶机 Flag
+    * 触发 WebHook，接入第三方应用
     
 * 管理端首页数据总览查看
     * 管理员、系统重要操作日志记录
