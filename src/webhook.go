@@ -194,10 +194,7 @@ func (s *Service) refreshWebHookStore() {
 
 // AddHook used to add a webhook.
 func (s *Service) AddHook(webHookType string, webHookData interface{}) {
-	s.sendWebHook(ANY_HOOK, webHookData)
-	if webHookType != ANY_HOOK {
-		s.sendWebHook(webHookType, webHookData)
-	}
+	s.sendWebHook(webHookType, webHookData)
 }
 
 func (s *Service) sendWebHook(webHookType string, webHookData interface{}) {
@@ -213,13 +210,13 @@ func (s *Service) sendWebHook(webHookType string, webHookData interface{}) {
 	}
 
 	for _, v := range webHooks {
-		if v.Type == webHookType {
+		if v.Type == webHookType || v.Type == ANY_HOOK {
 			go func(webhook WebHook) {
 				nonce := randstr.Hex(16)
 
 				req := gorequest.New().Post(webhook.URL)
 				req.Data = map[string]interface{}{
-					"type": webhook.Type,
+					"type": webHookType,
 					"data": webHookData,
 					// TODO: Here is not secure. The data should be added in the signature.
 					"nonce":     nonce,
