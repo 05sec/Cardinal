@@ -97,12 +97,14 @@ func SSHExecute(ip string, port string, user string, password string, command st
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	session, err := client.NewSession()
 	if err != nil {
 		return err
 	}
 	defer session.Close()
+
 	err = session.Run(command)
 	if err != nil {
 		return err
