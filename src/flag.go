@@ -240,7 +240,7 @@ func (s *Service) refreshFlag() {
 	}
 }
 
-func (s *Service) testSSH(c *gin.Context) (int, interface{}) {
+func (s *Service) testAllSSH(c *gin.Context) (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Where(&Challenge{AutoRefreshFlag: true}).Find(&challenges)
 
