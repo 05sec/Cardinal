@@ -119,6 +119,9 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.GET("/gameboxes/sshTest", func(c *gin.Context) {
 			c.JSON(s.testAllSSH(c))
 		})
+		manager.POST("/gameboxes/sshTest", func(c *gin.Context) {
+			c.JSON(s.testSSH(c))
+		})
 
 		// Team
 		manager.GET("/teams", func(c *gin.Context) {

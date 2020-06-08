@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha1"
 	"fmt"
@@ -87,7 +88,7 @@ func InputString(str *string, hint string) {
 	}
 }
 
-func SSHExecute(ip string, port string, user string, password string, command string) error {
+func SSHExecute(ip string, port string, user string, password string, command string) (string, error) {
 	client, err := ssh.Dial("tcp", ip+":"+port, &ssh.ClientConfig{
 		User:            user,
 		Auth:            []ssh.AuthMethod{ssh.Password(password)},
@@ -95,20 +96,22 @@ func SSHExecute(ip string, port string, user string, password string, command st
 		Timeout:         5 * time.Second,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer client.Close()
 
 	session, err := client.NewSession()
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer session.Close()
 
+	var output bytes.Buffer
+	session.Stdout = &output
 	err = session.Run(command)
 	if err != nil {
-		return err
+		return "", err
 	}
-
-	return nil
+	
+	return output.String(), nil
 }
