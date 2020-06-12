@@ -33,6 +33,7 @@ en-US:
 
   check:
     repeat: "Duplicated Check Ignored."
+    not_visible: "Challenge is now Invisible."
 
   config:
     load_success: "Load Config Files Succeeded!"

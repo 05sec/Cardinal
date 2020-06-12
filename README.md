@@ -94,7 +94,7 @@ chmod +x ./Cardinal
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.red"><img src="https://avatars3.githubusercontent.com/u/12731778?v=4" width="100px;" alt=""/><br /><sub><b>John Wu</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Code">💻</a> <a href="#design-wuhan005" title="Design">🎨</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Documentation">📖</a> <a href="#maintenance-wuhan005" title="Maintenance">🚧</a></td>
+    <td align="center"><a href="https://github.com/wuhan005"><img src="https://avatars3.githubusercontent.com/u/12731778?v=4" width="100px;" alt=""/><br /><sub><b>E99p1ant</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Code">💻</a> <a href="#design-wuhan005" title="Design">🎨</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Documentation">📖</a> <a href="#maintenance-wuhan005" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://github.com/Moesang"><img src="https://avatars2.githubusercontent.com/u/46858006?v=4" width="100px;" alt=""/><br /><sub><b>Moesang</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=Moesang" title="Code">💻</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=Moesang" title="Documentation">📖</a> <a href="#maintenance-Moesang" title="Maintenance">🚧</a></td>
     <td align="center"><a href="https://github.com/michaelfyc"><img src="https://avatars2.githubusercontent.com/u/45136049?v=4" width="100px;" alt=""/><br /><sub><b>michaelfyc</b></sub></a><br /><a href="#translation-michaelfyc" title="Translation">🌍</a></td>
   </tr>
@@ -105,13 +105,6 @@ chmod +x ./Cardinal
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 十分欢迎您和我们一起改进 Cardinal，您可以改进现有程序，加入新功能，完善文档，优化代码等。
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## 协议与许可
 

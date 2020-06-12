@@ -33,6 +33,7 @@ zh-CN:
 
   check:
     repeat: "重复 Check，已忽略"
+    not_visible: "题目未开题，CheckDown 失败"
 
   config:
     load_success: "加载配置文件成功"

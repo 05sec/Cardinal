@@ -230,7 +230,7 @@ func (s *Service) refreshFlag() {
 				// Replace the flag placeholder.
 				// strings.ReplaceAll need Go 1.13+, so we use strings.Replace here.
 				command := strings.Replace(challenge.Command, "{{FLAG}}", flag.Flag, -1)
-				err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, command)
+				_, err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, command)
 				if err != nil {
 					s.NewLog(IMPORTANT, "ssh_error", fmt.Sprintf("Team:%d Gamebox:%d Round:%d SSH 更新 Flag 失败：%v", gamebox.TeamID, gamebox.ID, s.Timer.NowRound, err.Error()))
 				}
@@ -240,7 +240,7 @@ func (s *Service) refreshFlag() {
 	}
 }
 
-func (s *Service) testSSH(c *gin.Context) (int, interface{}) {
+func (s *Service) testAllSSH(c *gin.Context) (int, interface{}) {
 	var challenges []Challenge
 	s.Mysql.Model(&Challenge{}).Where(&Challenge{AutoRefreshFlag: true}).Find(&challenges)
 
@@ -261,7 +261,7 @@ func (s *Service) testSSH(c *gin.Context) (int, interface{}) {
 			wg.Add(1)
 			go func(gamebox GameBox, challenge Challenge) {
 				defer wg.Done()
-				err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, "whoami")
+				_, err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, "whoami")
 				if err != nil {
 					errs = append(errs, errorMessage{
 						TeamID:      gamebox.TeamID,
@@ -275,4 +275,26 @@ func (s *Service) testSSH(c *gin.Context) (int, interface{}) {
 	}
 	wg.Wait()
 	return utils.MakeSuccessJSON(errs)
+}
+
+func (s *Service) testSSH(c *gin.Context) (int, interface{}) {
+	var inputForm struct {
+		IP       string `binding:"required"`
+		Port     string `binding:"required"`
+		User     string `binding:"required"`
+		Password string `binding:"required"`
+		Command  string `binding:"required"`
+	}
+	err := c.BindJSON(&inputForm)
+	if err != nil {
+		return utils.MakeErrJSON(400, 40036,
+			locales.I18n.T(c.GetString("lang"), "general.error_payload"),
+		)
+	}
+
+	output, err := utils.SSHExecute(inputForm.IP, inputForm.Port, inputForm.User, inputForm.Password, inputForm.Command)
+	if err != nil {
+		return utils.MakeErrJSON(400, 40037, err)
+	}
+	return utils.MakeSuccessJSON(output)
 }

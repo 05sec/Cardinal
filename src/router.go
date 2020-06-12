@@ -117,7 +117,15 @@ func (s *Service) initRouter() *gin.Engine {
 			c.JSON(s.EditGameBox(c))
 		})
 		manager.GET("/gameboxes/sshTest", func(c *gin.Context) {
+			c.JSON(s.testAllSSH(c))
+		})
+		manager.POST("/gameboxes/sshTest", func(c *gin.Context) {
 			c.JSON(s.testSSH(c))
+		})
+		manager.GET("/gameboxes/refreshFlag", func(c *gin.Context) {
+			s.refreshFlag()
+			// TODO: i18n
+			c.JSON(utils.MakeSuccessJSON("刷新 Flag 操作已执行，请在数据大屏查看是否有错误信息"))
 		})
 
 		// Team
