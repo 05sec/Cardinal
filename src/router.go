@@ -183,6 +183,30 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.GET("/asteroid/status", func(c *gin.Context) {
 			c.JSON(s.getAsteroidStatus())
 		})
+		manager.POST("/asteroid/attack", func(c *gin.Context) {
+			c.JSON(s.asteroidAttack(c))
+		})
+		manager.POST("/asteroid/rank", func(c *gin.Context) {
+			c.JSON(s.asteroidRank(c))
+		})
+		manager.POST("/asteroid/status", func(c *gin.Context) {
+			c.JSON(s.asteroidStatus(c))
+		})
+		manager.POST("/asteroid/round", func(c *gin.Context) {
+			c.JSON(s.asteroidRound(c))
+		})
+		manager.POST("/asteroid/easterEgg", func(c *gin.Context) {
+			c.JSON(s.asteroidEasterEgg(c))
+		})
+		manager.POST("/asteroid/time", func(c *gin.Context) {
+			c.JSON(s.asteroidTime(c))
+		})
+		manager.POST("/asteroid/clear", func(c *gin.Context) {
+			c.JSON(s.asteroidClear(c))
+		})
+		manager.POST("/asteroid/clearAll", func(c *gin.Context) {
+			c.JSON(s.asteroidClearAll(c))
+		})
 
 		// Check
 		check.POST("/checkDown", func(c *gin.Context) {
