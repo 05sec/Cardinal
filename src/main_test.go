@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/conf"
 	"github.com/vidar-team/Cardinal/src/utils"
 	"os"
@@ -64,6 +65,8 @@ func init() {
 		Token:    managerToken,
 		IsCheck:  false,
 	})
+
+	asteroid.InitAsteroid(service.asteroidGreetData)
 
 	service.Router = service.initRouter()
 }
