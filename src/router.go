@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/conf"
 	"github.com/vidar-team/Cardinal/src/frontend"
 	"github.com/vidar-team/Cardinal/src/locales"
@@ -55,6 +56,11 @@ func (s *Service) initRouter() *gin.Engine {
 	// Submit flag
 	api.POST("/flag", func(c *gin.Context) {
 		c.JSON(s.SubmitFlag(c))
+	})
+
+	// Asteroid websocket
+	api.GET("/asteroid", func(c *gin.Context) {
+		asteroid.ServeWebSocket(c)
 	})
 
 	// For team
@@ -171,6 +177,11 @@ func (s *Service) initRouter() *gin.Engine {
 		})
 		manager.GET("/flag/export", func(c *gin.Context) {
 			c.JSON(s.ExportFlag(c))
+		})
+
+		// Asteroid Unity3D
+		manager.GET("/asteroid/status", func(c *gin.Context) {
+			c.JSON(s.getAsteroidStatus())
 		})
 
 		// Check
