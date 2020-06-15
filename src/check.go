@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
 )
@@ -85,6 +86,9 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
+
+	// Asteroid Unity3D
+	asteroid.Status(int(gameBox.TeamID), "down")
 
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "general.success"))
 }

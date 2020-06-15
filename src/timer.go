@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/conf"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
@@ -170,6 +171,12 @@ func (s *Service) timerProcess() {
 
 					// Auto refresh flag
 					go s.refreshFlag()
+
+					// Asteroid Unity3D refresh.
+					asteroid.Rank()
+					asteroid.ClearAll()
+					asteroid.Round(s.Timer.NowRound)
+					asteroid.Time(s.Timer.RoundRemainTime)
 
 					fmt.Println(s.Timer.NowRound)
 				}

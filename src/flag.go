@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/conf"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
@@ -126,6 +127,8 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
+	// Send Unity3D attack message.
+	asteroid.Attack(int(teamID), int(flagData.TeamID))
 
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "flag.submit_success"))
 }
