@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/locales"
 	"log"
 )
 
@@ -42,4 +43,10 @@ func (s *Service) initMySQL() {
 		&Log{},
 		&WebHook{},
 	)
+
+	// Test the database charset.
+	if s.Mysql.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
+		log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "general.database_charset_error"))
+	}
+
 }
