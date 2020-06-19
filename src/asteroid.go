@@ -28,7 +28,7 @@ func (s *Service) asteroidGreetData() (result asteroid.Greet) {
 
 func (s *Service) getAsteroidStatus() (int, interface{}) {
 	return utils.MakeSuccessJSON(gin.H{
-		"status": s.GetBool("asteroid_enabled"),
+		// TODO
 	})
 }
 
