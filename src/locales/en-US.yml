@@ -11,6 +11,7 @@ en-US:
     no_auth: "Request Unauthorized!"
     not_found: "Resource Not Found!"
     method_not_allow: "Request Method Not Allowed!"
+    database_charset_error: "Database Charset Error. Please Make Sure the Charset of the Database is utf8mb4. e.g. CREATE DATABASE  `cardinal` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
   bulletin:
     post_error: "Add Bulletin Failed!"

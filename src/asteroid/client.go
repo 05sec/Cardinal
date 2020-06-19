@@ -61,11 +61,15 @@ func (c *client) writePump() {
 			w.Write(message)
 			if err := w.Close(); err != nil {
 				log.Printf("error: %v", err)
+				delete(hub.clients, c)
+				close(c.send)
 				return
 			}
 		case <-ticker.C:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				delete(hub.clients, c)
+				close(c.send)
 				return
 			}
 		}

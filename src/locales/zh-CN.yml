@@ -11,6 +11,7 @@ zh-CN:
     no_auth: "未授权访问"
     not_found: "资源不存在"
     method_not_allow: "请求方法不允许"
+    database_charset_error: "数据库编码格式错误。可能导致无法正确处理中文字符，请删除并重新创建数据库，设置编码格式为 utf8mb4。示例：CREATE DATABASE  `cardinal` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
   bulletin:
     post_error: "添加公告失败！"

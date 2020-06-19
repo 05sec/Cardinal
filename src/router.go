@@ -256,6 +256,14 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.DELETE("/webhook", func(c *gin.Context) {
 			c.JSON(s.deleteWebHook(c))
 		})
+
+		// Config
+		//manager.GET("/config", func(c *gin.Context) {
+		//	c.JSON(s.getConfig(c))
+		//})
+		//manager.PUT("/config", func(c *gin.Context) {
+		//	c.JSON(s.editConfig(c))
+		//})
 	}
 
 	// 404
