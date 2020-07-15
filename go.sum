@@ -173,6 +173,8 @@ github.com/vidar-team/Cardinal_manager_frontend v0.5.2-alpha h1:xgXwPqXCjHiHVQC7
 github.com/vidar-team/Cardinal_manager_frontend v0.5.2-alpha/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
 github.com/vidar-team/Cardinal_manager_frontend v0.6.0 h1:OMsb3O7raah7r37ppyjm83iMnV4B+1OTWG38VTuT0T8=
 github.com/vidar-team/Cardinal_manager_frontend v0.6.0/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
+github.com/vidar-team/Cardinal_manager_frontend v0.6.1 h1:R3h/YovMTtAsteNb2pVAQM/fr3whculO4JeRXzs9Hu0=
+github.com/vidar-team/Cardinal_manager_frontend v0.6.1/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
 github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd h1:LxsPdxzQnF9yE7Xv/1Ln8C8JJbEh1SlRyIDvgR/bsKg=
 github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd/go.mod h1:+ccdNT0xMY1dtc5XBxumbYfOUhmduiGudqaDgD2rVRE=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
