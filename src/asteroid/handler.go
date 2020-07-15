@@ -13,7 +13,7 @@ const (
 )
 
 var hub *Hub
-var refresh func() Greet // Used to get team, score, time data.
+var refresh func() Greet // Used to get title, team, score, time data.
 
 // InitAsteroid is used to init the asteroid. A function will be given to get the team rank data.
 func InitAsteroid(function func() Greet) {

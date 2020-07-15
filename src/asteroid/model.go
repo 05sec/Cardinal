@@ -10,6 +10,7 @@ type Team struct {
 
 // Greet will been sent when the client connect to the server firstly.
 type Greet struct {
+	Title string
 	Time  int
 	Round int
 	Team  []Team
