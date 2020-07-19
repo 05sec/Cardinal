@@ -23,6 +23,10 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
 ![Asteroid](https://s1.ax1x.com/2020/05/28/tVP6jU.png)
 （该 AWD 实时 3D 攻击大屏为项目 [Asteroid](https://github.com/wuhan005/Asteroid)，已适配接入 Cardinal）
 
+## 使用文档
+[cardinal.ink](https://cardinal.ink)
+> 请您在使用前认真阅读使用文档，谢谢 ♪(･ω･)ﾉ
+
 ## 功能介绍
 * 管理员创建题目、分配题目靶机、参赛队伍、生成 Flag、发布公告
     * 支持上传参赛队伍 Logo
