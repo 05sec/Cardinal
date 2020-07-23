@@ -1,6 +1,7 @@
 package main
 
 import (
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,11 @@ func (s *Service) initRouter() *gin.Engine {
 
 	api := r.Group("/api")
 	api.Use(locales.Middleware())
+	if conf.Get().Sentry {
+		api.Use(sentrygin.New(sentrygin.Options{
+			Repanic: true,
+		}))
+	}
 
 	// Frontend
 	if !conf.Get().SeparateFrontend {

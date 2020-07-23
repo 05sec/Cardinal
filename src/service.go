@@ -23,6 +23,9 @@ func (s *Service) init() {
 	// Load config file.
 	conf.Init()
 
+	// Sentry
+	s.initSentry()
+
 	// Init database.
 	s.initMySQL()
 
