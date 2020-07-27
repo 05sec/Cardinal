@@ -1,11 +1,76 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/thanhpk/randstr"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strconv"
 )
+
+func (s *Service) getDir(c *gin.Context) (int, interface{}) {
+	basePath := c.Query("path")
+	folder := c.Query("folder")
+	hidden, _ := strconv.ParseBool(c.Query("hidden"))
+	folderOnly, _ := strconv.ParseBool(c.Query("folderOnly"))
+
+	if basePath == "" {
+		nowPath, err := os.Getwd()
+		basePath = nowPath
+		if err != nil {
+			return utils.MakeErrJSON(500, 50025, "获取当前目录信息失败")
+		}
+	}
+	path := filepath.Join(basePath, folder)
+
+	f, err := os.Stat(path)
+	if err != nil {
+		return utils.MakeErrJSON(500, 50026, fmt.Sprintf("打开文件 %s 失败", path))
+	}
+	if !f.IsDir() {
+		return utils.MakeErrJSON(500, 50027, fmt.Sprintf("%s 不是目录", path))
+	}
+	fileInfo, err := ioutil.ReadDir(path)
+	if err != nil {
+		return utils.MakeErrJSON(500, 50026, fmt.Sprintf("打开文件 %s 失败", path))
+	}
+
+	type fileItem struct {
+		Name    string
+		IsDir   bool
+		Size    string
+		ModTime int64
+	}
+
+	files := make([]fileItem, 0, len(fileInfo))
+	for _, f := range fileInfo {
+		if f.Name()[0] == '.' && !hidden {
+			// skip hidden file.
+			continue
+		}
+
+		if !f.IsDir() && folderOnly {
+			// skip file.
+			continue
+		}
+
+		files = append(files, fileItem{
+			Name:    f.Name(),
+			IsDir:   f.IsDir(),
+			Size:    utils.FileSize(f.Size()),
+			ModTime: f.ModTime().Unix(),
+		})
+	}
+
+	return utils.MakeSuccessJSON(gin.H{
+		"path":  path,
+		"files": files,
+	})
+}
 
 // UploadPicture is upload team logo handler for manager.
 func (s *Service) UploadPicture(c *gin.Context) (int, interface{}) {

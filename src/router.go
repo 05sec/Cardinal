@@ -237,6 +237,14 @@ func (s *Service) initRouter() *gin.Engine {
 		manager.POST("/uploadPicture", func(c *gin.Context) {
 			c.JSON(s.UploadPicture(c))
 		})
+		manager.GET("/dir", func(c *gin.Context) {
+			c.JSON(s.getDir(c))
+		})
+
+		// Docker
+		manager.POST("/docker/findImage", func(c *gin.Context) {
+			c.JSON(s.getImageData(c))
+		})
 
 		// Log
 		manager.GET("/logs", func(c *gin.Context) {
