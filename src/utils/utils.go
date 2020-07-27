@@ -112,6 +112,6 @@ func SSHExecute(ip string, port string, user string, password string, command st
 	if err != nil {
 		return "", err
 	}
-	
+
 	return output.String(), nil
 }

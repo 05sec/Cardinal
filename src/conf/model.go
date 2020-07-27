@@ -31,6 +31,7 @@ type Base struct {
 	EndTime          time.Time
 	Duration         uint
 	SeparateFrontend bool
+	Sentry           bool
 	Port             string
 	Salt             string
 	FlagPrefix       string

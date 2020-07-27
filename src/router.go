@@ -1,6 +1,7 @@
 package main
 
 import (
+	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,11 @@ func (s *Service) initRouter() *gin.Engine {
 
 	api := r.Group("/api")
 	api.Use(locales.Middleware())
+	if conf.Get().Sentry {
+		api.Use(sentrygin.New(sentrygin.Options{
+			Repanic: true,
+		}))
+	}
 
 	// Frontend
 	if !conf.Get().SeparateFrontend {
@@ -230,6 +236,14 @@ func (s *Service) initRouter() *gin.Engine {
 		// File
 		manager.POST("/uploadPicture", func(c *gin.Context) {
 			c.JSON(s.UploadPicture(c))
+		})
+		manager.GET("/dir", func(c *gin.Context) {
+			c.JSON(s.getDir(c))
+		})
+
+		// Docker
+		manager.POST("/docker/findImage", func(c *gin.Context) {
+			c.JSON(s.getImageData(c))
 		})
 
 		// Log
