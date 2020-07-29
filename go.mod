@@ -4,10 +4,16 @@ go 1.13
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
 	github.com/aws/aws-sdk-go v1.30.20 // indirect
+	github.com/containerd/containerd v1.3.6 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
+	github.com/docker/distribution v2.7.1+incompatible // indirect
+	github.com/docker/docker v17.12.0-ce-rc1.0.20200728121027-0f41a77c6993+incompatible
+	github.com/docker/go-connections v0.4.0 // indirect
+	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.9.0 // indirect
@@ -15,6 +21,7 @@ require (
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.5.0
+	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2
@@ -22,6 +29,8 @@ require (
 	github.com/jinzhu/configor v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/qor/admin v0.0.0-20200229145930-e279f96c8c05 // indirect
@@ -38,6 +47,7 @@ require (
 	github.com/qor/session v0.0.0-20170907035918-8206b0adab70 // indirect
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46 // indirect
 	github.com/satori/go.uuid v1.2.0
+	github.com/sirupsen/logrus v1.6.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/thanhpk/randstr v1.0.4
@@ -49,7 +59,8 @@ require (
 	github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/text v0.3.0
-	golang.org/x/tools v0.0.0-20190328211700-ab21143f2384
+	golang.org/x/tools v0.0.0-20190524140312-2c0ae7006135
+	google.golang.org/grpc v1.30.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
 	moul.io/http2curl v1.0.0 // indirect
