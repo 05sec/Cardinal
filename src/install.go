@@ -197,7 +197,7 @@ func (s *Service) initManager() {
 			fmt.Println("\n\n=======================================")
 			fmt.Printf("Manager Name: %s\n", managerName)
 			fmt.Printf("Manager Password: %s\n", managerPassword)
-			fmt.Println("=======================================\n\n")
+			fmt.Printf("=======================================\n\n\n")
 		} else {
 			utils.InputString(&managerName, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_name")))
 			utils.InputString(&managerPassword, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_password")))
