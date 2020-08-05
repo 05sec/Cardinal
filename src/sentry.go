@@ -27,5 +27,5 @@ func (s *Service) initSentry() {
 	}
 
 	// greeting
-	sentry.CaptureMessage("Hello")
+	sentry.CaptureMessage("Hello " + VERSION)
 }

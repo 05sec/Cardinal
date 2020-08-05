@@ -18,6 +18,8 @@ import (
 	"time"
 )
 
+const DOCKER_ENV = "CARDINAL_DOCKER"
+
 const configTemplate = `
 [base]
 Title="{{ .Title }}"
@@ -184,10 +186,24 @@ func (s *Service) initManager() {
 	var managerCount int
 	s.Mysql.Model(&Manager{}).Count(&managerCount)
 	if managerCount == 0 {
-		// Create manager account if managers table is empty.
 		var managerName, managerPassword string
-		utils.InputString(&managerName, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_name")))
-		utils.InputString(&managerPassword, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_password")))
+
+		// Check if it is built by docker-compose.
+		if os.Getenv(DOCKER_ENV) != "" {
+			managerName = "admin_" + randstr.Hex(3)
+			managerPassword = randstr.String(16)
+
+			// Print out the account info.
+			fmt.Println("\n\n=======================================")
+			fmt.Printf("Manager Name: %s\n", managerName)
+			fmt.Printf("Manager Password: %s\n", managerPassword)
+			fmt.Println("=======================================\n\n")
+		} else {
+			utils.InputString(&managerName, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_name")))
+			utils.InputString(&managerPassword, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_password")))
+		}
+
+		// Create manager account if managers table is empty.
 		s.Mysql.Create(&Manager{
 			Name:     managerName,
 			Password: utils.AddSalt(managerPassword),
