@@ -5,6 +5,7 @@ type Team struct {
 	Id    int
 	Name  string
 	Rank  int
+	Image string
 	Score int
 }
 

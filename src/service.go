@@ -6,6 +6,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/livelog"
 )
 
 // Service is the main struct contains all the part of the Cardinal.
@@ -14,6 +15,7 @@ type Service struct {
 	Timer  *Timer
 	Store  *cache.Cache
 	Router *gin.Engine
+	Stream *livelog.Streamer
 }
 
 func (s *Service) init() {
@@ -43,6 +45,9 @@ func (s *Service) init() {
 
 	// Game timer.
 	s.initTimer()
+
+	// Live log
+	s.initLiveLog()
 
 	// Web router.
 	s.Router = s.initRouter()

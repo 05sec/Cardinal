@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/src/asteroid"
+	"github.com/vidar-team/Cardinal/src/livelog"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
 )
@@ -89,6 +90,14 @@ func (s *Service) CheckDown(c *gin.Context) (int, interface{}) {
 
 	// Asteroid Unity3D
 	asteroid.Status(int(gameBox.TeamID), "down")
+
+	var team Team
+	s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: gameBox.TeamID}}).Find(&team)
+	var challenge Challenge
+	s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
+	// Live log
+	_ = s.Stream.Write(GlobalStream, livelog.NewLine("check_down",
+		gin.H{"Team": team.Name, "Challenge": challenge.Title}))
 
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "general.success"))
 }

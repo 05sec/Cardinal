@@ -3,6 +3,7 @@ package livelog
 import (
 	"context"
 	"sync"
+	"time"
 )
 
 // The max size that the content can be.
@@ -10,9 +11,17 @@ const bufferSize = 5000
 
 // Line is a single line of the log.
 type Line struct {
-	Number    int    `json:"Position"`
-	Message   string `json:"Message"`
-	Timestamp int64  `json:"Time"`
+	Type      string      `json:"Type"`
+	Message   interface{} `json:"Message"`
+	Timestamp int64       `json:"Time"`
+}
+
+func NewLine(messageType string, message interface{}) *Line {
+	return &Line{
+		Type:      messageType,
+		Message:   message,
+		Timestamp: time.Now().Unix(),
+	}
 }
 
 type stream struct {

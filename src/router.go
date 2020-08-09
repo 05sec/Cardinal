@@ -60,6 +60,8 @@ func (s *Service) initRouter() *gin.Engine {
 	api.GET("/logout", func(c *gin.Context) {
 		c.JSON(s.TeamLogout(c))
 	})
+	// Live log
+	api.GET("/livelog", s.globalStreamHandler)
 
 	// Submit flag
 	api.POST("/flag", func(c *gin.Context) {

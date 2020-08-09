@@ -17,6 +17,7 @@ func (s *Service) asteroidGreetData() (result asteroid.Greet) {
 			Id:    int(team.ID),
 			Name:  team.Name,
 			Rank:  rank + 1,
+			Image: team.Logo,
 			Score: int(team.Score),
 		})
 	}

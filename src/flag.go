@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/src/asteroid"
 	"github.com/vidar-team/Cardinal/src/conf"
+	"github.com/vidar-team/Cardinal/src/livelog"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
 	"strconv"
@@ -73,6 +74,9 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		)
 	}
 
+	// Remove the space
+	inputForm.Flag = strings.TrimSpace(inputForm.Flag)
+
 	var flagData Flag
 	s.Mysql.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: s.Timer.NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
 	if flagData.ID == 0 || teamID == flagData.TeamID {                                                 // 注意不允许提交自己的 flag
@@ -104,8 +108,6 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	go s.AddHook(SUBMIT_FLAG_HOOK, gin.H{"from": teamID, "to": gamebox.TeamID, "gamebox": gamebox.ID})
-
 	// Update the victim's gamebox status to `down`.
 	s.Mysql.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&GameBox{IsAttacked: true})
 
@@ -127,8 +129,20 @@ func (s *Service) SubmitFlag(c *gin.Context) (int, interface{}) {
 
 	// Update the gamebox status in ranking list.
 	s.SetRankList()
+	// Webhook
+	go s.AddHook(SUBMIT_FLAG_HOOK, gin.H{"from": teamID, "to": gamebox.TeamID, "gamebox": gamebox.ID})
 	// Send Unity3D attack message.
 	asteroid.Attack(int(teamID), int(flagData.TeamID))
+
+	// Get attack team data
+	var flagTeam Team
+	s.Mysql.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: flagData.TeamID}}).Find(&flagTeam)
+	// Get challenge data
+	var challenge Challenge
+	s.Mysql.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: flagData.ChallengeID}}).Find(&challenge)
+	// Live log
+	_ = s.Stream.Write(GlobalStream, livelog.NewLine("submit_flag",
+		gin.H{"From": team.Name, "To": flagTeam.Name, "Challenge": challenge.Title}))
 
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "flag.submit_success"))
 }
