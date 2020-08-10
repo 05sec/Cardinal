@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// Hub contains all the connections and the action signal.
 type Hub struct {
 	// Registered clients.
 	clients map[*client]bool
