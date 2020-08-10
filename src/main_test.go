@@ -49,6 +49,7 @@ func init() {
 	service.initMySQL()
 	service.initStore()
 	service.initTimer()
+	service.initLiveLog()
 
 	managerToken = utils.GenerateToken()
 	team = make([]struct {
