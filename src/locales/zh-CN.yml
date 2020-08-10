@@ -38,6 +38,7 @@ zh-CN:
 
   config:
     load_success: "加载配置文件成功"
+    update_success: "更新设置成功！"
 
   file:
     select_picture: "请选择图片文件！"

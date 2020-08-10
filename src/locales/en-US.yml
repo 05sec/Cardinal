@@ -38,6 +38,7 @@ en-US:
 
   config:
     load_success: "Load Config Files Succeeded!"
+    update_success: "Update Config Succeeded!"
 
   file:
     select_picture: "Please Select an Image File!"

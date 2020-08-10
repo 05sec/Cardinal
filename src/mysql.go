@@ -43,7 +43,7 @@ func (s *Service) initMySQL() {
 		&Log{},
 		&WebHook{},
 
-		conf.DynamicConfig{},
+		&DynamicConfig{},
 	)
 
 	// Test the database charset.

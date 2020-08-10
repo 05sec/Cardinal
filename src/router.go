@@ -276,12 +276,12 @@ func (s *Service) initRouter() *gin.Engine {
 		})
 
 		// Config
-		//manager.GET("/config", func(c *gin.Context) {
-		//	c.JSON(s.getConfig(c))
-		//})
-		//manager.PUT("/config", func(c *gin.Context) {
-		//	c.JSON(s.editConfig(c))
-		//})
+		manager.GET("/config", func(c *gin.Context) {
+			c.JSON(s.getConfigHandler(c))
+		})
+		manager.PUT("/config", func(c *gin.Context) {
+			c.JSON(s.setConfigHandler(c))
+		})
 	}
 
 	// 404
