@@ -27,15 +27,12 @@ func init() {
 	config := conf.Get()
 	*config = conf.Config{
 		Base: conf.Base{
-			Title:          "HCTF",
 			BeginTime:      time.Now(),
 			RestTime:       nil,
 			EndTime:        time.Now().Add(12 * time.Hour),
 			Duration:       10,
 			Port:           ":19999",
 			Salt:           randstr.String(64),
-			FlagPrefix:     "hctf{",
-			FlagSuffix:     "}",
 			CheckDownScore: 10,
 			AttackScore:    10,
 		},
@@ -47,6 +44,7 @@ func init() {
 		},
 	}
 	service.initMySQL()
+	service.initDynamicConfig()
 	service.initStore()
 	service.initTimer()
 	service.initLiveLog()
