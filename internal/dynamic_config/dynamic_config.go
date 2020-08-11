@@ -2,24 +2,13 @@ package dynamic_config
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
 )
 
-// dynamicConfig is the config which is stored in database.
-// So it's a GORM model for users can edit it anytime.
-type DynamicConfig struct {
-	gorm.Model `json:"-"`
-
-	Key   string
-	Value string
-	Kind  int8
-}
-
 func Init() {
-	db.MySQL.Model(&DynamicConfig{})
+	db.MySQL.Model(&db.DynamicConfig{})
 
 	initConfig(utils.TITLE_CONF, "HCTF", utils.STRING)
 	initConfig(utils.FLAG_PREFIX_CONF, "hctf{", utils.STRING)
@@ -31,7 +20,7 @@ func Init() {
 // initConfig set the default value of the given key.
 // Always used in installation.
 func initConfig(key string, value string, kind int8) {
-	db.MySQL.Model(&DynamicConfig{}).FirstOrCreate(&DynamicConfig{
+	db.MySQL.Model(&db.DynamicConfig{}).FirstOrCreate(&db.DynamicConfig{
 		Key:   key,
 		Value: value,
 		Kind:  kind,
@@ -41,7 +30,7 @@ func initConfig(key string, value string, kind int8) {
 // Set update the config by insert a new record into database, for we can make a config version control soon.
 // Then refresh the config in struct.
 func Set(key string, value string) {
-	db.MySQL.Model(&DynamicConfig{}).Where("`key` = ?", key).Update(&DynamicConfig{
+	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` = ?", key).Update(&db.DynamicConfig{
 		Key:   key,
 		Value: value,
 	})
@@ -49,8 +38,8 @@ func Set(key string, value string) {
 
 // Get returns the config value.
 func Get(key string) string {
-	var config DynamicConfig
-	db.MySQL.Model(&DynamicConfig{}).Where("`key` = ?", key).Find(&config)
+	var config db.DynamicConfig
+	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` = ?", key).Find(&config)
 	return config.Value
 }
 
@@ -86,7 +75,7 @@ func GetConfig(c *gin.Context) (int, interface{}) {
 
 // GetAllConfig is the HTTP handler used to return the all the configs.
 func GetAllConfig(c *gin.Context) (int, interface{}) {
-	var config []DynamicConfig
-	db.MySQL.Model(&DynamicConfig{}).Find(&config)
+	var config []db.DynamicConfig
+	db.MySQL.Model(&db.DynamicConfig{}).Find(&config)
 	return utils.MakeSuccessJSON(config)
 }

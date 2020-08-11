@@ -11,16 +11,6 @@ import (
 	"strconv"
 )
 
-// Manager is a gorm model for database table `managers`.
-type Manager struct {
-	gorm.Model
-
-	Name     string
-	Password string `json:"-"`
-	IsCheck  bool
-	Token    string // For single sign-on
-}
-
 // ManagerLogin is manager login handler.
 func ManagerLogin(c *gin.Context) (int, interface{}) {
 	var formData struct {
@@ -34,15 +24,15 @@ func ManagerLogin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var manager Manager
-	db.MySQL.Where(&Manager{Name: formData.Name}).Find(&manager)
+	var manager db.Manager
+	db.MySQL.Where(&db.Manager{Name: formData.Name}).Find(&manager)
 
 	// The check account can't login.
 	if manager.ID != 0 && manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) && !manager.IsCheck {
 		// Login successfully
 		token := utils.GenerateToken()
 		tx := db.MySQL.Begin()
-		if tx.Model(&Manager{}).Where(&Manager{Name: manager.Name}).Updates(&Manager{Token: token}).RowsAffected != 1 {
+		if tx.Model(&db.Manager{}).Where(&db.Manager{Name: manager.Name}).Updates(&db.Manager{Token: token}).RowsAffected != 1 {
 			tx.Rollback()
 			return utils.MakeErrJSON(500, 50006,
 				locales.I18n.T(c.GetString("lang"), "general.server_error"),
@@ -61,7 +51,7 @@ func ManagerLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
 	tx := db.MySQL.Begin()
 	if token != "" {
-		if tx.Model(&Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Update(map[string]interface{}{"token": ""}).RowsAffected != 1 {
+		if tx.Model(&db.Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Update(map[string]interface{}{"token": ""}).RowsAffected != 1 {
 			tx.Rollback()
 		} else {
 			tx.Commit()
@@ -74,8 +64,8 @@ func ManagerLogout(c *gin.Context) (int, interface{}) {
 
 // GetAllManager returns all the manager.
 func GetAllManager(c *gin.Context) (int, interface{}) {
-	var manager []Manager
-	db.MySQL.Model(&Manager{}).Find(&manager)
+	var manager []db.Manager
+	db.MySQL.Model(&db.Manager{}).Find(&manager)
 	return utils.MakeSuccessJSON(manager)
 }
 
@@ -100,15 +90,15 @@ func NewManager(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkManager Manager
-	db.MySQL.Model(&Manager{}).Where(&Manager{Name: formData.Name}).Find(&checkManager)
+	var checkManager db.Manager
+	db.MySQL.Model(&db.Manager{}).Where(&db.Manager{Name: formData.Name}).Find(&checkManager)
 	if checkManager.ID != 0 {
 		return utils.MakeErrJSON(400, 40011,
 			locales.I18n.T(c.GetString("lang"), "manager.repeat"),
 		)
 	}
 
-	manager := Manager{
+	manager := db.Manager{
 		Name:     formData.Name,
 		IsCheck:  formData.IsCheck,
 		Password: utils.AddSalt(formData.Password),
@@ -146,7 +136,7 @@ func RefreshManagerToken(c *gin.Context) (int, interface{}) {
 
 	tx := db.MySQL.Begin()
 	token := utils.GenerateToken()
-	if tx.Model(&Manager{}).Where(&Manager{Model: gorm.Model{ID: uint(id)}}).Update(&Manager{
+	if tx.Model(&db.Manager{}).Where(&db.Manager{Model: gorm.Model{ID: uint(id)}}).Update(&db.Manager{
 		Token: token,
 	}).RowsAffected != 1 {
 		tx.Rollback()
@@ -179,7 +169,7 @@ func ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 
 	tx := db.MySQL.Begin()
 	password := randstr.String(16)
-	if tx.Model(&Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Update(&Manager{
+	if tx.Model(&db.Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Update(&db.Manager{
 		Password: utils.AddSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
@@ -211,7 +201,7 @@ func DeleteManager(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := db.MySQL.Begin()
-	if tx.Model(&Manager{}).Where("id = ?", id).Delete(&Manager{}).RowsAffected != 1 {
+	if tx.Model(&db.Manager{}).Where("id = ?", id).Delete(&db.Manager{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50010,
 			locales.I18n.T(c.GetString("lang"), "manager.delete_error"),

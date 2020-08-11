@@ -2,8 +2,6 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vidar-team/Cardinal/internal/auth/manager"
-	"github.com/vidar-team/Cardinal/internal/auth/team"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
@@ -21,8 +19,8 @@ func TeamAuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		var tokenData team.Token
-		db.MySQL.Where(&team.Token{Token: token}).Find(&tokenData)
+		var tokenData db.Token
+		db.MySQL.Where(&db.Token{Token: token}).Find(&tokenData)
 		if tokenData.ID == 0 {
 			c.JSON(utils.MakeErrJSON(401, 40100,
 				locales.I18n.T(c.GetString("lang"), "general.no_auth"),
@@ -48,8 +46,8 @@ func AdminAuthRequired() gin.HandlerFunc {
 			return
 		}
 
-		var managerData manager.Manager
-		db.MySQL.Where(&manager.Manager{Token: token}).Find(&managerData)
+		var managerData db.Manager
+		db.MySQL.Where(&db.Manager{Token: token}).Find(&managerData)
 		if managerData.ID == 0 {
 			c.JSON(utils.MakeErrJSON(401, 40101,
 				locales.I18n.T(c.GetString("lang"), "general.no_auth"),

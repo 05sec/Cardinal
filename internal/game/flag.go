@@ -6,7 +6,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
-	"github.com/vidar-team/Cardinal/internal/auth/team"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/livelog"
@@ -20,30 +19,6 @@ import (
 	"sync"
 	"time"
 )
-
-// AttackAction is a gorm model for database table `attack_actions`.
-// Used to store the flag submitted record.
-type AttackAction struct {
-	gorm.Model
-
-	TeamID         uint // Victim's team ID
-	GameBoxID      uint // Victim's gamebox ID
-	ChallengeID    uint // Victim's challenge ID
-	AttackerTeamID uint // Attacker's Team ID
-	Round          int
-}
-
-// Flag is a gorm model for database table `flags`.
-// All the flags will be generated before the competition start and save in this table.
-type Flag struct {
-	gorm.Model
-
-	TeamID      uint
-	GameBoxID   uint
-	ChallengeID uint
-	Round       int
-	Flag        string
-}
 
 // SubmitFlag is submit flag handler for teams.
 func SubmitFlag(c *gin.Context) (int, interface{}) {
@@ -60,8 +35,8 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 			locales.I18n.T(c.GetString("lang"), "general.invalid_token"),
 		)
 	}
-	var t team.Team
-	db.MySQL.Model(&team.Team{}).Where(&team.Team{SecretKey: secretKey}).Find(&t)
+	var t db.Team
+	db.MySQL.Model(&db.Team{}).Where(&db.Team{SecretKey: secretKey}).Find(&t)
 	teamID := t.ID
 	if teamID == 0 {
 		return utils.MakeErrJSON(403, 40306,
@@ -83,17 +58,17 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 	// Remove the space
 	inputForm.Flag = strings.TrimSpace(inputForm.Flag)
 
-	var flagData Flag
-	db.MySQL.Model(&Flag{}).Where(&Flag{Flag: inputForm.Flag, Round: timer.Get().NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
-	if flagData.ID == 0 || teamID == flagData.TeamID {                                                      // 注意不允许提交自己的 flag
+	var flagData db.Flag
+	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{Flag: inputForm.Flag, Round: timer.Get().NowRound}).Find(&flagData) // 注意判断是否为本轮 Flag
+	if flagData.ID == 0 || teamID == flagData.TeamID {                                                            // 注意不允许提交自己的 flag
 		return utils.MakeErrJSON(403, 40307,
 			locales.I18n.T(c.GetString("lang"), "flag.wrong"),
 		)
 	}
 
 	// Check the challenge is visible or not.
-	var gamebox GameBox
-	db.MySQL.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}, Visible: true}).Find(&gamebox)
+	var gamebox db.GameBox
+	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: flagData.GameBoxID}, Visible: true}).Find(&gamebox)
 	if gamebox.ID == 0 {
 		return utils.MakeErrJSON(403, 40308,
 			locales.I18n.T(c.GetString("lang"), "flag.wrong"),
@@ -101,8 +76,8 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check if the flag has been submitted by the team before.
-	var repeatAttackCheck AttackAction
-	db.MySQL.Model(&AttackAction{}).Where(&AttackAction{
+	var repeatAttackCheck db.AttackAction
+	db.MySQL.Model(&db.AttackAction{}).Where(&db.AttackAction{
 		TeamID:         flagData.TeamID,
 		GameBoxID:      flagData.GameBoxID,
 		AttackerTeamID: teamID,
@@ -115,11 +90,11 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 	}
 
 	// Update the victim's gamebox status to `down`.
-	db.MySQL.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&GameBox{IsAttacked: true})
+	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&db.GameBox{IsAttacked: true})
 
 	// Save this attack record.
 	tx := db.MySQL.Begin()
-	if tx.Create(&AttackAction{
+	if tx.Create(&db.AttackAction{
 		TeamID:         flagData.TeamID,
 		GameBoxID:      flagData.GameBoxID,
 		AttackerTeamID: teamID,
@@ -141,11 +116,11 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 	asteroid.SendAttack(int(teamID), int(flagData.TeamID))
 
 	// Get attack team data
-	var flagTeam team.Team
-	db.MySQL.Model(&team.Team{}).Where(&team.Team{Model: gorm.Model{ID: flagData.TeamID}}).Find(&flagTeam)
+	var flagTeam db.Team
+	db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: flagData.TeamID}}).Find(&flagTeam)
 	// Get challenge data
-	var challenge Challenge
-	db.MySQL.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: flagData.ChallengeID}}).Find(&challenge)
+	var challenge db.Challenge
+	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: flagData.ChallengeID}}).Find(&challenge)
 	// Live log
 	_ = livelog.Stream.Write(livelog.GlobalStream, livelog.NewLine("submit_flag",
 		gin.H{"From": t.Name, "To": flagTeam.Name, "Challenge": challenge.Title}))
@@ -173,10 +148,10 @@ func GetFlags(c *gin.Context) (int, interface{}) {
 	}
 
 	var total int
-	db.MySQL.Model(&Flag{}).Count(&total)
+	db.MySQL.Model(&db.Flag{}).Count(&total)
 
-	var flags []Flag
-	db.MySQL.Model(&Flag{}).Offset((page - 1) * per).Limit(per).Find(&flags)
+	var flags []db.Flag
+	db.MySQL.Model(&db.Flag{}).Offset((page - 1) * per).Limit(per).Find(&flags)
 
 	return utils.MakeSuccessJSON(gin.H{
 		"array": flags,
@@ -195,19 +170,19 @@ func ExportFlag(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var flags []Flag
-	db.MySQL.Model(&Flag{}).Where(&Flag{ChallengeID: uint(challengeID)}).Find(&flags)
+	var flags []db.Flag
+	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{ChallengeID: uint(challengeID)}).Find(&flags)
 	return utils.MakeSuccessJSON(flags)
 }
 
 // GenerateFlag is the generate flag handler for manager.
 func GenerateFlag(c *gin.Context) (int, interface{}) {
-	var gameBoxes []GameBox
-	db.MySQL.Model(&GameBox{}).Find(&gameBoxes)
+	var gameBoxes []db.GameBox
+	db.MySQL.Model(&db.GameBox{}).Find(&gameBoxes)
 
 	startTime := time.Now().UnixNano()
 	// Delete all the flags in the table.
-	db.MySQL.Unscoped().Delete(&Flag{})
+	db.MySQL.Unscoped().Delete(&db.Flag{})
 
 	flagPrefix := dynamic_config.Get(utils.FLAG_PREFIX_CONF)
 	flagSuffix := dynamic_config.Get(utils.FLAG_SUFFIX_CONF)
@@ -217,7 +192,7 @@ func GenerateFlag(c *gin.Context) (int, interface{}) {
 		// Flag = FlagPrefix + hmacSha1(TeamID + | + GameBoxID + | + Round, sha1(salt)) + FlagSuffix
 		for _, gameBox := range gameBoxes {
 			flag := flagPrefix + utils.HmacSha1Encode(fmt.Sprintf("%d|%d|%d", gameBox.TeamID, gameBox.ID, round), salt) + flagSuffix
-			db.MySQL.Create(&Flag{
+			db.MySQL.Create(&db.Flag{
 				TeamID:      gameBox.TeamID,
 				GameBoxID:   gameBox.ID,
 				ChallengeID: gameBox.ChallengeID,
@@ -228,7 +203,7 @@ func GenerateFlag(c *gin.Context) (int, interface{}) {
 	}
 
 	var count int
-	db.MySQL.Model(&Flag{}).Count(&count)
+	db.MySQL.Model(&db.Flag{}).Count(&count)
 	endTime := time.Now().UnixNano()
 	logger.New(logger.WARNING, "system",
 		string(locales.I18n.T(c.GetString("lang"), "log.generate_flag", gin.H{"total": count, "time": float64(endTime-startTime) / float64(time.Second)})),
@@ -239,17 +214,17 @@ func GenerateFlag(c *gin.Context) (int, interface{}) {
 // RefreshFlag refreshes all the flags in current round.
 func RefreshFlag() {
 	// Get the auto refresh flag challenges.
-	var challenges []Challenge
-	db.MySQL.Model(&Challenge{}).Where(&Challenge{AutoRefreshFlag: true}).Find(&challenges)
+	var challenges []db.Challenge
+	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{AutoRefreshFlag: true}).Find(&challenges)
 
 	for _, challenge := range challenges {
-		var gameboxes []GameBox
-		db.MySQL.Model(&GameBox{}).Where(&GameBox{ChallengeID: challenge.ID}).Find(&gameboxes)
+		var gameboxes []db.GameBox
+		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{ChallengeID: challenge.ID}).Find(&gameboxes)
 
 		for _, gamebox := range gameboxes {
-			go func(gamebox GameBox, challenge Challenge) {
-				var flag Flag
-				db.MySQL.Model(&Flag{}).Where(&Flag{
+			go func(gamebox db.GameBox, challenge db.Challenge) {
+				var flag db.Flag
+				db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
 					TeamID:    gamebox.TeamID,
 					GameBoxID: gamebox.ID,
 					Round:     timer.Get().NowRound,
@@ -268,8 +243,8 @@ func RefreshFlag() {
 }
 
 func TestAllSSH(c *gin.Context) (int, interface{}) {
-	var challenges []Challenge
-	db.MySQL.Model(&Challenge{}).Where(&Challenge{AutoRefreshFlag: true}).Find(&challenges)
+	var challenges []db.Challenge
+	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{AutoRefreshFlag: true}).Find(&challenges)
 
 	type errorMessage struct {
 		TeamID      uint
@@ -281,12 +256,12 @@ func TestAllSSH(c *gin.Context) (int, interface{}) {
 
 	wg := sync.WaitGroup{}
 	for _, challenge := range challenges {
-		var gameboxes []GameBox
-		db.MySQL.Model(&GameBox{}).Where(&GameBox{ChallengeID: challenge.ID}).Find(&gameboxes)
+		var gameboxes []db.GameBox
+		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{ChallengeID: challenge.ID}).Find(&gameboxes)
 
 		for _, gamebox := range gameboxes {
 			wg.Add(1)
-			go func(gamebox GameBox, challenge Challenge) {
+			go func(gamebox db.GameBox, challenge db.Challenge) {
 				defer wg.Done()
 				_, err := utils.SSHExecute(gamebox.IP, gamebox.SSHPort, gamebox.SSHUser, gamebox.SSHPassword, "whoami")
 				if err != nil {
@@ -324,4 +299,10 @@ func TestSSH(c *gin.Context) (int, interface{}) {
 		return utils.MakeErrJSON(400, 40037, err)
 	}
 	return utils.MakeSuccessJSON(output)
+}
+
+func GetLatestScoreRound() int {
+	var latestScore db.Score
+	db.MySQL.Model(&db.Score{}).Order("`round` DESC").Limit(1).Find(&latestScore)
+	return latestScore.Round
 }

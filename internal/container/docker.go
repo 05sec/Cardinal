@@ -96,8 +96,8 @@ func DeployFromDocker(c *gin.Context) (int, interface{}) {
 	// Pre-check
 
 	// challenge exist
-	var chall challenge.Challenge
-	db.MySQL.Model(&challenge.Challenge{}).Where(&challenge.Challenge{Model: gorm.Model{ID: form.Challenge}}).Find(&chall)
+	var chall db.Challenge
+	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: form.Challenge}}).Find(&chall)
 	if chall.ID == 0 {
 		return utils.MakeErrJSON(404, 40406, "payload error")
 	}

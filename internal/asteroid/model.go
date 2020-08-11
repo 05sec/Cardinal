@@ -1,16 +1,14 @@
 package asteroid
 
-import "github.com/vidar-team/Cardinal/internal/auth/team"
-
-// greet will been sent when the client connect to the server firstly.
-type greet struct {
+// Greet will been sent when the client connect to the server firstly.
+type Greet struct {
 	Title string
 	Time  int
 	Round int
-	Team  []spaceShip
+	Team  []Team
 }
 
-type spaceShip struct {
+type Team struct {
 	Id    int
 	Name  string
 	Rank  int
@@ -29,7 +27,7 @@ type attack struct {
 }
 
 type rank struct {
-	Team []team.Team
+	Team []Team
 }
 
 type status struct {

@@ -9,26 +9,10 @@ import (
 	"strconv"
 )
 
-// Bulletin is a gorm model for database table `bulletins`.
-type Bulletin struct {
-	gorm.Model
-
-	Title   string
-	Content string
-}
-
-// BulletinRead gorm model, used to store the bulletin is read by a team.
-type BulletinRead struct {
-	gorm.Model
-
-	TeamID     uint
-	BulletinID uint
-}
-
 // GetAllBulletins returns all bulletins from the database.
 func GetAllBulletins(c *gin.Context) (int, interface{}) {
-	var bulletins []Bulletin
-	db.MySQL.Model(&Bulletin{}).Order("`id` DESC").Find(&bulletins)
+	var bulletins []db.Bulletin
+	db.MySQL.Model(&db.Bulletin{}).Order("`id` DESC").Find(&bulletins)
 	return utils.MakeSuccessJSON(bulletins)
 }
 
@@ -47,7 +31,7 @@ func NewBulletin(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := db.MySQL.Begin()
-	if tx.Create(&Bulletin{
+	if tx.Create(&db.Bulletin{
 		Title:   inputForm.Title,
 		Content: inputForm.Content,
 	}).RowsAffected != 1 {
@@ -75,20 +59,20 @@ func EditBulletin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkBulletin Bulletin
-	db.MySQL.Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
+	var checkBulletin db.Bulletin
+	db.MySQL.Where(&db.Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
 		return utils.MakeErrJSON(404, 40404,
 			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
 
-	newBulletin := &Bulletin{
+	newBulletin := &db.Bulletin{
 		Title:   inputForm.Title,
 		Content: inputForm.Content,
 	}
 	tx := db.MySQL.Begin()
-	if tx.Model(&Bulletin{}).Where(&Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
+	if tx.Model(&db.Bulletin{}).Where(&db.Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50020,
 			locales.I18n.T(c.GetString("lang"), "bulletin.put_error"),
@@ -114,8 +98,8 @@ func DeleteBulletin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkBulletin Bulletin
-	db.MySQL.Where(&Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
+	var checkBulletin db.Bulletin
+	db.MySQL.Where(&db.Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
 		return utils.MakeErrJSON(404, 40404,
 			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
@@ -123,7 +107,7 @@ func DeleteBulletin(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := db.MySQL.Begin()
-	if tx.Where("id = ?", id).Delete(&Bulletin{}).RowsAffected != 1 {
+	if tx.Where("id = ?", id).Delete(&db.Bulletin{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50021,
 			locales.I18n.T(c.GetString("lang"), "bulletin.delete_error"),

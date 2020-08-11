@@ -39,7 +39,7 @@ func (c *client) writePump() {
 	// Init message
 	initData, _ := json.Marshal(&unityData{
 		Type: INIT,
-		Data: makeGreetMessage(),
+		Data: refresh(),
 	})
 	c.send <- initData
 

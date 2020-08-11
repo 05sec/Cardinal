@@ -15,6 +15,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/container"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
+	"github.com/vidar-team/Cardinal/internal/healthy"
 	"github.com/vidar-team/Cardinal/internal/livelog"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
@@ -174,7 +175,7 @@ func Init() *gin.Engine {
 		managerRouter.GET("/rank", func(c *gin.Context) {
 			c.JSON(utils.MakeSuccessJSON(gin.H{"Title": game.GetRankListTitle(), "Rank": game.GetManagerRankList()}))
 		})
-		managerRouter.GET("/panel", __(logger.Panel))
+		managerRouter.GET("/panel", __(healthy.Panel))
 
 		// WebHook
 		managerRouter.GET("/webhooks", __(webhook.GetWebHook))

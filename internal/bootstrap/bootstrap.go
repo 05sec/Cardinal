@@ -5,8 +5,10 @@ import (
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
+	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/livelog"
 	"github.com/vidar-team/Cardinal/internal/misc"
+	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/route"
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
@@ -29,12 +31,14 @@ func LinkStart() {
 
 	// Game timer.
 	timer.Init()
+	gameToTimerBridge()
 
 	// Cache
 	store.Init()
+	webhook.RefreshWebHookStore()
 
 	// Unity3D Asteroid
-	asteroid.Init()
+	asteroid.Init(game.AsteroidGreetData)
 
 	// Live log
 	livelog.Init()

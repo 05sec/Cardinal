@@ -4,25 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/auth/team"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/healthy"
 	"github.com/vidar-team/Cardinal/internal/logger"
-	"github.com/vidar-team/Cardinal/internal/misc"
 	"github.com/vidar-team/Cardinal/locales"
 	"time"
 )
-
-// Score is a gorm model for database table `scores`.
-// Every action (checkdown, attacked...) will be created a score record, and the total score will be calculated by SUM(`score`).
-type Score struct {
-	gorm.Model
-
-	TeamID    uint
-	GameBoxID uint
-	Round     int
-	Reason    string
-	Score     float64 `gorm:"index"`
-}
 
 // CalculateRoundScore will calculate the score of the given round.
 func CalculateRoundScore(round int) {
@@ -58,56 +45,56 @@ func CalculateRoundScore(round int) {
 	))
 
 	// Do healthy check to make sure the score is correct.
-	misc.HealthyCheck()
+	healthy.HealthyCheck()
 }
 
 // calculateGameBoxScore will calculate all the gameboxes' scores according to the data in scores table.
 func calculateGameBoxScore() {
-	var gameBoxes []GameBox
-	db.MySQL.Model(&GameBox{}).Find(&gameBoxes)
+	var gameBoxes []db.GameBox
+	db.MySQL.Model(&db.GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
 		var sc struct {
 			Score float64 `gorm:"Column:Score"`
 		}
 		db.MySQL.Table("scores").Select("SUM(score) AS Score").Where("`game_box_id` = ?", gameBox.ID).Scan(&sc)
 
-		var challenge Challenge
-		db.MySQL.Model(&Challenge{}).Where(&Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                  // Get the gamebox's base score.
-		db.MySQL.Model(&GameBox{}).Where(&GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&Score{Score: float64(challenge.BaseScore) + sc.Score}) // Update the gamebox's score.
+		var challenge db.Challenge
+		db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                     // Get the gamebox's base score.
+		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&db.Score{Score: float64(challenge.BaseScore) + sc.Score}) // Update the gamebox's score.
 	}
 }
 
 // calculateTeamScore will Calculate all the teams' score. (By sum the team's gameboxes' scores)
 func calculateTeamScore() {
-	var teams []team.Team
-	db.MySQL.Model(&team.Team{}).Find(&teams)
+	var teams []db.Team
+	db.MySQL.Model(&db.Team{}).Find(&teams)
 	for _, t := range teams {
 		var sc struct {
 			Score float64 `gorm:"Column:Score"`
 		}
 		db.MySQL.Table("game_boxes").Select("SUM(score) AS Score").Where("`team_id` = ? AND `visible` = ?", t.ID, 1).Scan(&sc)
-		db.MySQL.Model(&team.Team{}).Where(&team.Team{Model: gorm.Model{ID: t.ID}}).Update(&team.Team{Score: sc.Score})
+		db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: t.ID}}).Update(&db.Team{Score: sc.Score})
 	}
 }
 
 // addAttack will add scores to the attacker.
 func addAttack(round int) {
 	// Traversal all the gameboxes.
-	var gameBoxes []GameBox
-	db.MySQL.Model(&GameBox{}).Find(&gameBoxes)
+	var gameBoxes []db.GameBox
+	db.MySQL.Model(&db.GameBox{}).Find(&gameBoxes)
 	for _, gameBox := range gameBoxes {
 		// This gamebox has been attacked or not.
-		var attackActions []AttackAction
-		db.MySQL.Model(&AttackAction{}).Where(&AttackAction{GameBoxID: gameBox.ID, Round: round}).Find(&attackActions)
+		var attackActions []db.AttackAction
+		db.MySQL.Model(&db.AttackAction{}).Where(&db.AttackAction{GameBoxID: gameBox.ID, Round: round}).Find(&attackActions)
 		if len(attackActions) != 0 {
 			score := float64(conf.Get().AttackScore) / float64(len(attackActions)) // Score which every attacker can get from this gamebox.
 			// Add score to the attackers.
 			for _, action := range attackActions {
 				// Get the attacker's gamebox ID of this challenge.
-				var attackerGameBox GameBox
-				db.MySQL.Model(&GameBox{}).Where(&GameBox{TeamID: action.AttackerTeamID, ChallengeID: gameBox.ChallengeID}).Find(&attackerGameBox)
+				var attackerGameBox db.GameBox
+				db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{TeamID: action.AttackerTeamID, ChallengeID: gameBox.ChallengeID}).Find(&attackerGameBox)
 
-				db.MySQL.Create(&Score{
+				db.MySQL.Create(&db.Score{
 					TeamID:    action.AttackerTeamID,
 					GameBoxID: attackerGameBox.ID,
 					Round:     round,
@@ -127,10 +114,10 @@ func minusAttack(round int) {
 	}
 
 	// Every gamebox can only be deducted once in one round.
-	db.MySQL.Table("attack_actions").Select("DISTINCT(`game_box_id`) AS game_box_id, team_id").Where(&AttackAction{Round: round}).Scan(&attackActions)
+	db.MySQL.Table("attack_actions").Select("DISTINCT(`game_box_id`) AS game_box_id, team_id").Where(&db.AttackAction{Round: round}).Scan(&attackActions)
 
 	for _, action := range attackActions {
-		db.MySQL.Create(&Score{
+		db.MySQL.Create(&db.Score{
 			TeamID:    action.TeamID,
 			GameBoxID: action.GameBoxID,
 			Round:     round,
@@ -143,11 +130,11 @@ func minusAttack(round int) {
 // minusCheckDown will minus scores from the service down gameboxes.
 func minusCheckDown(round int) {
 	// Get all the DownAction of this round.
-	var downActions []DownAction
-	db.MySQL.Model(&DownAction{}).Where(&DownAction{Round: round}).Find(&downActions)
+	var downActions []db.DownAction
+	db.MySQL.Model(&db.DownAction{}).Where(&db.DownAction{Round: round}).Find(&downActions)
 
 	for _, action := range downActions {
-		db.MySQL.Create(&Score{
+		db.MySQL.Create(&db.Score{
 			TeamID:    action.TeamID,
 			GameBoxID: action.GameBoxID,
 			Round:     round,
@@ -160,12 +147,12 @@ func minusCheckDown(round int) {
 // addCheckDown will add scores to the service online gameboxes.
 func addCheckDown(round int) {
 	// Traversal all the challenges.
-	var challenges []Challenge
-	db.MySQL.Model(&Challenge{}).Find(&challenges)
+	var challenges []db.Challenge
+	db.MySQL.Model(&db.Challenge{}).Find(&challenges)
 	for _, challenge := range challenges {
 		// Get the check down teams of this challenge.
-		var downActions []DownAction
-		db.MySQL.Model(&DownAction{}).Where(&DownAction{ChallengeID: challenge.ID, Round: round}).Find(&downActions)
+		var downActions []db.DownAction
+		db.MySQL.Model(&db.DownAction{}).Where(&db.DownAction{ChallengeID: challenge.ID, Round: round}).Find(&downActions)
 		totalScore := len(downActions) * conf.Get().CheckDownScore // Score which every online team can get from this challenge.
 
 		// Get the service online teams' Gamebox ID of this challenge.
@@ -176,13 +163,13 @@ func addCheckDown(round int) {
 		}
 
 		// Then, get the service online Gamebox ID. (Process of elimination)
-		var safeGameBoxes []GameBox
-		db.MySQL.Model(&GameBox{}).Where(&GameBox{ChallengeID: challenge.ID}).Not("id", downGameBoxID).Find(&safeGameBoxes)
+		var safeGameBoxes []db.GameBox
+		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{ChallengeID: challenge.ID}).Not("id", downGameBoxID).Find(&safeGameBoxes)
 		score := float64(totalScore) / float64(len(safeGameBoxes))
 
 		// Well, add score!
 		for _, gamebox := range safeGameBoxes {
-			db.MySQL.Create(&Score{
+			db.MySQL.Create(&db.Score{
 				TeamID:    gamebox.TeamID,
 				GameBoxID: gamebox.ID,
 				Round:     round,

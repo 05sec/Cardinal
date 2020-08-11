@@ -5,8 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
-	"github.com/vidar-team/Cardinal/internal/db"
-	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -117,8 +115,8 @@ func timerProcess() {
 	lastRoundCalculate := false // A sign for the last round score calculate.
 
 	{
-		game.SetRankListTitle() // Refresh ranking list table header.
-		game.SetRankList()
+		SetRankListTitle() // Refresh ranking list table header.
+		SetRankList()
 	}
 
 	for {
@@ -169,21 +167,20 @@ func timerProcess() {
 					go webhook.Add(webhook.BEGIN_HOOK, t.NowRound)
 
 					// Clean the status of the gameboxes.
-					db.MySQL.Model(&game.GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
-					go game.SetRankList()
+					CleanGameBoxStatus()
+					SetRankList()
 
 					// Calculate scores.
 					// Get the latest score record.
-					var latestScore game.Score
-					db.MySQL.Model(&game.Score{}).Order("`round` DESC").Limit(1).Find(&latestScore)
+					latestScoreRound := GetLatestScoreRound()
 
 					// If Cardinal has been restart by unexpected error, get the latest round score and chick if need calculate the scores of previous round.
-					if latestScore.Round < t.NowRound-1 {
-						go game.CalculateRoundScore(t.NowRound - 1)
+					if latestScoreRound < t.NowRound-1 {
+						CalculateRoundScore(t.NowRound - 1)
 					}
 
 					// Auto refresh flag
-					go game.RefreshFlag()
+					RefreshFlag()
 
 					// Asteroid Unity3D refresh.
 					asteroid.NewRoundAction()
@@ -200,7 +197,7 @@ func timerProcess() {
 			// Calculate the score of the last round when the competition is over.
 			if !lastRoundCalculate {
 				lastRoundCalculate = true
-				go game.CalculateRoundScore(t.TotalRound)
+				go CalculateRoundScore(t.TotalRound)
 				// Game over hook
 				go webhook.Add(webhook.END_HOOK, nil)
 				logger.New(logger.IMPORTANT, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "timer.end")))

@@ -11,26 +11,6 @@ import (
 	"strconv"
 )
 
-// Token is a gorm model for database table `tokens`.
-// It used to store team token.
-type Token struct {
-	gorm.Model
-
-	TeamID uint
-	Token  string
-}
-
-// Team is a gorm model for database table `teams`.
-type Team struct {
-	gorm.Model
-
-	Name      string
-	Password  string `json:"-"`
-	Logo      string
-	Score     float64
-	SecretKey string
-}
-
 // TeamLogin is the team login handler.
 func TeamLogin(c *gin.Context) (int, interface{}) {
 	type TeamLoginForm struct {
@@ -46,14 +26,14 @@ func TeamLogin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var team Team
-	db.MySQL.Where(&Team{Name: formData.Name}).Find(&team)
+	var team db.Team
+	db.MySQL.Where(&db.Team{Name: formData.Name}).Find(&team)
 	if team.Name != "" && utils.CheckPassword(formData.Password, team.Password) {
 		// Login successfully
 		token := utils.GenerateToken()
 
 		tx := db.MySQL.Begin()
-		if tx.Create(&Token{TeamID: team.ID, Token: token}).RowsAffected != 1 {
+		if tx.Create(&db.Token{TeamID: team.ID, Token: token}).RowsAffected != 1 {
 			tx.Rollback()
 			return utils.MakeErrJSON(500, 50000,
 				locales.I18n.T(c.GetString("lang"), "general.server_error"),
@@ -71,7 +51,7 @@ func TeamLogin(c *gin.Context) (int, interface{}) {
 func TeamLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
 	if token != "" {
-		db.MySQL.Model(&Token{}).Where("token = ?", token).Delete(&Token{})
+		db.MySQL.Model(&db.Token{}).Where("token = ?", token).Delete(&db.Token{})
 	}
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "team.logout_success"))
 }
@@ -85,11 +65,11 @@ func GetTeamInfo(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var teamInfo Team
+	var teamInfo db.Team
 	rank := 0
-	var teams []Team
+	var teams []db.Team
 
-	db.MySQL.Model(&Team{}).Order("`score` DESC").Find(&teams)
+	db.MySQL.Model(&db.Team{}).Order("`score` DESC").Find(&teams)
 	// Get the team rank by its index.
 	for index, t := range teams {
 		if teamID.(uint) == t.ID {
@@ -110,8 +90,8 @@ func GetTeamInfo(c *gin.Context) (int, interface{}) {
 
 // GetAllTeams returns all the teams info for manager.
 func GetAllTeams(c *gin.Context) (int, interface{}) {
-	var teams []Team
-	db.MySQL.Model(&Team{}).Find(&teams)
+	var teams []db.Team
+	db.MySQL.Model(&db.Team{}).Find(&teams)
 	return utils.MakeSuccessJSON(teams)
 }
 
@@ -136,7 +116,7 @@ func NewTeams(c *gin.Context) (int, interface{}) {
 
 		// Check if the team name repeat in the database.
 		var count int
-		db.MySQL.Model(Team{}).Where(&Team{Name: item.Name}).Count(&count)
+		db.MySQL.Model(db.Team{}).Where(&db.Team{Name: item.Name}).Count(&count)
 		if count != 0 {
 			return utils.MakeErrJSON(400, 40002,
 				locales.I18n.T(c.GetString("lang"), "team.repeat"),
@@ -165,7 +145,7 @@ func NewTeams(c *gin.Context) (int, interface{}) {
 	teamName := "" // Log
 	for _, item := range inputForm {
 		password := randstr.String(16)
-		newTeam := &Team{
+		newTeam := &db.Team{
 			Name:      item.Name,
 			Password:  utils.AddSalt(password),
 			Logo:      item.Logo,
@@ -211,7 +191,7 @@ func EditTeam(c *gin.Context) (int, interface{}) {
 
 	// Check the team existed or not.
 	var count int
-	db.MySQL.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
+	db.MySQL.Model(db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
 	if count == 0 {
 		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
@@ -219,8 +199,8 @@ func EditTeam(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check the team name repeated or not.
-	var repeatCheckTeam Team
-	db.MySQL.Model(Team{}).Where(&Team{Name: inputForm.Name}).Find(&repeatCheckTeam)
+	var repeatCheckTeam db.Team
+	db.MySQL.Model(db.Team{}).Where(&db.Team{Name: inputForm.Name}).Find(&repeatCheckTeam)
 	if repeatCheckTeam.Name != "" && repeatCheckTeam.ID != inputForm.ID {
 		return utils.MakeErrJSON(400, 40004,
 			locales.I18n.T(c.GetString("lang"), "team.repeat"),
@@ -228,7 +208,7 @@ func EditTeam(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := db.MySQL.Begin()
-	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(gin.H{
+	if tx.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(gin.H{
 		"Name": inputForm.Name,
 		"Logo": inputForm.Logo,
 	}).RowsAffected != 1 {
@@ -257,8 +237,8 @@ func DeleteTeam(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var team Team
-	db.MySQL.Where(&Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
+	var team db.Team
+	db.MySQL.Where(&db.Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
 	if team.Name == "" {
 		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
@@ -266,7 +246,7 @@ func DeleteTeam(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := db.MySQL.Begin()
-	if tx.Where("id = ?", uint(id)).Delete(&Team{}).RowsAffected != 1 {
+	if tx.Where("id = ?", uint(id)).Delete(&db.Team{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50004,
 			locales.I18n.T(c.GetString("lang"), "team.delete_error"),
@@ -296,8 +276,8 @@ func ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check the team existed or not.
-	var checkTeam Team
-	db.MySQL.Model(Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
+	var checkTeam db.Team
+	db.MySQL.Model(db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
 	if checkTeam.Name == "" {
 		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
@@ -306,7 +286,7 @@ func ResetTeamPassword(c *gin.Context) (int, interface{}) {
 
 	newPassword := randstr.String(16)
 	tx := db.MySQL.Begin()
-	if tx.Model(&Team{}).Where(&Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&Team{Password: utils.AddSalt(newPassword)}).RowsAffected != 1 {
+	if tx.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&db.Team{Password: utils.AddSalt(newPassword)}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50005,
 			locales.I18n.T(c.GetString("lang"), "team.reset_password_error"),

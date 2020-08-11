@@ -3,7 +3,6 @@ package game
 import (
 	"github.com/patrickmn/go-cache"
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/auth/team"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/store"
@@ -83,12 +82,12 @@ func SetRankList() {
 	var rankList []*RankItem
 	var managerRankList []*RankItem
 
-	var teams []team.Team
-	db.MySQL.Model(&team.Team{}).Order("score DESC").Find(&teams) // Ordered by the team score.
+	var teams []db.Team
+	db.MySQL.Model(&db.Team{}).Order("score DESC").Find(&teams) // Ordered by the team score.
 	for _, team := range teams {
-		var gameboxes []GameBox
+		var gameboxes []db.GameBox
 		// Get the challenge data ordered by the challenge ID, to make sure the table header can match with the score correctly.
-		db.MySQL.Model(&GameBox{}).Where(&GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes)
+		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes)
 		var gameBoxInfo []*GameBoxInfo       // Gamebox info for manager.
 		var gameBoxStatuses []*GameBoxStatus // Gamebox info for users and public.
 

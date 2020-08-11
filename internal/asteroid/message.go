@@ -1,13 +1,5 @@
 package asteroid
 
-import (
-	"github.com/vidar-team/Cardinal/internal/auth/team"
-	"github.com/vidar-team/Cardinal/internal/db"
-	"github.com/vidar-team/Cardinal/internal/dynamic_config"
-	"github.com/vidar-team/Cardinal/internal/timer"
-	"github.com/vidar-team/Cardinal/internal/utils"
-)
-
 const (
 	INIT      = "init"
 	ATTACK    = "attack"
@@ -21,9 +13,11 @@ const (
 )
 
 var hub *Hub
+var refresh func() Greet // Used to get title, team, score, time data.
 
 // Init is used to init the asteroid. A function will be given to get the team rank data.
-func Init() {
+func Init(function func() Greet) {
+	refresh = function
 	hub = newHub()
 
 	// Start to handle the request.
@@ -35,8 +29,8 @@ func Init() {
 func NewRoundAction() {
 	sendRank()
 	sendClearAll()
-	sendRound(timer.Get().NowRound)
-	sendTime(timer.Get().RoundRemainTime)
+	sendRound(refresh().Round)
+	sendTime(refresh().Time)
 }
 
 // SendStatus sends the teams' status message.
@@ -49,27 +43,6 @@ func SendAttack(from int, to int) {
 	sendAttack(from, to)
 }
 
-func makeGreetMessage() greet {
-	var teams []team.Team
-	db.MySQL.Model(&team.Team{}).Order("score DESC").Find(&teams)
-	ships := make([]spaceShip, 0, len(teams))
-	for rank, team := range teams {
-		ships = append(ships, spaceShip{
-			Id:    int(team.ID),
-			Name:  team.Name,
-			Rank:  rank,
-			Image: team.Logo,
-			Score: int(team.Score),
-		})
-	}
-	return greet{
-		Title: dynamic_config.Get(utils.TITLE_CONF),
-		Time:  timer.Get().RoundRemainTime,
-		Round: timer.Get().NowRound,
-		Team:  ships,
-	}
-}
-
 // sendAttack sends an attack action message.
 func sendAttack(from int, to int) {
 	hub.sendMessage(ATTACK, attack{
@@ -80,9 +53,7 @@ func sendAttack(from int, to int) {
 
 // sendRank sends the team rank list message.
 func sendRank() {
-	var teams []team.Team
-	db.MySQL.Model(&team.Team{}).Order("score DESC").Find(&teams)
-	hub.sendMessage(RANK, rank{Team: teams})
+	hub.sendMessage(RANK, rank{Team: refresh().Team})
 }
 
 // sendStatus sends the teams' status message.
