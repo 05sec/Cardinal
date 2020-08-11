@@ -12,7 +12,6 @@ type Config struct {
 
 // Base is the basic config of the cardinal.
 type Base struct {
-	Title            string
 	SystemLanguage   string
 	BeginTime        time.Time
 	RestTime         [][]time.Time
@@ -22,8 +21,6 @@ type Base struct {
 	Sentry           bool
 	Port             string
 	Salt             string
-	FlagPrefix       string
-	FlagSuffix       string
 	CheckDownScore   int
 	AttackScore      int
 }

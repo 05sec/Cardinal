@@ -32,7 +32,7 @@ func (s *Service) init() {
 	s.initMySQL()
 
 	// Refresh the dynamic config from the database.
-	s.RefreshConfig()
+	s.initDynamicConfig()
 
 	// Unity3D Asteroid
 	asteroid.InitAsteroid(s.asteroidGreetData)

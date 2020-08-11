@@ -14,46 +14,45 @@ type DynamicConfig struct {
 
 	Key   string
 	Value string
+	Kind  int8
+}
+
+func (s *Service) initDynamicConfig() {
+	s.initConfig(utils.TITLE_CONF, "HCTF", utils.STRING)
+	s.initConfig(utils.FLAG_PREFIX_CONF, "hctf{", utils.STRING)
+	s.initConfig(utils.FLAG_SUFFIX_CONF, "}", utils.STRING)
+	s.initConfig(utils.ANIMATE_ASTEROID, utils.BOOLEAN_FALSE, utils.BOOLEAN)
+	s.initConfig(utils.SHOW_OTHERS_GAMEBOX, utils.BOOLEAN_FALSE, utils.BOOLEAN)
 }
 
 // initConfig set the default value of the given key.
 // Always used in installation.
-func (s *Service) initConfig(key string, value string) {
-	var count int
-	s.Mysql.Model(&DynamicConfig{}).Where("key = ?", key).Count(&count)
-	if count != 0 {
-		return
-	}
-
-	tx := s.Mysql.Begin()
-	if tx.Model(&DynamicConfig{}).Where("key = ?", key).Update(&DynamicConfig{
+func (s *Service) initConfig(key string, value string, kind int8) {
+	s.Mysql.Model(&DynamicConfig{}).FirstOrCreate(&DynamicConfig{
 		Key:   key,
 		Value: value,
-	}).RowsAffected != 1 {
-		tx.Rollback()
-		return
-	}
-	tx.Commit()
+		Kind:  kind,
+	}, "`key` = ?", key)
 }
 
 // setConfig update the config by insert a new record into database, for we can make a config version control soon.
 // Then refresh the config in struct.
 func (s *Service) setConfig(key string, value string) {
-	s.Mysql.FirstOrCreate(&DynamicConfig{
+	s.Mysql.Model(&DynamicConfig{}).Where("`key` = ?", key).Update(&DynamicConfig{
 		Key:   key,
 		Value: value,
-	}, "key = ?", key)
+	})
 }
 
 // getConfig returns the config value.
 func (s *Service) getConfig(key string) string {
 	var config DynamicConfig
-	s.Mysql.Model(&DynamicConfig{}).Where("key = ?", key).Find(&config)
+	s.Mysql.Model(&DynamicConfig{}).Where("`key` = ?", key).Find(&config)
 	return config.Value
 }
 
 func (s *Service) setConfigHandler(c *gin.Context) (int, interface{}) {
-	var inputForm struct {
+	var inputForm []struct {
 		Key   string `binding:"required"`
 		Value string `binding:"required"`
 	}
@@ -61,7 +60,10 @@ func (s *Service) setConfigHandler(c *gin.Context) (int, interface{}) {
 	if err := c.BindJSON(&inputForm); err != nil {
 		return utils.MakeErrJSON(400, 40046, locales.I18n.T(c.GetString("lang"), "general.error_payload"))
 	}
-	s.setConfig(inputForm.Key, inputForm.Value)
+
+	for _, config := range inputForm {
+		s.setConfig(config.Key, config.Value)
+	}
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "config.update_success"))
 }
 
@@ -75,4 +77,10 @@ func (s *Service) getConfigHandler(c *gin.Context) (int, interface{}) {
 	}
 	value := s.getConfig(inputForm.Key)
 	return utils.MakeSuccessJSON(value)
+}
+
+func (s *Service) getAllConfigHandler(c *gin.Context) (int, interface{}) {
+	var config []DynamicConfig
+	s.Mysql.Model(&DynamicConfig{}).Find(&config)
+	return utils.MakeSuccessJSON(config)
 }

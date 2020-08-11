@@ -203,11 +203,14 @@ func (s *Service) GenerateFlag(c *gin.Context) (int, interface{}) {
 	// Delete all the flags in the table.
 	s.Mysql.Unscoped().Delete(&Flag{})
 
+	flagPrefix := s.getConfig(utils.FLAG_PREFIX_CONF)
+	flagSuffix := s.getConfig(utils.FLAG_SUFFIX_CONF)
+
 	salt := utils.Sha1Encode(conf.Get().Salt)
 	for round := 1; round <= s.Timer.TotalRound; round++ {
 		// Flag = FlagPrefix + hmacSha1(TeamID + | + GameBoxID + | + Round, sha1(salt)) + FlagSuffix
 		for _, gameBox := range gameBoxes {
-			flag := conf.Get().FlagPrefix + utils.HmacSha1Encode(fmt.Sprintf("%d|%d|%d", gameBox.TeamID, gameBox.ID, round), salt) + conf.Get().FlagSuffix
+			flag := flagPrefix + utils.HmacSha1Encode(fmt.Sprintf("%d|%d|%d", gameBox.TeamID, gameBox.ID, round), salt) + flagSuffix
 			s.Mysql.Create(&Flag{
 				TeamID:      gameBox.TeamID,
 				GameBoxID:   gameBox.ID,

@@ -42,7 +42,7 @@ func (s *Service) initRouter() *gin.Engine {
 
 	api.GET("/base", func(c *gin.Context) {
 		c.JSON(utils.MakeSuccessJSON(gin.H{
-			"Title": conf.Get().Title,
+			"Title": s.getConfig(utils.TITLE_CONF),
 		}))
 	})
 	api.GET("/time", func(c *gin.Context) {
@@ -276,6 +276,9 @@ func (s *Service) initRouter() *gin.Engine {
 		})
 
 		// Config
+		manager.GET("/configs", func(c *gin.Context) {
+			c.JSON(s.getAllConfigHandler(c))
+		})
 		manager.GET("/config", func(c *gin.Context) {
 			c.JSON(s.getConfigHandler(c))
 		})

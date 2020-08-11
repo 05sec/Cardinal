@@ -16,6 +16,7 @@ type Line struct {
 	Timestamp int64       `json:"Time"`
 }
 
+// NewLine creates a line.
 func NewLine(messageType string, message interface{}) *Line {
 	return &Line{
 		Type:      messageType,

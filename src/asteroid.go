@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/src/asteroid"
-	"github.com/vidar-team/Cardinal/src/conf"
 	"github.com/vidar-team/Cardinal/src/locales"
 	"github.com/vidar-team/Cardinal/src/utils"
 )
@@ -22,7 +21,7 @@ func (s *Service) asteroidGreetData() (result asteroid.Greet) {
 		})
 	}
 
-	result.Title = conf.Get().Title
+	result.Title = s.getConfig(utils.TITLE_CONF)
 	result.Team = asteroidTeam
 	result.Time = s.Timer.RoundRemainTime
 	result.Round = s.Timer.NowRound

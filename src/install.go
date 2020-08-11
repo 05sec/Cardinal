@@ -22,7 +22,6 @@ const DOCKER_ENV = "CARDINAL_DOCKER"
 
 const configTemplate = `
 [base]
-Title="{{ .Title }}"
 SystemLanguage="zh-CN"
 BeginTime="{{ .BeginTime }}"
 RestTime=[
@@ -36,9 +35,6 @@ Sentry={{ .Sentry }}
 Salt="{{ .Salt }}"
 
 Port=":{{ .Port }}"
-
-FlagPrefix="{{ .FlagPrefix }}"
-FlagSuffix="{{ .FlagSuffix }}"
 
 CheckDownScore={{ .CheckDownScore }}
 AttackScore={{ .AttackScore }}
@@ -120,14 +116,12 @@ func (s *Service) install() {
 // GenerateConfigFileGuide can lead the user to fill in the config file.
 func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 	input := struct {
-		Title, BeginTime, RestTime, EndTime, SeparateFrontend, Sentry, Duration, Port, Salt, FlagPrefix, FlagSuffix, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string
+		BeginTime, RestTime, EndTime, SeparateFrontend, Sentry, Duration, Port, Salt, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string
 	}{
 		SeparateFrontend: "false",
 		Sentry:           "true",
 		Duration:         "2",
 		Port:             "19999",
-		FlagPrefix:       "hctf{",
-		FlagSuffix:       "}",
 		CheckDownScore:   "50",
 		AttackScore:      "50",
 		DBHost:           "localhost:3306",
@@ -135,8 +129,6 @@ func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 	}
 
 	log.Println(locales.I18n.T(lang, "install.greet"))
-
-	utils.InputString(&input.Title, string(locales.I18n.T(lang, "install.input_title")))
 
 	var beginTime time.Time
 	err := errors.New("")
@@ -156,8 +148,6 @@ func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 
 	utils.InputString(&input.Duration, string(locales.I18n.T(lang, "install.duration")))
 	utils.InputString(&input.Port, string(locales.I18n.T(lang, "install.port")))
-	utils.InputString(&input.FlagPrefix, string(locales.I18n.T(lang, "install.flag_prefix")))
-	utils.InputString(&input.FlagSuffix, string(locales.I18n.T(lang, "install.flag_suffix")))
 	utils.InputString(&input.CheckDownScore, string(locales.I18n.T(lang, "install.checkdown_score")))
 	utils.InputString(&input.AttackScore, string(locales.I18n.T(lang, "install.attack_score")))
 	utils.InputString(&input.SeparateFrontend, string(locales.I18n.T(lang, "install.separate_frontend")))
