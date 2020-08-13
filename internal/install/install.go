@@ -48,7 +48,7 @@ DBPassword="{{ .DBPassword }}"
 DBName="{{ .DBName }}"
 `
 
-func install() {
+func Init() {
 	// Check `uploads` folder exist
 	if !utils.FileIsExist("./uploads") {
 		err := os.Mkdir("./uploads", os.ModePerm)

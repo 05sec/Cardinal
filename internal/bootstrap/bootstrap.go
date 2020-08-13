@@ -6,6 +6,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
+	"github.com/vidar-team/Cardinal/internal/install"
 	"github.com/vidar-team/Cardinal/internal/livelog"
 	"github.com/vidar-team/Cardinal/internal/misc"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
@@ -18,6 +19,7 @@ import (
 // LinkStart starts the Cardinal.
 func LinkStart() {
 	// Install
+	install.Init()
 
 	// Sentry
 	misc.Sentry()

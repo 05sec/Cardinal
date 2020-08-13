@@ -84,6 +84,12 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 		Round:          flagData.Round,
 	}).Find(&repeatAttackCheck)
 	if repeatAttackCheck.ID != 0 {
+		// Animate Asteroid
+		animateAsteroid, _ := strconv.ParseBool(dynamic_config.Get(utils.ANIMATE_ASTEROID))
+		if animateAsteroid {
+			asteroid.SendAttack(int(teamID), int(flagData.TeamID))
+		}
+
 		return utils.MakeErrJSON(403, 40309,
 			locales.I18n.T(c.GetString("lang"), "flag.repeat"),
 		)
