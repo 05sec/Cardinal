@@ -30,6 +30,9 @@ func LinkStart() {
 	// Init MySQL database.
 	db.InitMySQL()
 
+	// Check manager
+	install.InitManager()
+
 	// Refresh the dynamic config from the database.
 	dynamic_config.Init()
 

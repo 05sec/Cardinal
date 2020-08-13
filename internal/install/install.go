@@ -174,7 +174,7 @@ func GenerateConfigFileGuide(lang string) ([]byte, error) {
 	return wr.Bytes(), nil
 }
 
-func initManager() {
+func InitManager() {
 	var managerCount int
 	db.MySQL.Model(&db.Manager{}).Count(&managerCount)
 	if managerCount == 0 {
