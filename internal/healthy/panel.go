@@ -22,8 +22,8 @@ func Panel(c *gin.Context) (int, interface{}) {
 		"CheckDown":          checkDown,
 		"NumGoroutine":       runtime.NumGoroutine(),         // Goroutine number
 		"MemAllocated":       utils.FileSize(int64(m.Alloc)), // Allocated memory
-		"TotalScore":         totalScore(),
-		"PreviousRoundScore": previousRoundScore(),
+		"TotalScore":         TotalScore(),
+		"PreviousRoundScore": PreviousRoundScore(),
 		"Version":            utils.VERSION,
 		"CommitSHA":          utils.COMMIT_SHA,
 		"BuildTime":          utils.BUILD_TIME,
