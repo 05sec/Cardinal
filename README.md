@@ -86,7 +86,7 @@ chmod +x ./Cardinal
 ./Cardinal
 ```
 
-### Docker部署
+### Docker 部署
 
 首先请从 [docker 官网](https://docs.docker.com) 安装 `docker` 与 `docker-compose`
 
