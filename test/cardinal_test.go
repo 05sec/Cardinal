@@ -43,7 +43,7 @@ func prepare() {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	conf.Get()
+	conf.Init()
 
 	// Init MySQL database.
 	db.InitMySQL()

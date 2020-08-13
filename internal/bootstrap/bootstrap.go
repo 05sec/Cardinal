@@ -21,6 +21,9 @@ func LinkStart() {
 	// Install
 	install.Init()
 
+	// Config
+	conf.Init()
+
 	// Sentry
 	misc.Sentry()
 

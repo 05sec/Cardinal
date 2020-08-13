@@ -11,7 +11,7 @@ import (
 
 var conf *config
 
-func init() {
+func Init() {
 	if os.Getenv("TRAVIS") != "true" {
 		_, err := toml.DecodeFile("./conf/Cardinal.toml", &conf)
 		if err != nil {
