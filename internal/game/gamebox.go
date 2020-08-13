@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -197,6 +198,25 @@ func EditGameBox(c *gin.Context) (int, interface{}) {
 	tx.Commit()
 
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.put_success"))
+}
+
+// GetOthersGameBox returns the other teams' gameboxes if the config is set to true.
+func GetOthersGameBox(c *gin.Context) (int, interface{}) {
+	animateAsteroid, _ := strconv.ParseBool(dynamic_config.Get(utils.SHOW_OTHERS_GAMEBOX))
+	if !animateAsteroid {
+		return utils.MakeErrJSON(400, 40047, locales.I18n.T(c.GetString("lang"), "general.no_auth"))
+	}
+	var gameboxs []struct {
+		ID            uint
+		ChallengeName string
+		TeamName      string
+		IP            string
+		Port          string
+	}
+	db.MySQL.Raw("SELECT `game_boxes`.`id`, `game_boxes`.`ip`,`game_boxes`.`port`, `challenges`.`title` AS challenge_name, `teams`.`name` AS team_name " +
+		"FROM `game_boxes`, `teams`, `challenges` " +
+		"WHERE `game_boxes`.`visible` = 1 AND `game_boxes`.`challenge_id` = `challenges`.`id` AND `game_boxes`.`team_id` = `teams`.`id`").Scan(&gameboxs)
+	return utils.MakeSuccessJSON(gameboxs)
 }
 
 func CleanGameBoxStatus() {

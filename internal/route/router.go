@@ -89,6 +89,7 @@ func Init() *gin.Engine {
 	{
 		teamRouter.GET("/info", __(team.GetTeamInfo))
 		teamRouter.GET("/gameboxes", __(game.GetSelfGameBoxes))
+		teamRouter.GET("/gameboxes/all", __(game.GetOthersGameBox))
 		teamRouter.GET("/rank", func(c *gin.Context) {
 			c.JSON(utils.MakeSuccessJSON(gin.H{"Title": game.GetRankListTitle(), "Rank": game.GetRankList()}))
 		})
