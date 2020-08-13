@@ -16,7 +16,7 @@ func HealthyCheck() {
 	var teamCount int
 	db.MySQL.Model(&db.Team{}).Count(&teamCount)
 
-	previousRoundScore := previousRoundScore()
+	previousRoundScore := PreviousRoundScore()
 	if math.Abs(previousRoundScore) != 0 {
 		// If the previous round total score is not equal zero, maybe all the teams were checked down.
 		if previousRoundScore != float64(-conf.Get().CheckDownScore*teamCount) {
@@ -27,7 +27,7 @@ func HealthyCheck() {
 		}
 	}
 
-	totalScore := totalScore()
+	totalScore := TotalScore()
 	if math.Abs(totalScore) != 0 {
 		// If sum all the scores but it is not equal zero, maybe all the teams were checked down in some rounds.
 		if int(totalScore)%(conf.Get().CheckDownScore*teamCount) != 0 {
@@ -39,8 +39,8 @@ func HealthyCheck() {
 	}
 }
 
-// previousRoundScore returns the previous round's score count.
-func previousRoundScore() float64 {
+// PreviousRoundScore returns the previous round's score count.
+func PreviousRoundScore() float64 {
 	var score []float64
 	// Pay attention if there is no action in the previous round, the SUM(`score`) will be NULL.
 	db.MySQL.Model(&db.Score{}).Where(&db.Score{Round: timer.Get().NowRound}).Pluck("IFNULL(SUM(`score`), 0)", &score)
@@ -48,8 +48,8 @@ func previousRoundScore() float64 {
 	return value
 }
 
-// totalScore returns all the rounds' score count.
-func totalScore() float64 {
+// TotalScore returns all the rounds' score count.
+func TotalScore() float64 {
 	var score []float64
 	// Pay attention in the first round, the SUM(`score`) is NULL.
 	db.MySQL.Model(&db.Score{}).Pluck("IFNULL(SUM(`score`), 0)", &score)

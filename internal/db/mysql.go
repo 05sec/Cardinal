@@ -26,6 +26,27 @@ func InitMySQL() {
 	db.DB().SetMaxIdleConns(128)
 	db.DB().SetMaxOpenConns(256)
 
+	// Create tables.
+	db.AutoMigrate(
+		&Manager{},
+		&Challenge{},
+		&Token{},
+		&Team{},
+		&Bulletin{},
+		&BulletinRead{}, // Not used
+
+		&AttackAction{},
+		&DownAction{},
+		&Score{},
+		&Flag{},
+		&GameBox{},
+
+		&Log{},
+		&WebHook{},
+
+		&DynamicConfig{},
+	)
+
 	MySQL = db
 
 	// Test the database charset.

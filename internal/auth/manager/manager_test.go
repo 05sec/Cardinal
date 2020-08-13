@@ -1,27 +1,28 @@
-package manager
+package manager_test
 
 import (
 	"bytes"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
+	"github.com/vidar-team/Cardinal/internal/test"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestService_ManagerLogout(t *testing.T) {
+func Test_ManagerLogout(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/logout", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
-func TestService_ManagerLogin(t *testing.T) {
+func Test_ManagerLogin(t *testing.T) {
 	w := httptest.NewRecorder()
 	// JSON error
 	req, _ := http.NewRequest("POST", "/api/manager/login", bytes.NewBuffer([]byte(`Name=e99&Password=qwe1qwe2qwe3`)))
-	service.Router.ServeHTTP(w, req)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// Login fail
@@ -31,7 +32,7 @@ func TestService_ManagerLogin(t *testing.T) {
 		"Password": "123456",
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/login", bytes.NewBuffer(jsonData))
-	service.Router.ServeHTTP(w, req)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	// Login success
@@ -41,7 +42,7 @@ func TestService_ManagerLogin(t *testing.T) {
 		"Password": "qwe1qwe2qwe3",
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/login", bytes.NewBuffer(jsonData))
-	service.Router.ServeHTTP(w, req)
+	test.Router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
 	var backData struct {
@@ -51,23 +52,23 @@ func TestService_ManagerLogin(t *testing.T) {
 	}
 
 	_ = json.Unmarshal(w.Body.Bytes(), &backData)
-	managerToken = backData.Data
+	test.ManagerToken = backData.Data
 }
 
-func TestService_GetAllManager(t *testing.T) {
+func Test_GetAllManager(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/managers", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
-func TestService_NewManager(t *testing.T) {
+func Test_NewManager(t *testing.T) {
 	w := httptest.NewRecorder()
 	// JSON error
 	req, _ := http.NewRequest("POST", "/api/manager/manager", bytes.NewBuffer([]byte(`Name=e991111&Password=1122334455`)))
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// repeat manager
@@ -77,8 +78,8 @@ func TestService_NewManager(t *testing.T) {
 		"Password": "123456",
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/manager", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// Wrong check account
@@ -89,8 +90,8 @@ func TestService_NewManager(t *testing.T) {
 		"IsCheck":  false,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/manager", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
@@ -99,8 +100,8 @@ func TestService_NewManager(t *testing.T) {
 		"Password": "123456",
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/manager", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
@@ -110,44 +111,44 @@ func TestService_NewManager(t *testing.T) {
 		"IsCheck":  true,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/manager", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
-func TestService_RefreshManagerToken(t *testing.T) {
+func Test_RefreshManagerToken(t *testing.T) {
 	// error id
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/manager/token?id=asdfg", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// no id
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/token", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// id not exist
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/token?id=233", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 500, w.Code)
 
 	// success
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/token?id=2", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/token?id=3", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	var backJSON = struct {
 		Error int    `json:"error"`
 		Msg   string `json:"msg"`
@@ -156,73 +157,73 @@ func TestService_RefreshManagerToken(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &backJSON)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, 200, w.Code)
-	checkToken = backJSON.Data
+	test.CheckToken = backJSON.Data
 }
 
-func TestService_ChangeManagerPassword(t *testing.T) {
+func Test_ChangeManagerPassword(t *testing.T) {
 	// error id
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/manager/changePassword?id=asdfg", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// no id
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/changePassword", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// id not exist
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/changePassword?id=233", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 500, w.Code)
 
 	// success
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/manager/changePassword?id=2", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
-func TestService_DeleteManager(t *testing.T) {
+func Test_DeleteManager(t *testing.T) {
 	// error id
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", "/api/manager/manager?id=asdfg", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// no id exist
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/manager", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// id not exist
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/manager?id=233", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 500, w.Code)
 
 	// success
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/manager?id=2", nil)
-	req.Header.Set("Authorization", managerToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.ManagerToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
-func TestService_ManagerRequired(t *testing.T) {
+func Test_ManagerRequired(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/teams", nil)
-	req.Header.Set("Authorization", checkToken)
-	service.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", test.CheckToken)
+	test.Router.ServeHTTP(w, req)
 	assert.Equal(t, 401, w.Code)
 }

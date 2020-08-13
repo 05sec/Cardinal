@@ -24,7 +24,6 @@ func LinkStart() {
 
 	// Init MySQL database.
 	db.InitMySQL()
-	autoMigrate()
 
 	// Refresh the dynamic config from the database.
 	dynamic_config.Init()
