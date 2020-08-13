@@ -1,4 +1,4 @@
-package team_test
+package cardinal_test
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/healthy"
-	"github.com/vidar-team/Cardinal/internal/test"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"net/http"
 	"net/http/httptest"
@@ -30,8 +29,8 @@ func Test_NewTeams(t *testing.T) {
 		"Logo": "",
 	})
 	req, _ := http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// error payload
@@ -40,8 +39,8 @@ func Test_NewTeams(t *testing.T) {
 		"Logo": "",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// repeat in form
@@ -54,8 +53,8 @@ func Test_NewTeams(t *testing.T) {
 		"Logo": "test",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// success
@@ -72,8 +71,8 @@ func Test_NewTeams(t *testing.T) {
 	},
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	// save the team password
@@ -88,7 +87,7 @@ func Test_NewTeams(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &password)
 	assert.Equal(t, nil, err)
 	// save two teams' password
-	test.Team = append(test.Team, struct {
+	team = append(team, struct {
 		Name      string `json:"Name"`
 		Password  string `json:"Password"`
 		Token     string `json:"token"`
@@ -112,16 +111,16 @@ func Test_NewTeams(t *testing.T) {
 		"Logo": "test_image.png",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/teams", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 }
 
 func Test_GetAllTeams(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/teams", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -133,8 +132,8 @@ func Test_EditTeam(t *testing.T) {
 		"Logo": "",
 	})
 	req, _ := http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// team not found
@@ -145,8 +144,8 @@ func Test_EditTeam(t *testing.T) {
 		"Logo": "",
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// team name repeat
@@ -157,8 +156,8 @@ func Test_EditTeam(t *testing.T) {
 		"Logo": "",
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// success
@@ -169,8 +168,8 @@ func Test_EditTeam(t *testing.T) {
 		"Logo": "",
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/team", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -181,8 +180,8 @@ func Test_ResetTeamPassword(t *testing.T) {
 		"IDd": 3,
 	})
 	req, _ := http.NewRequest("POST", "/api/manager/team/resetPassword", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// team not found
@@ -191,8 +190,8 @@ func Test_ResetTeamPassword(t *testing.T) {
 		"ID": 233,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/team/resetPassword", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// success
@@ -201,8 +200,8 @@ func Test_ResetTeamPassword(t *testing.T) {
 		"ID": 3,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/team/resetPassword", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -210,22 +209,22 @@ func Test_DeleteTeam(t *testing.T) {
 	// error id
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", "/api/manager/team?id=asdfg", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// id not exist
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/team?id=233", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// success
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/team?id=3", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -237,30 +236,30 @@ func Test_TeamLogin(t *testing.T) {
 		"Password": "",
 	})
 	req, _ := http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// error password
 	w = httptest.NewRecorder()
 	jsonData, _ = json.Marshal(map[string]interface{}{
-		"Name":     test.Team[1].Name,
+		"Name":     team[1].Name,
 		"Password": "aaa",
 	})
 	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	// success Vidar
 	w = httptest.NewRecorder()
 	jsonData, _ = json.Marshal(map[string]interface{}{
-		"Name":     test.Team[0].Name,
-		"Password": test.Team[0].Password,
+		"Name":     team[0].Name,
+		"Password": team[0].Password,
 	})
 	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	var backJSON = struct {
 		Error int    `json:"error"`
@@ -269,17 +268,17 @@ func Test_TeamLogin(t *testing.T) {
 	}{}
 	err := json.Unmarshal(w.Body.Bytes(), &backJSON)
 	assert.Equal(t, nil, err)
-	test.Team[0].Token = backJSON.Data
+	team[0].Token = backJSON.Data
 
 	// success e99
 	w = httptest.NewRecorder()
 	jsonData, _ = json.Marshal(map[string]interface{}{
-		"Name":     test.Team[1].Name,
-		"Password": test.Team[1].Password,
+		"Name":     team[1].Name,
+		"Password": team[1].Password,
 	})
 	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	backJSON = struct {
 		Error int    `json:"error"`
@@ -288,15 +287,15 @@ func Test_TeamLogin(t *testing.T) {
 	}{}
 	err = json.Unmarshal(w.Body.Bytes(), &backJSON)
 	assert.Equal(t, nil, err)
-	test.Team[1].Token = backJSON.Data
+	team[1].Token = backJSON.Data
 }
 
 func Test_GetTeamInfo(t *testing.T) {
 	// Team1 Vidar
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/team/info", nil)
-	req.Header.Set("Authorization", test.Team[0].Token)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].Token)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	var backJSON = struct {
 		Error int    `json:"error"`
@@ -312,13 +311,13 @@ func Test_GetTeamInfo(t *testing.T) {
 	err := json.Unmarshal(w.Body.Bytes(), &backJSON)
 	assert.Equal(t, nil, err)
 	// save access key for test
-	test.Team[0].AccessKey = backJSON.Data.Token
+	team[0].AccessKey = backJSON.Data.Token
 
 	// Team2 e99
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/team/info", nil)
-	req.Header.Set("Authorization", test.Team[1].Token)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[1].Token)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	backJSON = struct {
 		Error int    `json:"error"`
@@ -334,25 +333,25 @@ func Test_GetTeamInfo(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &backJSON)
 	assert.Equal(t, nil, err)
 	// save access key for test
-	test.Team[1].AccessKey = backJSON.Data.Token
+	team[1].AccessKey = backJSON.Data.Token
 }
 
 func Test_TeamLogout(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/logout", nil)
-	req.Header.Set("Authorization", test.Team[0].Token)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].Token)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	//login again
 	w = httptest.NewRecorder()
 	jsonData, _ := json.Marshal(map[string]interface{}{
-		"Name":     test.Team[0].Name,
-		"Password": test.Team[0].Password,
+		"Name":     team[0].Name,
+		"Password": team[0].Password,
 	})
 	req, _ = http.NewRequest("POST", "/api/login", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	var backJSON = struct {
 		Error int    `json:"error"`
@@ -361,7 +360,7 @@ func Test_TeamLogout(t *testing.T) {
 	}{}
 	err := json.Unmarshal(w.Body.Bytes(), &backJSON)
 	assert.Equal(t, nil, err)
-	test.Team[0].Token = backJSON.Data
+	team[0].Token = backJSON.Data
 }
 
 // Gamebox Test
@@ -376,8 +375,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Description": "web1 for Vidar",
 	})
 	req, _ := http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// error payload
@@ -390,8 +389,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Description": "web1 for Vidar",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// challenge not found
@@ -404,8 +403,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Description": "web1 for Vidar",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// team not found
@@ -418,8 +417,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Description": "web1 for Vidar",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// success
@@ -450,8 +449,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Description": "pwn1 for E99",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	// repeat
@@ -464,8 +463,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Description": "web1 for Vidar",
 	}})
 	req, _ = http.NewRequest("POST", "/api/manager/gameboxes", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// Set gamebox visible
@@ -476,8 +475,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Visible": true,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge/visible", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	// set challenge id 3
@@ -487,8 +486,8 @@ func Test_NewGameBoxes(t *testing.T) {
 		"Visible": true,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge/visible", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -502,8 +501,8 @@ func Test_EditGameBox(t *testing.T) {
 		"Description": "web1 for Vidar",
 	})
 	req, _ := http.NewRequest("PUT", "/api/manager/gamebox", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// gamebox not found
@@ -515,8 +514,8 @@ func Test_EditGameBox(t *testing.T) {
 		"Description": "web1 for Vidar",
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/gamebox", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 500, w.Code)
 
 	// success
@@ -528,8 +527,8 @@ func Test_EditGameBox(t *testing.T) {
 		"Description": "Web1 for Vidar",
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/gamebox", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -537,40 +536,40 @@ func Test_GetGameBoxes(t *testing.T) {
 	// error query
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/gameboxes", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=asda&per=skfdnj", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=0&per=1", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=1&per=0", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/gameboxes?page=1&per=1", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
 func Test_GetSelfGameBoxes(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/team/gameboxes", nil)
-	req.Header.Set("Authorization", test.Team[0].Token)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].Token)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -578,41 +577,45 @@ func Test_GetSelfGameBoxes(t *testing.T) {
 func Test_GenerateFlag(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/api/manager/flag/generate", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
+
+	var count int
+	db.MySQL.Model(&db.Flag{}).Count(&count)
+	assert.NotEqual(t, 0, count)
 }
 
 func Test_GetFlags(t *testing.T) {
 	// error query
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/flags", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/flags?page=asda&per=skfdnj", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/flags?page=0&per=1", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/flags?page=1&per=0", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/flags?page=1&per=1", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -656,8 +659,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": flag1.Flag,
 	})
 	req, _ := http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[0].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	timer.Get().Status = "on"
@@ -669,7 +672,7 @@ func Test_SubmitFlag(t *testing.T) {
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", "")
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	// error token
@@ -679,7 +682,7 @@ func Test_SubmitFlag(t *testing.T) {
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
 	req.Header.Set("Authorization", "errortoken")
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	// error payload
@@ -688,8 +691,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": 12312312,
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[0].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// error flag
@@ -698,8 +701,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": "hctf{here is a error flag}",
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[0].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	// success flag1
@@ -708,8 +711,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": flag1.Flag,
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[0].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	fmt.Println("flag1", w.Body.String())
 
@@ -719,8 +722,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": flag2.Flag,
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[0].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	fmt.Println("flag2", w.Body.String())
 
@@ -730,8 +733,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": flag3.Flag,
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[1].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[1].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	fmt.Println("flag3", w.Body.String())
 
@@ -741,8 +744,8 @@ func Test_SubmitFlag(t *testing.T) {
 		"flag": flag1.Flag,
 	})
 	req, _ = http.NewRequest("POST", "/api/flag", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.Team[0].AccessKey)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].AccessKey)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 }
 
@@ -755,8 +758,8 @@ func Test_CheckDown(t *testing.T) {
 		"GameBoxID": 4,
 	})
 	req, _ := http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	timer.Get().Status = "on"
@@ -766,8 +769,8 @@ func Test_CheckDown(t *testing.T) {
 		"GameBoxID": "4",
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// gamebox not found
@@ -776,8 +779,8 @@ func Test_CheckDown(t *testing.T) {
 		"GameBoxID": 233,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	// success
@@ -786,8 +789,8 @@ func Test_CheckDown(t *testing.T) {
 		"GameBoxID": 4,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	fmt.Println("checkdown", w.Body.String())
 
@@ -797,8 +800,8 @@ func Test_CheckDown(t *testing.T) {
 		"GameBoxID": 4,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/checkDown", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 }
 
@@ -834,8 +837,8 @@ func Test_TotalScore(t *testing.T) {
 func Test_GetAllBulletins2(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/team/bulletins", nil)
-	req.Header.Set("Authorization", test.Team[0].Token)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].Token)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -847,14 +850,14 @@ func Test_GetRankList(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/rank", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/team/rank", nil)
-	req.Header.Set("Authorization", test.Team[0].Token)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", team[0].Token)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 

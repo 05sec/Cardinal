@@ -1,10 +1,9 @@
-package game_test
+package cardinal_test
 
 import (
 	"bytes"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
-	"github.com/vidar-team/Cardinal/internal/test"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -17,8 +16,8 @@ func Test_NewChallenge(t *testing.T) {
 		"Title": "Web1",
 	})
 	req, _ := http.NewRequest("POST", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// success
@@ -28,8 +27,8 @@ func Test_NewChallenge(t *testing.T) {
 		"BaseScore": 800,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
@@ -38,8 +37,8 @@ func Test_NewChallenge(t *testing.T) {
 		"BaseScore": 1000,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
@@ -48,8 +47,8 @@ func Test_NewChallenge(t *testing.T) {
 		"BaseScore": 1000,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	// repeat
@@ -59,8 +58,8 @@ func Test_NewChallenge(t *testing.T) {
 		"BaseScore": 800,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 }
 
@@ -72,8 +71,8 @@ func Test_EditChallenge(t *testing.T) {
 		"BaseScore": 1000,
 	})
 	req, _ := http.NewRequest("PUT", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// not found
@@ -84,8 +83,8 @@ func Test_EditChallenge(t *testing.T) {
 		"BaseScore": 1000,
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// success
@@ -96,8 +95,8 @@ func Test_EditChallenge(t *testing.T) {
 		"BaseScore": 800,
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
@@ -107,16 +106,16 @@ func Test_EditChallenge(t *testing.T) {
 		"BaseScore": 1000,
 	})
 	req, _ = http.NewRequest("PUT", "/api/manager/challenge", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
 func Test_GetAllChallenges(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/challenges", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -124,22 +123,22 @@ func Test_DeleteChallenge(t *testing.T) {
 	// error id
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", "/api/manager/challenge?id=asdfg", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// id not exist
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/challenge?id=233", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// success delete 2
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("DELETE", "/api/manager/challenge?id=2", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -151,8 +150,8 @@ func Test_SetVisible(t *testing.T) {
 		"Visible": "true",
 	})
 	req, _ := http.NewRequest("POST", "/api/manager/challenge/visible", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 400, w.Code)
 
 	// challenge not found
@@ -162,7 +161,7 @@ func Test_SetVisible(t *testing.T) {
 		"Visible": true,
 	})
 	req, _ = http.NewRequest("POST", "/api/manager/challenge/visible", bytes.NewBuffer(jsonData))
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 }

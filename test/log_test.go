@@ -1,8 +1,7 @@
-package logger_test
+package cardinal_test
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/vidar-team/Cardinal/internal/test"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,16 +10,16 @@ import (
 func Test_GetLogs(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/logs", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
 func Test_Panel(t *testing.T) {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/manager/panel", nil)
-	req.Header.Set("Authorization", test.ManagerToken)
-	test.Router.ServeHTTP(w, req)
+	req.Header.Set("Authorization", managerToken)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 }
 
@@ -34,12 +33,12 @@ func Test_Panel2(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/", nil)
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/base", nil)
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 	//err := json.Unmarshal(w.Body.Bytes(), &backJSON)
 	//assert.Equal(t, nil, err)
@@ -47,36 +46,36 @@ func Test_Panel2(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/time", nil)
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/404_not_found_router", nil)
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 404, w.Code)
 
 	// no auth
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/flags", nil)
 	req.Header.Set("Authorization", "error_token")
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 401, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/manager/flags", nil)
 	req.Header.Set("Authorization", "")
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/team/rank", nil)
 	req.Header.Set("Authorization", "error_token")
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 401, w.Code)
 
 	w = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", "/api/team/rank", nil)
 	req.Header.Set("Authorization", "")
-	test.Router.ServeHTTP(w, req)
+	router.ServeHTTP(w, req)
 	assert.Equal(t, 403, w.Code)
 }

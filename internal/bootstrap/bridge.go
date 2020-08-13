@@ -5,7 +5,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/timer"
 )
 
-func gameToTimerBridge() {
+func GameToTimerBridge() {
 	timer.SetRankListTitle = game.SetRankListTitle
 	timer.SetRankList = game.SetRankList
 	timer.CleanGameBoxStatus = game.CleanGameBoxStatus

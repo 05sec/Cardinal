@@ -30,7 +30,7 @@ func LinkStart() {
 
 	// Game timer.
 	timer.Init()
-	gameToTimerBridge()
+	GameToTimerBridge()
 
 	// Cache
 	store.Init()
