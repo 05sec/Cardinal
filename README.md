@@ -86,6 +86,18 @@ chmod +x ./Cardinal
 ./Cardinal
 ```
 
+### Docker部署
+
+首先请从 [docker 官网](https://docs.docker.com) 安装 `docker` 与 `docker-compose`
+
+确保当前用户拥有 `docker` 及 `docker-compose` 权限，然后执行
+
+```bash
+curl https://sh.cardinal.ink | bash
+```
+
+初次使用应当在下载后配置 `docker-compose.yml` 内的各项参数
+
 ## 开始使用
 默认端口： `19999`
 * 选手端 `http://localhost:19999/`
