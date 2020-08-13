@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/src/conf"
-	"github.com/vidar-team/Cardinal/src/locales"
-	"github.com/vidar-team/Cardinal/src/utils"
+	"github.com/vidar-team/Cardinal/conf"
+	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/logger"
+	"github.com/vidar-team/Cardinal/internal/utils"
+	"github.com/vidar-team/Cardinal/locales"
 	"io/ioutil"
 	"log"
 	"os"
@@ -46,7 +48,7 @@ DBPassword="{{ .DBPassword }}"
 DBName="{{ .DBName }}"
 `
 
-func (s *Service) install() {
+func install() {
 	// Check `uploads` folder exist
 	if !utils.FileIsExist("./uploads") {
 		err := os.Mkdir("./uploads", os.ModePerm)
@@ -101,7 +103,7 @@ func (s *Service) install() {
 			utils.InputString(&index, "type 1, 2... to select")
 		}
 
-		content, err := s.GenerateConfigFileGuide(languages[index])
+		content, err := GenerateConfigFileGuide(languages[index])
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -114,7 +116,7 @@ func (s *Service) install() {
 }
 
 // GenerateConfigFileGuide can lead the user to fill in the config file.
-func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
+func GenerateConfigFileGuide(lang string) ([]byte, error) {
 	input := struct {
 		BeginTime, RestTime, EndTime, SeparateFrontend, Sentry, Duration, Port, Salt, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string
 	}{
@@ -172,9 +174,9 @@ func (s *Service) GenerateConfigFileGuide(lang string) ([]byte, error) {
 	return wr.Bytes(), nil
 }
 
-func (s *Service) initManager() {
+func initManager() {
 	var managerCount int
-	s.Mysql.Model(&Manager{}).Count(&managerCount)
+	db.MySQL.Model(&db.Manager{}).Count(&managerCount)
 	if managerCount == 0 {
 		var managerName, managerPassword string
 
@@ -194,11 +196,11 @@ func (s *Service) initManager() {
 		}
 
 		// Create manager account if managers table is empty.
-		s.Mysql.Create(&Manager{
+		db.MySQL.Create(&db.Manager{
 			Name:     managerName,
 			Password: utils.AddSalt(managerPassword),
 		})
-		s.NewLog(WARNING, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
+		logger.New(logger.WARNING, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
 		log.Println(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success"))
 	}
 }
