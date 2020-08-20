@@ -22,7 +22,7 @@ func MakeErrJSON(httpStatusCode int, errCode int, msg interface{}) (int, interfa
 	return httpStatusCode, gin.H{"error": errCode, "msg": fmt.Sprint(msg)}
 }
 
-// MakeErrJSON makes the successful response JSON for gin.
+// MakeSuccessJSON makes the successful response JSON for gin.
 func MakeSuccessJSON(data interface{}) (int, interface{}) {
 	return 200, gin.H{"error": 0, "msg": "success", "data": data}
 }
