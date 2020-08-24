@@ -37,8 +37,8 @@ func LinkStart() {
 	dynamic_config.Init()
 
 	// Game timer.
-	timer.Init()
 	GameToTimerBridge()
+	timer.Init()
 
 	// Cache
 	store.Init()

@@ -1,7 +1,6 @@
 package timer
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
@@ -47,6 +46,17 @@ func GetTime(c *gin.Context) (int, interface{}) {
 }
 
 func Init() {
+	// Check the bridge.
+	if SetRankListTitle == nil ||
+		SetRankList == nil ||
+		CleanGameBoxStatus == nil ||
+		GetLatestScoreRound == nil ||
+		RefreshFlag == nil ||
+		CalculateRoundScore == nil {
+
+		log.Fatalln("Timer bridge error, the function should be not nil.")
+	}
+
 	t = &timer{
 		BeginTime: conf.Get().BeginTime,
 		EndTime:   conf.Get().EndTime,
@@ -185,7 +195,7 @@ func timerProcess() {
 					// Asteroid Unity3D refresh.
 					asteroid.NewRoundAction()
 
-					fmt.Println(t.NowRound)
+					log.Printf("Round %d\n", t.NowRound)
 				}
 			}
 
