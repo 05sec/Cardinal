@@ -137,3 +137,6 @@ en-US:
     delete_team: "Team [ {{.teamName}} ] Deleted."
     team_reset_password: "Team  [ {{.teamName}} ] login password Reset."
     rank_list_Succeeded: "Rank List Title Updated."
+
+  misc:
+    version_out_of_date: "The Current Version of Cardinal is Out of Date. Now Version: {{.currentVersion}} / Latest Version: {{.latestVersion}}"

@@ -2,7 +2,7 @@ package utils
 
 // These variable will be assigned in CI.
 var (
-	VERSION    string
+	VERSION    string = "v0.7.0"
 	COMMIT_SHA string
 	BUILD_TIME string
 )

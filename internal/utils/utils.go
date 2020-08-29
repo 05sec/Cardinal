@@ -13,6 +13,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -114,4 +115,53 @@ func SSHExecute(ip string, port string, user string, password string, command st
 	}
 
 	return output.String(), nil
+}
+
+// CompareVersion used to compare the cardinal version.
+func CompareVersion(v1 string, v2 string) bool {
+	// The version of Cardinal is v.x.x.x,
+	// we split the string by `.` and compare the number.
+	// if 	v1 >= v2 return true
+	// 		v1 < v2 return false
+	//
+	// It will always return false if the version format is wrong.
+
+	// Empty string
+	if v1 == "" || v2 == "" {
+		return false
+	}
+
+	// Check format
+	if v1[0] != 'v' || v2[0] != 'v' {
+		return false
+	}
+	v1, v2 = v1[1:], v2[1:]
+
+	v1Segment := strings.Split(v1, ".")
+	v2Segment := strings.Split(v2, ".")
+	if len(v1Segment) != 3 || len(v2Segment) != 3 {
+		return false
+	}
+
+	if v1 == v2 {
+		return true
+	}
+
+	// Compare each part.
+	for segIndex := 0; segIndex < 3; segIndex++ {
+		v1Number, err := strconv.Atoi(v1Segment[segIndex])
+		if err != nil {
+			return false
+		}
+		v2Number, err := strconv.Atoi(v2Segment[segIndex])
+		if err != nil {
+			return false
+		}
+		if v1Number == v2Number {
+			continue
+		}
+		return v1Number > v2Number
+	}
+	// They are the same.
+	return true
 }

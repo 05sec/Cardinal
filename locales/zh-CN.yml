@@ -137,3 +137,6 @@ zh-CN:
     delete_team: "Team [ {{.teamName}} ] 被删除"
     team_reset_password: "队伍 [ {{.teamName}} ] 登录密码已重置"
     rank_list_success: "更新排行榜标题成功"
+
+  misc:
+    version_out_of_date: "当前 Cardinal 并非最新版本，请考虑升级到最新版本。当前版本: {{.currentVersion}} / 最新版本: {{.latestVersion}}"

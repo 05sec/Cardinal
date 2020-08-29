@@ -24,6 +24,9 @@ func LinkStart() {
 	// Config
 	conf.Init()
 
+	// Check version
+	misc.CheckVersion()
+
 	// Sentry
 	misc.Sentry()
 
