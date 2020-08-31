@@ -127,4 +127,12 @@ curl https://sh.cardinal.ink | bash
 
 © Vidar-Team
 
-使用 APACHE LICENSE VERSION 2.0 进行许可，禁止商业用途。
+本项目使用 APACHE LICENSE VERSION 2.0 进行许可。
+
+若您安装及/或使用 Cardinal 及其相关软件、文档，即表示您已充分阅读、理解并同意接受本协议。
+
+我们接受并允许各大高校、安全团队、技术爱好者使用 Cardinal 作为比赛训练平台或举办内部训练赛。
+
+但不允许在未经许可授权的情况下，使用 Cardinal 的代码、文档、相关软件等开展商业培训、商业比赛、产品销售等任何营利性行为。禁止恶意更换、去除 Cardinal 及其相关软件、文档版权信息。
+
+一经发现，严肃处理。Vidar-Team 保留追究其法律责任的权力。

@@ -319,6 +319,10 @@ github.com/vidar-team/Cardinal_frontend v0.7.0 h1:7RcqGZcLy6bMXMBZvIbIoVC08mzdBF
 github.com/vidar-team/Cardinal_frontend v0.7.0/go.mod h1:wD4qPD/Z+T3eT0SiOQe9262VY6xSyWz12UQXmkH9uiI=
 github.com/vidar-team/Cardinal_manager_frontend v0.7.0 h1:ETcUmcSkh8cZYV2dSKioRM4bnAhnTNjEFKwD8yW4nCQ=
 github.com/vidar-team/Cardinal_manager_frontend v0.7.0/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
+github.com/vidar-team/Cardinal_manager_frontend v0.7.1-1 h1:vCxLOT54YmYf8hB9QdqB7VVVOhxdTIMpcLUE33E8FcE=
+github.com/vidar-team/Cardinal_manager_frontend v0.7.1-1/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
+github.com/vidar-team/Cardinal_manager_frontend v0.7.1-2 h1:X8mtIOhaFJZVcmBQZzdicoI6Lx2+5bNkwSMV9m4XeOQ=
+github.com/vidar-team/Cardinal_manager_frontend v0.7.1-2/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
 github.com/vidar-team/Cardinal_manager_frontend v0.7.1 h1:HgqOwST8hmFHD1w9zSQy3cvXU3SfZGbR9t+NepVHaAs=
 github.com/vidar-team/Cardinal_manager_frontend v0.7.1/go.mod h1:uJBQtuXHTLNyuIMONoM1OqYmW7Q/N40+587Qt90kqAk=
 github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=

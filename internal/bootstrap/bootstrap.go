@@ -24,6 +24,9 @@ func LinkStart() {
 	// Config
 	conf.Init()
 
+	// Check version
+	misc.CheckVersion()
+
 	// Sentry
 	misc.Sentry()
 
@@ -37,8 +40,8 @@ func LinkStart() {
 	dynamic_config.Init()
 
 	// Game timer.
-	timer.Init()
 	GameToTimerBridge()
+	timer.Init()
 
 	// Cache
 	store.Init()

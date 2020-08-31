@@ -59,8 +59,8 @@ func prepare() {
 	// Refresh the dynamic config from the database.
 	dynamic_config.Init()
 
-	timer.Init()
 	bootstrap.GameToTimerBridge()
+	timer.Init()
 
 	asteroid.Init(game.AsteroidGreetData)
 
