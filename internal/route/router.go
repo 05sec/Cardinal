@@ -169,6 +169,8 @@ func Init() *gin.Engine {
 		managerRouter.GET("/dir", __(upload.GetDir))
 
 		// Docker
+		managerRouter.GET("/docker/images", __(container.GetImageList))
+		managerRouter.DELETE("/docker/image", __(container.DeleteImage))
 		managerRouter.GET("/docker/containers", __(container.GetContainerList))
 		managerRouter.POST("/docker/container/start", __(container.StartContainer))
 		managerRouter.POST("/docker/container/stop", __(container.StopContainer))
