@@ -68,3 +68,22 @@ func StopContainer(c *gin.Context) (int, interface{}) {
 
 	return utils.MakeSuccessJSON("关闭成功")
 }
+
+// DeleteContainer starts the container.
+func DeleteContainer(c *gin.Context) (int, interface{}) {
+	containerId, ok := c.GetQuery("containerId")
+	if !ok {
+		return utils.MakeErrJSON(400, 40099, "payload error")
+	}
+
+	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
+	if err != nil {
+		return utils.MakeErrJSON(500, 59999, err)
+	}
+	err = cli.ContainerRemove(context.Background(), containerId, types.ContainerRemoveOptions{})
+	if err != nil {
+		return utils.MakeErrJSON(500, 59999, err)
+	}
+
+	return utils.MakeSuccessJSON("删除成功")
+}
