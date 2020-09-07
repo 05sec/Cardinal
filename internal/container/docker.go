@@ -1,11 +1,8 @@
 package container
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/parnurzeal/gorequest"
@@ -22,20 +19,6 @@ type dockerImage struct {
 		Instruction string `json:"instruction"`
 		Size        int    `json:"size"`
 	} `json:"layers"`
-}
-
-// GetContainerList returns all the docker containers.
-func GetContainerList(c *gin.Context) (int, interface{}) {
-	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
-	if err != nil {
-		return utils.MakeErrJSON(500, 59999, err)
-	}
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
-	if err != nil {
-		return utils.MakeErrJSON(500, 59999, err)
-	}
-	fmt.Println(containers)
-	return utils.MakeSuccessJSON(containers)
 }
 
 func GetImageData(c *gin.Context) (int, interface{}) {

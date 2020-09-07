@@ -170,6 +170,7 @@ func Init() *gin.Engine {
 
 		// Docker
 		managerRouter.GET("/docker/containers", __(container.GetContainerList))
+		managerRouter.POST("/docker/container/start", __(container.StartContainer))
 		managerRouter.POST("/docker/findImage", __(container.GetImageData))
 
 		// Log
