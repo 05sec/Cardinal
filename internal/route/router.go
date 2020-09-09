@@ -73,6 +73,7 @@ func Init() *gin.Engine {
 	api.GET("/logout", __(team.TeamLogout))
 
 	// Live log
+	api.GET("/livelog/:id", livelog.PrivateStreamHandler)
 	api.GET("/livelog", livelog.GlobalStreamHandler)
 
 	// Submit flag
@@ -168,14 +169,16 @@ func Init() *gin.Engine {
 		managerRouter.POST("/uploadPicture", __(upload.UploadPicture))
 		managerRouter.GET("/dir", __(upload.GetDir))
 
-		// Docker
+		// Docker image
 		managerRouter.GET("/docker/images", __(container.GetImageList))
 		managerRouter.DELETE("/docker/image", __(container.DeleteImage))
+		managerRouter.POST("/docker/image/find", __(container.GetImageData))
+		managerRouter.POST("/docker/image/pull", __(container.PullImage))
+		// Docker container
 		managerRouter.GET("/docker/containers", __(container.GetContainerList))
 		managerRouter.POST("/docker/container/start", __(container.StartContainer))
 		managerRouter.DELETE("/docker/container", __(container.DeleteContainer))
 		managerRouter.POST("/docker/container/stop", __(container.StopContainer))
-		managerRouter.POST("/docker/findImage", __(container.GetImageData))
 
 		// Log
 		managerRouter.GET("/logs", __(logger.GetLogs))

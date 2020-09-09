@@ -9,7 +9,7 @@ import (
 type Streamer struct {
 	sync.Mutex
 
-	streams map[int64]*stream
+	streams map[string]*stream
 }
 
 var errStreamNotFound = errors.New("stream: not found")
@@ -17,12 +17,12 @@ var errStreamNotFound = errors.New("stream: not found")
 // newStreamer returns a new in-memory log streamer.
 func newStreamer() *Streamer {
 	return &Streamer{
-		streams: make(map[int64]*stream),
+		streams: make(map[string]*stream),
 	}
 }
 
 // Create adds a new log stream.
-func (s *Streamer) Create(id int64) error {
+func (s *Streamer) Create(id string) error {
 	s.Lock()
 	s.streams[id] = newStream()
 	s.Unlock()
@@ -30,7 +30,7 @@ func (s *Streamer) Create(id int64) error {
 }
 
 // Delete removes a log by id.
-func (s *Streamer) Delete(id int64) error {
+func (s *Streamer) Delete(id string) error {
 	s.Lock()
 	stream, ok := s.streams[id]
 	if ok {
@@ -44,7 +44,7 @@ func (s *Streamer) Delete(id int64) error {
 }
 
 // Write adds a new line into stream.
-func (s *Streamer) Write(id int64, line *Line) error {
+func (s *Streamer) Write(id string, line *Line) error {
 	s.Lock()
 	stream, ok := s.streams[id]
 	s.Unlock()
@@ -55,7 +55,7 @@ func (s *Streamer) Write(id int64, line *Line) error {
 }
 
 // Tail returns the end signal.
-func (s *Streamer) Tail(ctx context.Context, id int64) (<-chan *Line, <-chan error) {
+func (s *Streamer) Tail(ctx context.Context, id string) (<-chan *Line, <-chan error) {
 	s.Lock()
 	stream, ok := s.streams[id]
 	s.Unlock()
@@ -66,10 +66,10 @@ func (s *Streamer) Tail(ctx context.Context, id int64) (<-chan *Line, <-chan err
 }
 
 // Info returns the count of subscribers in each stream.
-func (s *Streamer) Info() map[int64]int {
+func (s *Streamer) Info() map[string]int {
 	s.Lock()
 	defer s.Unlock()
-	info := map[int64]int{}
+	info := map[string]int{}
 	for id, stream := range s.streams {
 		stream.Lock()
 		info[id] = len(stream.sub)
