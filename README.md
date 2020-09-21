@@ -37,7 +37,7 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
     * 分数计算异常日志提醒
     * 自定义攻击、Checkdown 分数
     * 队伍平分靶机分数
-    * 【BETA】自动更新靶机 Flag
+    * 自动更新靶机 Flag
     * 触发 WebHook，接入第三方应用
     
 * 管理端首页数据总览查看
@@ -73,9 +73,6 @@ chmod +x ./Cardinal
 # 克隆代码
 git clone https://github.com/vidar-team/Cardinal.git
 
-# 切换目录
-cd Cardinal/src
-
 # 编译
 go build -o Cardinal
 
@@ -88,7 +85,7 @@ chmod +x ./Cardinal
 
 ### Docker 部署
 
-首先请从 [docker 官网](https://docs.docker.com) 安装 `docker` 与 `docker-compose`
+首先请从 [Docker 官网](https://docs.docker.com) 安装 `docker` 与 `docker-compose`
 
 确保当前用户拥有 `docker` 及 `docker-compose` 权限，然后执行
 
@@ -101,7 +98,7 @@ curl https://sh.cardinal.ink | bash
 ## 开始使用
 默认端口： `19999`
 * 选手端 `http://localhost:19999/`
-* 后端管理 `http://localhost:19999/manager`
+* 后台管理 `http://localhost:19999/manager`
 
 ## Contributors ✨
 
