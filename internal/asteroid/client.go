@@ -2,9 +2,10 @@ package asteroid
 
 import (
 	"encoding/json"
-	"github.com/gorilla/websocket"
 	"log"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (

@@ -1,10 +1,11 @@
 package healthy
 
 import (
+	"runtime"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"runtime"
 )
 
 // Panel returns the system runtime status, which is used in backstage data panel.

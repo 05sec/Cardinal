@@ -1,12 +1,13 @@
 package bulletin
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"strconv"
 )
 
 // GetAllBulletins returns all bulletins from the database.

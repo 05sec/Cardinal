@@ -1,6 +1,10 @@
 package timer
 
 import (
+	"log"
+	"math"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
@@ -8,9 +12,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"log"
-	"math"
-	"time"
 )
 
 var t = new(timer)

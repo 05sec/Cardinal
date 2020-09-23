@@ -2,6 +2,9 @@ package cardinal_test
 
 import (
 	"fmt"
+	"log"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
@@ -15,8 +18,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"log"
-	"testing"
 )
 
 var managerToken = utils.GenerateToken()

@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"io"
 )
 
 // FetchImage pull the image from the given registry.

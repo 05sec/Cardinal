@@ -1,6 +1,10 @@
 package webhook
 
 import (
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/parnurzeal/gorequest"
@@ -11,9 +15,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 const (

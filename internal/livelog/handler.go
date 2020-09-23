@@ -3,10 +3,11 @@ package livelog
 import (
 	"context"
 	"encoding/json"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 const GlobalStream = 0

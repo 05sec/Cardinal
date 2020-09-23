@@ -6,16 +6,17 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"fmt"
-	"github.com/dustin/go-humanize"
-	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
-	"github.com/vidar-team/Cardinal/conf"
-	"golang.org/x/crypto/ssh"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/dustin/go-humanize"
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
+	"github.com/vidar-team/Cardinal/conf"
+	"golang.org/x/crypto/ssh"
 )
 
 // MakeErrJSON makes the error response JSON for gin.

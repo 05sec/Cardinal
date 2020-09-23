@@ -2,12 +2,13 @@ package misc
 
 import (
 	"encoding/json"
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"log"
 )
 
 const GITHUB_RELEASE_API = "https://api.github.com/repos/vidar-team/Cardinal/releases/latest"

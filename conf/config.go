@@ -1,12 +1,13 @@
 package conf
 
 import (
-	"github.com/BurntSushi/toml"
-	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/locales"
 	"log"
 	"os"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/locales"
 )
 
 var conf *config

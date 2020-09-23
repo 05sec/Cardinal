@@ -3,10 +3,11 @@ package cardinal_test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_getWebHook(t *testing.T) {

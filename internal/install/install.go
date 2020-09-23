@@ -4,12 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/db"
-	"github.com/vidar-team/Cardinal/internal/logger"
-	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 	"io/ioutil"
 	"log"
 	"os"
@@ -18,6 +12,13 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/thanhpk/randstr"
+	"github.com/vidar-team/Cardinal/conf"
+	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/logger"
+	"github.com/vidar-team/Cardinal/internal/utils"
+	"github.com/vidar-team/Cardinal/locales"
 )
 
 const DOCKER_ENV = "CARDINAL_DOCKER"

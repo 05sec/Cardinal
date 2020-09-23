@@ -1,6 +1,8 @@
 package manager
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
@@ -8,7 +10,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"strconv"
 )
 
 // ManagerLogin is manager login handler.

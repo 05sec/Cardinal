@@ -1,6 +1,9 @@
 package game
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/internal/db"
@@ -9,8 +12,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"math"
-	"strconv"
 )
 
 // GetSelfGameBoxes returns the gameboxes which belong to the team.

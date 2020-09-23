@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"log"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/db"
@@ -13,7 +15,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/route"
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
-	"log"
 )
 
 // LinkStart starts the Cardinal.

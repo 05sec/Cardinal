@@ -2,13 +2,14 @@ package healthy
 
 import (
 	"fmt"
+	"math"
+	"strconv"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/locales"
-	"math"
-	"strconv"
 )
 
 // HealthyCheck will be used to check whether Cardinal runs normally.
