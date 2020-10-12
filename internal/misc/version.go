@@ -3,6 +3,7 @@ package misc
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
@@ -15,7 +16,7 @@ const GITHUB_RELEASE_API = "https://api.github.com/repos/vidar-team/Cardinal/rel
 
 func CheckVersion() {
 	// Check Cardinal version.
-	resp, body, _ := gorequest.New().Get(GITHUB_RELEASE_API).End()
+	resp, body, _ := gorequest.New().Get(GITHUB_RELEASE_API).Timeout(5 * time.Second).End()
 	if resp != nil && resp.StatusCode == 200 {
 		type releaseApiJson struct {
 			Name        string `json:"name"`
