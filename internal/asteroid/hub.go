@@ -2,11 +2,11 @@ package asteroid
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	log "unknwon.dev/clog/v2"
 )
 
 // Hub contains all the connections and the action signal.
@@ -70,7 +70,7 @@ func (h *Hub) serve(c *gin.Context) {
 	}
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Println(err)
+		log.Error("Failed to upgrade: %v", err)
 		return
 	}
 	client := &client{hub: h, conn: conn, send: make(chan []byte, 256)}

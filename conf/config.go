@@ -1,9 +1,10 @@
 package conf
 
 import (
-	"log"
 	"os"
 	"time"
+
+	log "unknwon.dev/clog/v2"
 
 	"github.com/BurntSushi/toml"
 	"github.com/thanhpk/randstr"
@@ -16,14 +17,14 @@ func Init() {
 	if os.Getenv("TRAVIS") != "true" {
 		_, err := toml.DecodeFile("./conf/Cardinal.toml", &conf)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal("Failed to decode config file: %v", err)
 		}
 
-		log.Println(locales.I18n.T(conf.SystemLanguage, "config.load_success"))
+		log.Trace(string(locales.I18n.T(conf.SystemLanguage, "config.load_success")))
 	} else {
 		// Travis CI Test, set the config in test code.
 		conf = new(config)
-		log.Println("Test mode")
+		log.Trace("Test mode")
 
 		conf = &config{
 			Base: Base{

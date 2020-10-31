@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -19,8 +18,10 @@ import (
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
+	log "unknwon.dev/clog/v2"
 )
 
+// DOCKER_ENV: docker environment sign.
 const DOCKER_ENV = "CARDINAL_DOCKER"
 
 const configTemplate = `
@@ -54,7 +55,7 @@ func Init() {
 	if !utils.FileIsExist("./uploads") {
 		err := os.Mkdir("./uploads", os.ModePerm)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal("Failed to create ./uploads folder: %v", err)
 		}
 	}
 
@@ -62,7 +63,7 @@ func Init() {
 	if !utils.FileIsExist("./conf") {
 		err := os.Mkdir("./conf", os.ModePerm)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal("Failed to create ./conf folder: %v", err)
 		}
 	}
 
@@ -70,14 +71,14 @@ func Init() {
 	if !utils.FileIsExist("./locales") {
 		err := os.Mkdir("./locales", os.ModePerm)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal("Failed to create ./locales folder: %v", err)
 		}
 	}
 
 	// Check language file exist
 	files, err := ioutil.ReadDir("./locales")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal("Failed to read ./locales folder: %v", err)
 	}
 	languages := map[string]string{}
 	index := 0 // Use a outside `index` variable instead of the loop `index`. Not all the files is `.yml`.
@@ -88,11 +89,11 @@ func Init() {
 		}
 	}
 	if len(languages) == 0 {
-		log.Fatalln("Can not find the language file!")
+		log.Fatal("Can not find the language file!")
 	}
 
 	if !utils.FileIsExist("./conf/Cardinal.toml") {
-		log.Println("Please select a preferred language for the installation guide:")
+		log.Info("Please select a preferred language for the installation guide:")
 		for index, lang := range languages {
 			fmt.Printf("%s - %s\n", index, lang)
 		}
@@ -106,13 +107,13 @@ func Init() {
 
 		content, err := GenerateConfigFileGuide(languages[index])
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal("Failed to start config file guide: %v", err)
 		}
 		err = ioutil.WriteFile("./conf/Cardinal.toml", content, 0644)
 		if err != nil {
-			log.Fatalln(err)
+			log.Fatal("Failed to write config file: %v", err)
 		}
-		log.Println(locales.I18n.T(languages[index], "install.create_config_success"))
+		log.Info(string(locales.I18n.T(languages[index], "install.create_config_success")))
 	}
 }
 
@@ -131,7 +132,7 @@ func GenerateConfigFileGuide(lang string) ([]byte, error) {
 		DBName:           "cardinal",
 	}
 
-	log.Println(locales.I18n.T(lang, "install.greet"))
+	log.Info(string(locales.I18n.T(lang, "install.greet")))
 
 	var beginTime time.Time
 	err := errors.New("")
@@ -202,6 +203,6 @@ func InitManager() {
 			Password: utils.AddSalt(managerPassword),
 		})
 		logger.New(logger.WARNING, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
-		log.Println(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success"))
+		log.Info(string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
 	}
 }

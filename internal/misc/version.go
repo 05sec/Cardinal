@@ -2,8 +2,9 @@ package misc
 
 import (
 	"encoding/json"
-	"log"
 	"time"
+
+	log "unknwon.dev/clog/v2"
 
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
@@ -30,10 +31,10 @@ func CheckVersion() {
 		if err == nil {
 			// Compare version.
 			if !utils.CompareVersion(utils.VERSION, releaseData.TagName) {
-				log.Println(locales.I18n.T(conf.Get().SystemLanguage, "misc.version_out_of_date", gin.H{
+				log.Info(string(locales.I18n.T(conf.Get().SystemLanguage, "misc.version_out_of_date", gin.H{
 					"currentVersion": utils.VERSION,
 					"latestVersion":  releaseData.TagName,
-				}))
+				})))
 			}
 		}
 	}

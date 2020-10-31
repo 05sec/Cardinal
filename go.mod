@@ -65,4 +65,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 	moul.io/http2curl v1.0.0 // indirect
+	unknwon.dev/clog/v2 v2.1.2
 )
