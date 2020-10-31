@@ -67,7 +67,7 @@ func GetGameBoxes(c *gin.Context) (int, interface{}) {
 	return utils.MakeSuccessJSON(gin.H{
 		"Data":      gameBox,
 		"Total":     total,
-		"TotalPage": math.Ceil(float64(total / perPage)),
+		"TotalPage": int(math.Ceil(float64(total) / float64(perPage))),
 	})
 }
 

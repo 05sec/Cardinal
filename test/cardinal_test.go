@@ -1,7 +1,7 @@
 package cardinal_test
 
 import (
-	"fmt"
+	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -35,11 +35,15 @@ var router *gin.Engine
 
 func TestMain(m *testing.M) {
 	prepare()
-	fmt.Println("Cardinal Test ready...")
+	log.Trace("Cardinal Test ready...")
 	m.Run()
+
+	os.Exit(0)
 }
 
 func prepare() {
+	_ = log.NewConsole(100)
+	
 	log.Trace("Prepare for Cardinal test environment...")
 
 	gin.SetMode(gin.ReleaseMode)

@@ -38,7 +38,7 @@ func CheckPassword(inputPassword string, realPassword string) bool {
 // Sha1Encode: Sha1 encode input string.
 func Sha1Encode(input string) string {
 	h := sha1.New()
-	h.Write([]byte(input))
+	_, _ = h.Write([]byte(input))
 	bs := h.Sum(nil)
 	return fmt.Sprintf("%x", bs)
 }
