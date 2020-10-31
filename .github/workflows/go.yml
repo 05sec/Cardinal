@@ -1,7 +1,7 @@
 name: Go
 on:
   push:
-    branches: [master]
+    branches: [master, dev]
     paths:
       - '**.go'
   pull_request:
