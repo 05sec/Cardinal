@@ -2,6 +2,11 @@ package game
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/conf"
@@ -14,10 +19,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 // SubmitFlag is submit flag handler for teams.

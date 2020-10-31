@@ -2,19 +2,22 @@ package misc
 
 import (
 	"encoding/json"
+	"time"
+
+	log "unknwon.dev/clog/v2"
+
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"log"
 )
 
 const GITHUB_RELEASE_API = "https://api.github.com/repos/vidar-team/Cardinal/releases/latest"
 
 func CheckVersion() {
 	// Check Cardinal version.
-	resp, body, _ := gorequest.New().Get(GITHUB_RELEASE_API).End()
+	resp, body, _ := gorequest.New().Get(GITHUB_RELEASE_API).Timeout(5 * time.Second).End()
 	if resp != nil && resp.StatusCode == 200 {
 		type releaseApiJson struct {
 			Name        string `json:"name"`
@@ -28,10 +31,10 @@ func CheckVersion() {
 		if err == nil {
 			// Compare version.
 			if !utils.CompareVersion(utils.VERSION, releaseData.TagName) {
-				log.Println(locales.I18n.T(conf.Get().SystemLanguage, "misc.version_out_of_date", gin.H{
+				log.Info(string(locales.I18n.T(conf.Get().SystemLanguage, "misc.version_out_of_date", gin.H{
 					"currentVersion": utils.VERSION,
 					"latestVersion":  releaseData.TagName,
-				}))
+				})))
 			}
 		}
 	}

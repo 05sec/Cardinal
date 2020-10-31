@@ -2,6 +2,7 @@ package misc
 
 import (
 	"fmt"
+
 	"github.com/getsentry/sentry-go"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"

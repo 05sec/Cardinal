@@ -6,16 +6,17 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"fmt"
-	"github.com/dustin/go-humanize"
-	"github.com/gin-gonic/gin"
-	"github.com/satori/go.uuid"
-	"github.com/vidar-team/Cardinal/conf"
-	"golang.org/x/crypto/ssh"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/dustin/go-humanize"
+	"github.com/gin-gonic/gin"
+	"github.com/satori/go.uuid"
+	"github.com/vidar-team/Cardinal/conf"
+	"golang.org/x/crypto/ssh"
 )
 
 // MakeErrJSON makes the error response JSON for gin.
@@ -37,7 +38,7 @@ func CheckPassword(inputPassword string, realPassword string) bool {
 // Sha1Encode: Sha1 encode input string.
 func Sha1Encode(input string) string {
 	h := sha1.New()
-	h.Write([]byte(input))
+	_, _ = h.Write([]byte(input))
 	bs := h.Sum(nil)
 	return fmt.Sprintf("%x", bs)
 }

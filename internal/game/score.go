@@ -1,6 +1,8 @@
 package game
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/vidar-team/Cardinal/conf"
@@ -8,7 +10,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/healthy"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/locales"
-	"time"
 )
 
 // CalculateRoundScore will calculate the score of the given round.

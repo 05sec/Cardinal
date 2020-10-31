@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/healthy"
 	"github.com/vidar-team/Cardinal/internal/timer"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 // three team accounts

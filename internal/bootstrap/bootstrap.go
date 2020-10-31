@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/db"
@@ -13,8 +15,12 @@ import (
 	"github.com/vidar-team/Cardinal/internal/route"
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
-	"log"
 )
+
+func init() {
+	// Init log
+	_ = log.NewConsole(100)
+}
 
 // LinkStart starts the Cardinal.
 func LinkStart() {
@@ -56,5 +62,5 @@ func LinkStart() {
 	// Web router.
 	router := route.Init()
 
-	log.Fatalln(router.Run(conf.Get().Port))
+	log.Fatal("Failed to start web server: %v", router.Run(conf.Get().Port))
 }

@@ -2,8 +2,9 @@ package utils
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_CompareVersion(t *testing.T) {

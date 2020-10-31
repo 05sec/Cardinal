@@ -1,7 +1,9 @@
 package cardinal_test
 
 import (
-	"fmt"
+	"os"
+	"testing"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
@@ -15,8 +17,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"log"
-	"testing"
+	log "unknwon.dev/clog/v2"
 )
 
 var managerToken = utils.GenerateToken()
@@ -34,12 +35,16 @@ var router *gin.Engine
 
 func TestMain(m *testing.M) {
 	prepare()
-	fmt.Println("Cardinal Test ready...")
+	log.Trace("Cardinal Test ready...")
 	m.Run()
+
+	os.Exit(0)
 }
 
 func prepare() {
-	log.Println("Prepare for Cardinal test environment...")
+	_ = log.NewConsole(100)
+	
+	log.Trace("Prepare for Cardinal test environment...")
 
 	gin.SetMode(gin.ReleaseMode)
 

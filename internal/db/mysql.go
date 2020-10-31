@@ -2,11 +2,12 @@ package db
 
 import (
 	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/locales"
-	"log"
+	log "unknwon.dev/clog/v2"
 )
 
 var MySQL *gorm.DB
@@ -20,7 +21,7 @@ func InitMySQL() {
 	))
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal("Failed to connect to mysql database: %v", err)
 	}
 
 	db.DB().SetMaxIdleConns(128)
@@ -51,6 +52,6 @@ func InitMySQL() {
 
 	// Test the database charset.
 	if MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
-		log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "general.database_charset_error"))
+		log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "general.database_charset_error")))
 	}
 }

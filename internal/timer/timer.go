@@ -1,6 +1,9 @@
 package timer
 
 import (
+	"math"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
@@ -8,9 +11,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/utils"
 	"github.com/vidar-team/Cardinal/locales"
-	"log"
-	"math"
-	"time"
+	log "unknwon.dev/clog/v2"
 )
 
 var t = new(timer)
@@ -54,7 +55,7 @@ func Init() {
 		RefreshFlag == nil ||
 		CalculateRoundScore == nil {
 
-		log.Fatalln("Timer bridge error, the function should be not nil.")
+		log.Fatal("Timer bridge error, the function should be not nil.")
 	}
 
 	t = &timer{
@@ -108,13 +109,13 @@ func Init() {
 	}
 	t.TotalRound = int(totalTime / 60 / int64(t.Duration))
 
-	log.Println(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_round", gin.H{
+	log.Trace(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_round", gin.H{
 		"round": t.TotalRound,
-	}))
+	})))
 
-	log.Println(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_time", gin.H{
+	log.Trace(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_time", gin.H{
 		"time": int(totalTime / 60),
-	}))
+	})))
 
 	go timerProcess()
 }
@@ -195,7 +196,7 @@ func timerProcess() {
 					// Asteroid Unity3D refresh.
 					asteroid.NewRoundAction()
 
-					log.Printf("Round %d\n", t.NowRound)
+					log.Trace("New round: %d", t.NowRound)
 				}
 			}
 
@@ -222,38 +223,38 @@ func timerProcess() {
 
 func checkTimeConfig() {
 	if t.BeginTime.Unix() > t.EndTime.Unix() {
-		log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.start_time_error"))
+		log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.start_time_error")))
 	}
 
 	// Check the RestTime in config file is correct.
 	for key, dur := range t.RestTime {
 		if len(dur) != 2 {
-			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.single_rest_time_error"))
+			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.single_rest_time_error")))
 		}
 		if dur[0].Unix() >= dur[1].Unix() {
-			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_start_error",
+			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_start_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
 				},
-			))
+			)))
 		}
 		if dur[0].Unix() <= t.BeginTime.Unix() || dur[1].Unix() >= t.EndTime.Unix() {
-			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_overflow_error",
+			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_overflow_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
 				},
-			))
+			)))
 		}
 		// RestTime should in order.
 		if key != 0 && dur[0].Unix() <= t.RestTime[key-1][0].Unix() {
-			log.Fatalln(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_order_error",
+			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_order_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
 				},
-			))
+			)))
 		}
 	}
 }

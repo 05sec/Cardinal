@@ -3,14 +3,15 @@ package container
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strconv"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/parnurzeal/gorequest"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"regexp"
-	"strconv"
-	"time"
 )
 
 type dockerImage struct {

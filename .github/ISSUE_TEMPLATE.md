@@ -1,5 +1,5 @@
 <!--
-如果是反馈 Bug，请认真填写下方表单。
+如果是反馈 Bug，请认真填写下方表单。
 If this is a bug report please fill out the template below.
 
 如果是提出新的 Feature，请详细描述您的需求。
@@ -11,8 +11,6 @@ Please make sure that you have read the project Wiki (https://cardinal.ink/) and
 -->
 
 **运行环境 Environment**:
-
-  - Go 版本 / Go Version:  <!-- go version -->
     
   - 操作系统 / Operating System: <!-- uanme -a -->
 

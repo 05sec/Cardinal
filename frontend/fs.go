@@ -1,10 +1,11 @@
 package frontend
 
 import (
-	challenger "github.com/vidar-team/Cardinal_frontend/dist"
-	manager "github.com/vidar-team/Cardinal_manager_frontend/dist"
 	"net/http"
 	"strings"
+
+	challenger "github.com/vidar-team/Cardinal_frontend/dist"
+	manager "github.com/vidar-team/Cardinal_manager_frontend/dist"
 )
 
 type frontendFS struct {
