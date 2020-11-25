@@ -41,6 +41,7 @@ func GetTime(c *gin.Context) (int, interface{}) {
 		"EndTime":         t.EndTime.Unix(),
 		"Duration":        t.Duration,
 		"NowRound":        t.NowRound,
+		"NowTime":         time.Now().Unix(),
 		"RoundRemainTime": t.RoundRemainTime,
 		"Status":          t.Status,
 	})
