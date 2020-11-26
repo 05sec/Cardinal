@@ -12,6 +12,8 @@
 
 ### Changed
 * 日志包更换为 `unknwon.dev/clog/v2`。
+* 折叠显示 README 图片。
+* 修改 GitHub 打赏链接。
 
 ### Removed
 * 去除消息队列功能。
