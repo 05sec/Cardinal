@@ -9,6 +9,7 @@ var (
 
 const (
 	// Config
+	DATBASE_VERSION     = "database_version"
 	TITLE_CONF          = "title"
 	FLAG_PREFIX_CONF    = "flag_prefix"
 	FLAG_SUFFIX_CONF    = "flag_suffix"

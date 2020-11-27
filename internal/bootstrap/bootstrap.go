@@ -45,6 +45,9 @@ func LinkStart() {
 	// Refresh the dynamic config from the database.
 	dynamic_config.Init()
 
+	// Check if the database need update.
+	misc.CheckDatabaseVersion()
+
 	// Game timer.
 	GameToTimerBridge()
 	timer.Init()

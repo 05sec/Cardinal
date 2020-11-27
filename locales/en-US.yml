@@ -140,3 +140,4 @@ en-US:
 
   misc:
     version_out_of_date: "The Current Version of Cardinal is Out of Date. Now Version: {{.currentVersion}} / Latest Version: {{.latestVersion}}"
+    database_version_out_of_date: "The Database Structure Has Been Upgraded. Please delete the current Database and regenerate it."
