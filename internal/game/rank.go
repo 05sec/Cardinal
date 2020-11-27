@@ -4,9 +4,9 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/store"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 // RankItem is used to create the ranking list.

@@ -6,10 +6,10 @@ import (
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/livelog"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 // CheckDown is the gamebox check down handler for bots.

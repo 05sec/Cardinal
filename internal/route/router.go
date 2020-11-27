@@ -17,12 +17,12 @@ import (
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/healthy"
 	"github.com/vidar-team/Cardinal/internal/livelog"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/upload"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 func Init() *gin.Engine {

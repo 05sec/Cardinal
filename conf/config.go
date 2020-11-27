@@ -4,11 +4,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/vidar-team/Cardinal/internal/locales"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/BurntSushi/toml"
 	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 var conf *config

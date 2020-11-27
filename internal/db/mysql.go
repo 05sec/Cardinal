@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/locales"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	log "unknwon.dev/clog/v2"
 )
 

@@ -7,9 +7,9 @@ import (
 
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/timer"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 // HealthyCheck will be used to check whether Cardinal runs normally.
