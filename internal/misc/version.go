@@ -6,13 +6,13 @@ import (
 
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 const GITHUB_RELEASE_API = "https://api.github.com/repos/vidar-team/Cardinal/releases/latest"

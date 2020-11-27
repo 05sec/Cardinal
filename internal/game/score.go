@@ -8,8 +8,8 @@ import (
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/healthy"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 // CalculateRoundScore will calculate the score of the given round.

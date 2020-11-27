@@ -11,10 +11,10 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/thanhpk/randstr"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 const (

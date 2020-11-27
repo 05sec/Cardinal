@@ -2,8 +2,8 @@ package asteroid
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 func GetAsteroidStatus(c *gin.Context) (int, interface{}) {

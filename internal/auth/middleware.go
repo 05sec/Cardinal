@@ -3,8 +3,8 @@ package auth
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	"github.com/vidar-team/Cardinal/locales"
 )
 
 // TeamAuthRequired is the team permission check middleware.
