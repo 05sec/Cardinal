@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/gin-gonic/gin"
@@ -37,5 +39,14 @@ func CheckVersion() {
 				})))
 			}
 		}
+	}
+}
+
+// CheckDatabaseVersion compares the database version in the dynamic_config with now version.
+// It will show a alert if database need update.
+func CheckDatabaseVersion() {
+	databaseVersion := dynamic_config.Get(utils.DATBASE_VERSION)
+	if databaseVersion != db.VERSION {
+		log.Warn(string(locales.I18n.T(conf.Get().SystemLanguage, "misc.database_version_out_of_date")))
 	}
 }

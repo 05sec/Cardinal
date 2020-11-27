@@ -10,6 +10,7 @@ import (
 func Init() {
 	db.MySQL.Model(&db.DynamicConfig{})
 
+	initConfig(utils.DATBASE_VERSION, db.VERSION, utils.STRING)
 	initConfig(utils.TITLE_CONF, "HCTF", utils.STRING)
 	initConfig(utils.FLAG_PREFIX_CONF, "hctf{", utils.STRING)
 	initConfig(utils.FLAG_SUFFIX_CONF, "}", utils.STRING)
