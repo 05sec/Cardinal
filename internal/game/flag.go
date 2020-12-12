@@ -140,6 +140,30 @@ func GetFlags(c *gin.Context) (int, interface{}) {
 	pageStr := c.DefaultQuery("page", "1")
 	perStr := c.DefaultQuery("per", "15")
 
+	// filter
+	roundStr := c.DefaultQuery("round", "0")
+	teamStr := c.DefaultQuery("team", "0")
+	challengeStr := c.DefaultQuery("challenge", "0")
+
+	round, err := strconv.Atoi(roundStr)
+	if err != nil || round < 0 {
+		return utils.MakeErrJSON(400, 40022,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
+	}
+	teamID, err := strconv.Atoi(teamStr)
+	if err != nil || teamID < 0 {
+		return utils.MakeErrJSON(400, 40022,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
+	}
+	challengeID, err := strconv.Atoi(challengeStr)
+	if err != nil || challengeID < 0 {
+		return utils.MakeErrJSON(400, 40022,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
+	}
+
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page <= 0 {
 		return utils.MakeErrJSON(400, 40022,
@@ -155,10 +179,18 @@ func GetFlags(c *gin.Context) (int, interface{}) {
 	}
 
 	var total int
-	db.MySQL.Model(&db.Flag{}).Count(&total)
+	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
+		TeamID:      uint(teamID),
+		ChallengeID: uint(challengeID),
+		Round:       round,
+	}).Count(&total)
 
 	var flags []db.Flag
-	db.MySQL.Model(&db.Flag{}).Offset((page - 1) * per).Limit(per).Find(&flags)
+	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
+		TeamID:      uint(teamID),
+		ChallengeID: uint(challengeID),
+		Round:       round,
+	}).Offset((page - 1) * per).Limit(per).Find(&flags)
 
 	return utils.MakeSuccessJSON(gin.H{
 		"array": flags,
