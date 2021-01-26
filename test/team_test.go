@@ -8,8 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/healthy"
@@ -582,7 +583,7 @@ func Test_GenerateFlag(t *testing.T) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
 
-	var count int
+	var count int64
 	db.MySQL.Model(&db.Flag{}).Count(&count)
 	assert.NotEqual(t, 0, count)
 }
