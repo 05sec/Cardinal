@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/db"
@@ -97,7 +98,7 @@ func SubmitFlag(c *gin.Context) (int, interface{}) {
 	}
 
 	// Update the victim's gamebox status to `down`.
-	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Update(&db.GameBox{IsAttacked: true})
+	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: flagData.GameBoxID}}).Updates(&db.GameBox{IsAttacked: true})
 
 	// Save this attack record.
 	tx := db.MySQL.Begin()
@@ -178,7 +179,7 @@ func GetFlags(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var total int
+	var total int64
 	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
 		TeamID:      uint(teamID),
 		ChallengeID: uint(challengeID),
@@ -241,7 +242,7 @@ func GenerateFlag(c *gin.Context) (int, interface{}) {
 		}
 	}
 
-	var count int
+	var count int64
 	db.MySQL.Model(&db.Flag{}).Count(&count)
 	endTime := time.Now().UnixNano()
 	logger.New(logger.WARNING, "system",

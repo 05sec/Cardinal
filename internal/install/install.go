@@ -13,12 +13,13 @@ import (
 	"time"
 
 	"github.com/thanhpk/randstr"
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	log "unknwon.dev/clog/v2"
 )
 
 // DOCKER_ENV: docker environment sign.
@@ -177,7 +178,7 @@ func GenerateConfigFileGuide(lang string) ([]byte, error) {
 }
 
 func InitManager() {
-	var managerCount int
+	var managerCount int64
 	db.MySQL.Model(&db.Manager{}).Count(&managerCount)
 	if managerCount == 0 {
 		var managerName, managerPassword string

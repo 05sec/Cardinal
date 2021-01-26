@@ -4,8 +4,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -52,7 +53,7 @@ func ManagerLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
 	tx := db.MySQL.Begin()
 	if token != "" {
-		if tx.Model(&db.Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Update(map[string]interface{}{"token": ""}).RowsAffected != 1 {
+		if tx.Model(&db.Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Updates(map[string]interface{}{"token": ""}).RowsAffected != 1 {
 			tx.Rollback()
 		} else {
 			tx.Commit()
@@ -137,7 +138,7 @@ func RefreshManagerToken(c *gin.Context) (int, interface{}) {
 
 	tx := db.MySQL.Begin()
 	token := utils.GenerateToken()
-	if tx.Model(&db.Manager{}).Where(&db.Manager{Model: gorm.Model{ID: uint(id)}}).Update(&db.Manager{
+	if tx.Model(&db.Manager{}).Where(&db.Manager{Model: gorm.Model{ID: uint(id)}}).Updates(&db.Manager{
 		Token: token,
 	}).RowsAffected != 1 {
 		tx.Rollback()
@@ -170,7 +171,7 @@ func ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 
 	tx := db.MySQL.Begin()
 	password := randstr.String(16)
-	if tx.Model(&db.Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Update(&db.Manager{
+	if tx.Model(&db.Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Updates(&db.Manager{
 		Password: utils.AddSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()

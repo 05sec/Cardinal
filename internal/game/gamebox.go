@@ -5,7 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/locales"
@@ -59,7 +60,7 @@ func GetGameBoxes(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var total int
+	var total int64
 	db.MySQL.Model(&db.GameBox{}).Count(&total)
 	var gameBox []db.GameBox
 	db.MySQL.Model(&db.GameBox{}).Offset((page - 1) * perPage).Limit(perPage).Find(&gameBox)
@@ -94,7 +95,7 @@ func NewGameBoxes(c *gin.Context) (int, interface{}) {
 	}
 
 	for _, item := range inputForm {
-		var count int
+		var count int64
 
 		// Check the ChallengeID
 		var challenge db.Challenge
@@ -221,5 +222,5 @@ func GetOthersGameBox(c *gin.Context) (int, interface{}) {
 }
 
 func CleanGameBoxStatus() {
-	db.MySQL.Model(&db.GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
+	db.MySQL.Model(&db.GameBox{}).Updates(map[string]interface{}{"is_down": false, "is_attacked": false})
 }

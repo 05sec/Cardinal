@@ -2,6 +2,7 @@ package dynamic_config
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -31,7 +32,7 @@ func initConfig(key string, value string, kind int8) {
 // Set update the config by insert a new record into database, for we can make a config version control soon.
 // Then refresh the config in struct.
 func Set(key string, value string) {
-	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` = ?", key).Update(&db.DynamicConfig{
+	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` = ?", key).Updates(&db.DynamicConfig{
 		Key:   key,
 		Value: value,
 	})

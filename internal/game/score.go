@@ -4,7 +4,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/healthy"
@@ -60,8 +61,8 @@ func calculateGameBoxScore() {
 		db.MySQL.Table("scores").Select("SUM(score) AS Score").Where("`game_box_id` = ?", gameBox.ID).Scan(&sc)
 
 		var challenge db.Challenge
-		db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                                     // Get the gamebox's base score.
-		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&db.Score{Score: float64(challenge.BaseScore) + sc.Score}) // Update the gamebox's score.
+		db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)                      // Get the gamebox's base score.
+		db.MySQL.Model(&db.Score{}).Where(&db.Score{GameBoxID: gameBox.ID}).Updates(&db.Score{Score: float64(challenge.BaseScore) + sc.Score}) // Update the gamebox's score.
 	}
 }
 
@@ -74,7 +75,7 @@ func calculateTeamScore() {
 			Score float64 `gorm:"Column:Score"`
 		}
 		db.MySQL.Table("game_boxes").Select("SUM(score) AS Score").Where("`team_id` = ? AND `visible` = ?", t.ID, 1).Scan(&sc)
-		db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: t.ID}}).Update(&db.Team{Score: sc.Score})
+		db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: t.ID}}).Updates(&db.Team{Score: sc.Score})
 	}
 }
 

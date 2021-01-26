@@ -4,8 +4,9 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -116,7 +117,7 @@ func NewTeams(c *gin.Context) (int, interface{}) {
 		tmpTeamName[item.Name] = 0
 
 		// Check if the team name repeat in the database.
-		var count int
+		var count int64
 		db.MySQL.Model(db.Team{}).Where(&db.Team{Name: item.Name}).Count(&count)
 		if count != 0 {
 			return utils.MakeErrJSON(400, 40002,
@@ -191,7 +192,7 @@ func EditTeam(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check the team existed or not.
-	var count int
+	var count int64
 	db.MySQL.Model(db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
 	if count == 0 {
 		return utils.MakeErrJSON(404, 40401,

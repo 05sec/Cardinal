@@ -14,13 +14,13 @@ import (
 
 // HealthyCheck will be used to check whether Cardinal runs normally.
 func HealthyCheck() {
-	var teamCount int
+	var teamCount int64
 	db.MySQL.Model(&db.Team{}).Count(&teamCount)
 
 	previousRoundScore := PreviousRoundScore()
 	if math.Abs(previousRoundScore) != 0 {
 		// If the previous round total score is not equal zero, maybe all the teams were checked down.
-		if previousRoundScore != float64(-conf.Get().CheckDownScore*teamCount) {
+		if previousRoundScore != float64(-int64(conf.Get().CheckDownScore)*teamCount) {
 			// Maybe there are some mistakes in previous round score.
 			logger.New(logger.IMPORTANT, "healthy_check",
 				string(locales.I18n.T(conf.Get().SystemLanguage, "healthy.previous_round_non_zero_error")),
@@ -31,7 +31,7 @@ func HealthyCheck() {
 	totalScore := TotalScore()
 	if math.Abs(totalScore) != 0 {
 		// If sum all the scores but it is not equal zero, maybe all the teams were checked down in some rounds.
-		if int(totalScore)%(conf.Get().CheckDownScore*teamCount) != 0 {
+		if int64(totalScore)%(int64(conf.Get().CheckDownScore)*teamCount) != 0 {
 			// Maybes there are some mistakes.
 			logger.New(logger.IMPORTANT, "healthy_check",
 				string(locales.I18n.T(conf.Get().SystemLanguage, "healthy.total_score_non_zero_error")),

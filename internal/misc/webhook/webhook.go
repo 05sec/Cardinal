@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/parnurzeal/gorequest"
 	"github.com/patrickmn/go-cache"
 	"github.com/thanhpk/randstr"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -133,7 +134,7 @@ func EditWebHook(c *gin.Context) (int, interface{}) {
 	}
 
 	tx := db.MySQL.Begin()
-	if tx.Model(&db.WebHook{}).Where(&db.WebHook{Model: gorm.Model{ID: inputForm.ID}}).Update(&editWebHook).RowsAffected != 1 {
+	if tx.Model(&db.WebHook{}).Where(&db.WebHook{Model: gorm.Model{ID: inputForm.ID}}).Updates(&editWebHook).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50023,
 			locales.I18n.T(c.GetString("lang"), "webhook.edit_error"))

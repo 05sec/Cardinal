@@ -2,7 +2,8 @@ package game
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/livelog"
@@ -59,7 +60,7 @@ func CheckDown(c *gin.Context) (int, interface{}) {
 	}
 
 	// No problem! Update the gamebox status to down.
-	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&db.GameBox{IsDown: true})
+	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: gameBox.ID}}).Updates(&db.GameBox{IsDown: true})
 
 	tx := db.MySQL.Begin()
 	if tx.Create(&db.DownAction{

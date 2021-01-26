@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -37,7 +38,7 @@ func SetVisible(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	db.MySQL.Model(&db.GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
+	db.MySQL.Model(&db.GameBox{}).Where("challenge_id = ?", inputForm.ID).Updates(map[string]interface{}{"visible": inputForm.Visible})
 
 	// Calculate all the teams' score. (Only visible challenges)
 	calculateTeamScore()
