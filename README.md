@@ -142,9 +142,9 @@ curl https://sh.cardinal.ink | bash
 
 ## 使用 Cardinal 的团队及组织
 
-<a href="https://ctf.bugku.com/" target="_blank"><img src="https://cardinal.ink/brand/bugku.png" style="max-height: 65px; margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
-<a><img src="https://cardinal.ink/brand/QLNU.jpg" style="max-height: 65px; margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
-<a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" style="max-height: 65px; margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
+<a href="https://ctf.bugku.com/" target="_blank"><img src="https://cardinal.ink/brand/bugku.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
+<a><img src="https://cardinal.ink/brand/QLNU.jpg" height="65px"  style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
+<a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 
 ## 协议与许可
 
