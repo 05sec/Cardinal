@@ -14,6 +14,7 @@
 **[我有好点子 / 我想吐槽](https://support.qq.com/products/293679/)**
 
 # [Cardinal](https://cardinal.ink) —— CTF AWD 线下赛平台
+
 ## 介绍
 
 Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本程序可以作为 CTF 线下比赛平台，亦可用于团队内部 AWD 模拟练习。
@@ -31,13 +32,17 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
 </details>
 
 ## 文档
+
 ### 官方文档  [cardinal.ink](https://cardinal.ink)
+
 > 请您在使用前认真阅读官方使用文档，谢谢 ♪(･ω･)ﾉ
 
 ### 教程
+
 [AWD平台搭建–Cardinal](https://cloud.tencent.com/developer/article/1744139)
 
 ## 功能介绍
+
 * 管理员创建题目、分配题目靶机、参赛队伍、生成 Flag、发布公告
     * 支持上传参赛队伍 Logo
     * 题目可设置状态开放、下线，队伍分数同步更新
@@ -50,17 +55,18 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
     * 队伍平分靶机分数
     * 自动更新靶机 Flag
     * 触发 WebHook，接入第三方应用
-    
+
 * 管理端首页数据总览查看
     * 管理员、系统重要操作日志记录
     * 系统运行状态查看
-    
+
 * 选手查看自己的队伍信息，靶机信息，Token，总排行榜，公告
     * 总排行榜靶机状态实时更新
 
 * 前后端分离，前端开源可定制
 
 ## 安装
+
 ### Release 安装
 
 [下载](https://github.com/vidar-team/Cardinal/releases)适用于您目标机器的架构程序，运行即可。
@@ -107,13 +113,16 @@ curl https://sh.cardinal.ink | bash
 初次使用应当在下载后配置 `docker-compose.yml` 内的各项参数
 
 ## 开始使用
+
 默认端口： `19999`
+
 * 选手端 `http://localhost:19999/`
 * 后台管理 `http://localhost:19999/manager`
 
 ## Contributors ✨
 
-[提交 Bug](https://github.com/vidar-team/Cardinal/issues/new) | [Fork & Pull Request](https://github.com/vidar-team/Cardinal/fork)
+[提交 Bug](https://github.com/vidar-team/Cardinal/issues/new)
+| [Fork & Pull Request](https://github.com/vidar-team/Cardinal/fork)
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
@@ -130,6 +139,12 @@ curl https://sh.cardinal.ink | bash
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 十分欢迎您和我们一起改进 Cardinal，您可以改进现有程序，加入新功能，完善文档，优化代码等。
+
+## 使用 Cardinal 的团队及组织
+
+<a href="https://ctf.bugku.com/" target="_blank"><img src="https://cardinal.ink/brand/bugku.png" style="max-height: 65px; margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
+<a><img src="https://cardinal.ink/brand/QLNU.jpg" style="max-height: 65px; margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
+<a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" style="max-height: 65px; margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 
 ## 协议与许可
 
