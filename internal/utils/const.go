@@ -15,6 +15,7 @@ const (
 	FLAG_SUFFIX_CONF    = "flag_suffix"
 	ANIMATE_ASTEROID    = "animate_asteroid"
 	SHOW_OTHERS_GAMEBOX = "show_others_gamebox"
+	DEFAULT_LANGUAGE    = "default_language"
 
 	BOOLEAN_TRUE  = "true"
 	BOOLEAN_FALSE = "false"
@@ -24,4 +25,5 @@ const (
 	// Config type
 	STRING = iota
 	BOOLEAN
+	SELECT
 )

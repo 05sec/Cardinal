@@ -59,6 +59,7 @@ en-US:
     repeat: "Duplicated Gamebox Found!"
     not_found: "Gamebox Not Found!"
     auto_refresh_flag_error: "Missing GameBox SSH!"
+    reset_success: "Reset gameboxes successfully!"
 
   team:
     post_error: "Add Team Failed!"
