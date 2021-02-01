@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/locales"
@@ -222,4 +223,15 @@ func GetOthersGameBox(c *gin.Context) (int, interface{}) {
 
 func CleanGameBoxStatus() {
 	db.MySQL.Model(&db.GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
+}
+
+func ResetAllGameBoxes(c *gin.Context) (int, interface{}) {
+	db.MySQL.Model(&db.AttackAction{}).Delete(&db.AttackAction{})
+	db.MySQL.Model(&db.DownAction{}).Delete(&db.DownAction{})
+
+	CleanGameBoxStatus()
+	SetRankList()
+
+	logger.New(logger.IMPORTANT, "manager_operate", string(locales.I18n.T(c.GetString("lang"), "gamebox.reset_success")))
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.reset_success"))
 }
