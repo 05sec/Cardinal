@@ -150,7 +150,8 @@ type WebHook struct {
 type DynamicConfig struct {
 	gorm.Model `json:"-"`
 
-	Key   string
-	Value string
-	Kind  int8
+	Key     string
+	Value   string
+	Kind    int8
+	Options string
 }

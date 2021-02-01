@@ -5,6 +5,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/frontend"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
@@ -57,7 +58,8 @@ func Init() *gin.Engine {
 
 	api.GET("/base", func(c *gin.Context) {
 		c.JSON(utils.MakeSuccessJSON(gin.H{
-			"Title": dynamic_config.Get(utils.TITLE_CONF),
+			"Title":    dynamic_config.Get(utils.TITLE_CONF),
+			"Language": dynamic_config.Get(utils.DEFAULT_LANGUAGE),
 		}))
 	})
 
@@ -124,6 +126,7 @@ func Init() *gin.Engine {
 			// TODO: i18n
 			c.JSON(utils.MakeSuccessJSON("刷新 Flag 操作已执行，请在数据大屏查看是否有错误信息"))
 		})
+		managerRouter.GET("/gameboxes/reset", __(game.ResetAllGameBoxes))
 
 		// Team
 		managerRouter.GET("/teams", __(team.GetAllTeams))

@@ -59,6 +59,7 @@ zh-CN:
     repeat: "存在重复添加的靶机，请检查"
     not_found: "靶机不存在！"
     auto_refresh_flag_error: "靶机 SSH 设置为空"
+    reset_success: "重置靶机信息成功"
 
   team:
     post_error: "添加队伍失败！"
