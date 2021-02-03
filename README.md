@@ -142,7 +142,6 @@ curl https://sh.cardinal.ink | bash
 
 ## 使用 Cardinal 的团队及组织
 
-<a href="https://ctf.bugku.com/" target="_blank"><img src="https://cardinal.ink/brand/bugku.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 <a><img src="https://cardinal.ink/brand/QLNU.jpg" height="65px"  style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 <a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 
