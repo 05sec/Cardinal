@@ -13,7 +13,7 @@ import (
 
 var _ ChallengesStore = (*challenges)(nil)
 
-// Challenges is the default constant of the ChallengesStore.
+// Challenges is the default instance of the ChallengesStore.
 var Challenges ChallengesStore
 
 // ChallengesStore is the persistent interface for challenges.
@@ -34,7 +34,7 @@ type ChallengesStore interface {
 	DeleteAll(ctx context.Context) error
 }
 
-// NewChallengesStore returns a ChallengesStore constant with the given database connection.
+// NewChallengesStore returns a ChallengesStore instance with the given database connection.
 func NewChallengesStore(db *gorm.DB) ChallengesStore {
 	return &challenges{DB: db}
 }
