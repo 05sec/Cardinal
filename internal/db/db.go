@@ -23,7 +23,9 @@ func Init(username, password, host, name string) error {
 	}
 
 	// Migrate databases.
-	if db.AutoMigrate().Error != nil {
+	if db.AutoMigrate(
+		&Challenge{},
+	) != nil {
 		return errors.Wrap(err, "auto migrate")
 	}
 
@@ -31,6 +33,8 @@ func Init(username, password, host, name string) error {
 	if MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
 		return ErrBadCharset
 	}
+
+	Challenges = NewChallengesStore(db)
 
 	return nil
 }

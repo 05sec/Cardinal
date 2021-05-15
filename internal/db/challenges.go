@@ -76,7 +76,7 @@ func (db *challenges) Create(ctx context.Context, opts CreateChallengeOptions) (
 
 func (db *challenges) Get(ctx context.Context) ([]*Challenge, error) {
 	var challenges []*Challenge
-	return challenges, db.DB.WithContext(ctx).Model(&Challenge{}).Find(&challenges).Error
+	return challenges, db.DB.WithContext(ctx).Model(&Challenge{}).Order("id ASC").Find(&challenges).Error
 }
 
 var ErrChallengeNotExists = errors.New("challenge does not exist")
@@ -100,12 +100,14 @@ type UpdateChallengeOptions struct {
 }
 
 func (db *challenges) Update(ctx context.Context, id uint, opts UpdateChallengeOptions) error {
-	return db.WithContext(ctx).Model(&Challenge{}).Where("id = ?", id).Select("*").Updates(&Challenge{
-		Title:            opts.Title,
-		BaseScore:        opts.BaseScore,
-		AutoRenewFlag:    opts.AutoRenewFlag,
-		RenewFlagCommand: opts.RenewFlagCommand,
-	}).Error
+	return db.WithContext(ctx).Model(&Challenge{}).Where("id = ?", id).
+		Select("Title", "BaseScore", "AutoRenewFlag", "RenewFlagCommand").
+		Updates(&Challenge{
+			Title:            opts.Title,
+			BaseScore:        opts.BaseScore,
+			AutoRenewFlag:    opts.AutoRenewFlag,
+			RenewFlagCommand: opts.RenewFlagCommand,
+		}).Error
 }
 
 func (db *challenges) DeleteByID(ctx context.Context, id uint) error {
@@ -113,5 +115,5 @@ func (db *challenges) DeleteByID(ctx context.Context, id uint) error {
 }
 
 func (db *challenges) DeleteAll(ctx context.Context) error {
-	return db.WithContext(ctx).Delete(&Challenge{}).Error
+	return db.WithContext(ctx).Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&Challenge{}).Error
 }
