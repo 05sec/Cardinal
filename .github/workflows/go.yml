@@ -52,3 +52,4 @@ jobs:
           DBHOST: localhost
           DBUSER: root
           DBPASSWORD: cardinal_passw0rd
+          CARDINAL_TEST: true
