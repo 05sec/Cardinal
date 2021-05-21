@@ -14,7 +14,7 @@ import (
 
 	"github.com/thanhpk/randstr"
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -178,7 +178,7 @@ func GenerateConfigFileGuide(lang string) ([]byte, error) {
 
 func InitManager() {
 	var managerCount int
-	db.MySQL.Model(&db.Manager{}).Count(&managerCount)
+	dbold.MySQL.Model(&dbold.Manager{}).Count(&managerCount)
 	if managerCount == 0 {
 		var managerName, managerPassword string
 
@@ -198,7 +198,7 @@ func InitManager() {
 		}
 
 		// Create manager account if managers table is empty.
-		db.MySQL.Create(&db.Manager{
+		dbold.MySQL.Create(&dbold.Manager{
 			Name:     managerName,
 			Password: utils.AddSalt(managerPassword),
 		})

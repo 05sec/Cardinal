@@ -2,8 +2,9 @@ package game
 
 import (
 	"github.com/patrickmn/go-cache"
+
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/store"
@@ -64,7 +65,7 @@ func SetRankListTitle() {
 	var result []struct {
 		Title string `gorm:"Column:Title"`
 	}
-	db.MySQL.Raw("SELECT `challenges`.`Title` FROM `challenges` WHERE `challenges`.`id` IN " +
+	dbold.MySQL.Raw("SELECT `challenges`.`Title` FROM `challenges` WHERE `challenges`.`id` IN " +
 		"(SELECT DISTINCT challenge_id FROM `game_boxes` WHERE `visible` = 1 AND `deleted_at` IS NULL) " + // DISTINCT get all the visible challenge IDs and remove duplicate data
 		"AND `deleted_at` IS NULL ORDER BY `challenges`.`id`").Scan(&result)
 
@@ -82,12 +83,12 @@ func SetRankList() {
 	var rankList []*RankItem
 	var managerRankList []*RankItem
 
-	var teams []db.Team
-	db.MySQL.Model(&db.Team{}).Order("score DESC").Find(&teams) // Ordered by the team score.
+	var teams []dbold.Team
+	dbold.MySQL.Model(&dbold.Team{}).Order("score DESC").Find(&teams) // Ordered by the team score.
 	for _, team := range teams {
-		var gameboxes []db.GameBox
+		var gameboxes []dbold.GameBox
 		// Get the challenge data ordered by the challenge ID, to make sure the table header can match with the score correctly.
-		db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes)
+		dbold.MySQL.Model(&dbold.GameBox{}).Where(&dbold.GameBox{TeamID: team.ID, Visible: true}).Order("challenge_id").Find(&gameboxes)
 		var gameBoxInfo []*GameBoxInfo       // Gamebox info for manager.
 		var gameBoxStatuses []*GameBoxStatus // Gamebox info for users and public.
 

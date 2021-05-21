@@ -3,8 +3,9 @@ package game
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+
 	"github.com/vidar-team/Cardinal/internal/asteroid"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/livelog"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
@@ -33,8 +34,8 @@ func CheckDown(c *gin.Context) (int, interface{}) {
 	}
 
 	// Does it check down one gamebox repeatedly in one round?
-	var repeatCheck db.DownAction
-	db.MySQL.Model(&db.DownAction{}).Where(&db.DownAction{
+	var repeatCheck dbold.DownAction
+	dbold.MySQL.Model(&dbold.DownAction{}).Where(&dbold.DownAction{
 		GameBoxID: inputForm.GameBoxID,
 		Round:     timer.Get().NowRound,
 	}).Find(&repeatCheck)
@@ -45,8 +46,8 @@ func CheckDown(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check the gamebox is existed or not.
-	var gameBox db.GameBox
-	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
+	var gameBox dbold.GameBox
+	dbold.MySQL.Model(&dbold.GameBox{}).Where(&dbold.GameBox{Model: gorm.Model{ID: inputForm.GameBoxID}}).Find(&gameBox)
 	if gameBox.ID == 0 {
 		return utils.MakeErrJSON(403, 40312,
 			locales.I18n.T(c.GetString("lang"), "gamebox.not_found"),
@@ -59,10 +60,10 @@ func CheckDown(c *gin.Context) (int, interface{}) {
 	}
 
 	// No problem! Update the gamebox status to down.
-	db.MySQL.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&db.GameBox{IsDown: true})
+	dbold.MySQL.Model(&dbold.GameBox{}).Where(&dbold.GameBox{Model: gorm.Model{ID: gameBox.ID}}).Update(&dbold.GameBox{IsDown: true})
 
-	tx := db.MySQL.Begin()
-	if tx.Create(&db.DownAction{
+	tx := dbold.MySQL.Begin()
+	if tx.Create(&dbold.DownAction{
 		TeamID:      gameBox.TeamID,
 		ChallengeID: gameBox.ChallengeID,
 		GameBoxID:   inputForm.GameBoxID,
@@ -84,10 +85,10 @@ func CheckDown(c *gin.Context) (int, interface{}) {
 	// Asteroid Unity3D
 	asteroid.SendStatus(int(gameBox.TeamID), "down")
 
-	var t db.Team
-	db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: gameBox.TeamID}}).Find(&t)
-	var challenge db.Challenge
-	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
+	var t dbold.Team
+	dbold.MySQL.Model(&dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: gameBox.TeamID}}).Find(&t)
+	var challenge dbold.Challenge
+	dbold.MySQL.Model(&dbold.Challenge{}).Where(&dbold.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
 	// Live log
 	_ = livelog.Stream.Write(livelog.GlobalStream, livelog.NewLine("check_down",
 		gin.H{"Team": t.Name, "Challenge": challenge.Title}))

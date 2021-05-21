@@ -10,6 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/vidar-team/Cardinal/internal/dbold"
 )
 
 var ErrBadCharset = errors.New("bad charset")
@@ -30,7 +32,7 @@ func Init(username, password, host, name string) error {
 	}
 
 	// Test database charset, we should support Chinese input.
-	if MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
+	if dbold.MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
 		return ErrBadCharset
 	}
 

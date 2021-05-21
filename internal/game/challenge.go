@@ -6,7 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/vidar-team/Cardinal/internal/db"
+
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -29,15 +30,15 @@ func SetVisible(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkChallenge db.Challenge
-	db.MySQL.Where(&db.Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
+	var checkChallenge dbold.Challenge
+	dbold.MySQL.Where(&dbold.Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
 		return utils.MakeErrJSON(404, 40402,
 			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
 
-	db.MySQL.Model(&db.GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
+	dbold.MySQL.Model(&dbold.GameBox{}).Where("challenge_id = ?", inputForm.ID).Update(map[string]interface{}{"visible": inputForm.Visible})
 
 	// Calculate all the teams' score. (Only visible challenges)
 	calculateTeamScore()
@@ -58,8 +59,8 @@ func SetVisible(c *gin.Context) (int, interface{}) {
 
 // GetAllChallenges get all challenges from the database.
 func GetAllChallenges(c *gin.Context) (int, interface{}) {
-	var challenges []db.Challenge
-	db.MySQL.Model(&db.Challenge{}).Find(&challenges)
+	var challenges []dbold.Challenge
+	dbold.MySQL.Model(&dbold.Challenge{}).Find(&challenges)
 	type resultStruct struct {
 		ID              uint
 		CreatedAt       time.Time
@@ -75,8 +76,8 @@ func GetAllChallenges(c *gin.Context) (int, interface{}) {
 		// For the challenge model doesn't have the `visible` field,
 		// We can only get the challenge's visible status by one of its gamebox.
 		// TODO: Need to find a better way to get the challenge's visible status.
-		var gameBox db.GameBox
-		db.MySQL.Where(&db.GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
+		var gameBox dbold.GameBox
+		dbold.MySQL.Where(&dbold.GameBox{ChallengeID: v.ID}).Limit(1).Find(&gameBox)
 
 		res = append(res, resultStruct{
 			ID:              v.ID,
@@ -117,22 +118,22 @@ func NewChallenge(c *gin.Context) (int, interface{}) {
 		inputForm.Command = ""
 	}
 
-	newChallenge := &db.Challenge{
+	newChallenge := &dbold.Challenge{
 		Title:           inputForm.Title,
 		BaseScore:       inputForm.BaseScore,
 		AutoRefreshFlag: inputForm.AutoRefreshFlag,
 		Command:         inputForm.Command,
 	}
-	var checkChallenge db.Challenge
+	var checkChallenge dbold.Challenge
 
-	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Title: newChallenge.Title}).Find(&checkChallenge)
+	dbold.MySQL.Model(&dbold.Challenge{}).Where(&dbold.Challenge{Title: newChallenge.Title}).Find(&checkChallenge)
 	if checkChallenge.Title != "" {
 		return utils.MakeErrJSON(403, 40313,
 			locales.I18n.T(c.GetString("lang"), "general.post_repeat"),
 		)
 	}
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	if tx.Create(newChallenge).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50016,
@@ -175,8 +176,8 @@ func EditChallenge(c *gin.Context) (int, interface{}) {
 		inputForm.Command = ""
 	}
 
-	var checkChallenge db.Challenge
-	db.MySQL.Where(&db.Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
+	var checkChallenge dbold.Challenge
+	dbold.MySQL.Where(&dbold.Challenge{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkChallenge)
 	if checkChallenge.Title == "" {
 		return utils.MakeErrJSON(404, 40403,
 			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
@@ -190,8 +191,8 @@ func EditChallenge(c *gin.Context) (int, interface{}) {
 		"AutoRefreshFlag": inputForm.AutoRefreshFlag,
 		"Command":         inputForm.Command,
 	}
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(editChallenge).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.Challenge{}).Where(&dbold.Challenge{Model: gorm.Model{ID: inputForm.ID}}).Updates(editChallenge).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50017,
 			locales.I18n.T(c.GetString("lang"), "challenge.put_error"),
@@ -232,18 +233,18 @@ func DeleteChallenge(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var challenge db.Challenge
-	db.MySQL.Where(&db.Challenge{Model: gorm.Model{ID: uint(id)}}).Find(&challenge)
+	var challenge dbold.Challenge
+	dbold.MySQL.Where(&dbold.Challenge{Model: gorm.Model{ID: uint(id)}}).Find(&challenge)
 	if challenge.Title == "" {
 		return utils.MakeErrJSON(404, 40403,
 			locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
 		)
 	}
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	// 同时删除 GameBox
-	tx.Where("challenge_id = ?", uint(id)).Delete(&db.GameBox{})
-	if tx.Where("id = ?", uint(id)).Delete(&db.Challenge{}).RowsAffected != 1 {
+	tx.Where("challenge_id = ?", uint(id)).Delete(&dbold.GameBox{})
+	if tx.Where("id = ?", uint(id)).Delete(&dbold.Challenge{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50018,
 			locales.I18n.T(c.GetString("lang"), "challenge.delete_error"),

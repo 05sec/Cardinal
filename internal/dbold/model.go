@@ -1,6 +1,8 @@
-package db
+package dbold
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // If the version is different from the database record, it will ask user for cleaning the database.
 const VERSION = "20201127"

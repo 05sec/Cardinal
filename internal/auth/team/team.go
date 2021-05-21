@@ -6,7 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/internal/db"
+
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -27,14 +28,14 @@ func TeamLogin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var team db.Team
-	db.MySQL.Where(&db.Team{Name: formData.Name}).Find(&team)
+	var team dbold.Team
+	dbold.MySQL.Where(&dbold.Team{Name: formData.Name}).Find(&team)
 	if team.Name != "" && utils.CheckPassword(formData.Password, team.Password) {
 		// Login successfully
 		token := utils.GenerateToken()
 
-		tx := db.MySQL.Begin()
-		if tx.Create(&db.Token{TeamID: team.ID, Token: token}).RowsAffected != 1 {
+		tx := dbold.MySQL.Begin()
+		if tx.Create(&dbold.Token{TeamID: team.ID, Token: token}).RowsAffected != 1 {
 			tx.Rollback()
 			return utils.MakeErrJSON(500, 50000,
 				locales.I18n.T(c.GetString("lang"), "general.server_error"),
@@ -52,7 +53,7 @@ func TeamLogin(c *gin.Context) (int, interface{}) {
 func TeamLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
 	if token != "" {
-		db.MySQL.Model(&db.Token{}).Where("token = ?", token).Delete(&db.Token{})
+		dbold.MySQL.Model(&dbold.Token{}).Where("token = ?", token).Delete(&dbold.Token{})
 	}
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "team.logout_success"))
 }
@@ -66,11 +67,11 @@ func GetTeamInfo(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var teamInfo db.Team
+	var teamInfo dbold.Team
 	rank := 0
-	var teams []db.Team
+	var teams []dbold.Team
 
-	db.MySQL.Model(&db.Team{}).Order("`score` DESC").Find(&teams)
+	dbold.MySQL.Model(&dbold.Team{}).Order("`score` DESC").Find(&teams)
 	// Get the team rank by its index.
 	for index, t := range teams {
 		if teamID.(uint) == t.ID {
@@ -91,8 +92,8 @@ func GetTeamInfo(c *gin.Context) (int, interface{}) {
 
 // GetAllTeams returns all the teams info for manager.
 func GetAllTeams(c *gin.Context) (int, interface{}) {
-	var teams []db.Team
-	db.MySQL.Model(&db.Team{}).Find(&teams)
+	var teams []dbold.Team
+	dbold.MySQL.Model(&dbold.Team{}).Find(&teams)
 	return utils.MakeSuccessJSON(teams)
 }
 
@@ -117,7 +118,7 @@ func NewTeams(c *gin.Context) (int, interface{}) {
 
 		// Check if the team name repeat in the database.
 		var count int
-		db.MySQL.Model(db.Team{}).Where(&db.Team{Name: item.Name}).Count(&count)
+		dbold.MySQL.Model(dbold.Team{}).Where(&dbold.Team{Name: item.Name}).Count(&count)
 		if count != 0 {
 			return utils.MakeErrJSON(400, 40002,
 				locales.I18n.T(c.GetString("lang"), "team.repeat"),
@@ -142,11 +143,11 @@ func NewTeams(c *gin.Context) (int, interface{}) {
 	}
 	var resultData []resultItem
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	teamName := "" // Log
 	for _, item := range inputForm {
 		password := randstr.String(16)
-		newTeam := &db.Team{
+		newTeam := &dbold.Team{
 			Name:      item.Name,
 			Password:  utils.AddSalt(password),
 			Logo:      item.Logo,
@@ -192,7 +193,7 @@ func EditTeam(c *gin.Context) (int, interface{}) {
 
 	// Check the team existed or not.
 	var count int
-	db.MySQL.Model(db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
+	dbold.MySQL.Model(dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: inputForm.ID}}).Count(&count)
 	if count == 0 {
 		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
@@ -200,16 +201,16 @@ func EditTeam(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check the team name repeated or not.
-	var repeatCheckTeam db.Team
-	db.MySQL.Model(db.Team{}).Where(&db.Team{Name: inputForm.Name}).Find(&repeatCheckTeam)
+	var repeatCheckTeam dbold.Team
+	dbold.MySQL.Model(dbold.Team{}).Where(&dbold.Team{Name: inputForm.Name}).Find(&repeatCheckTeam)
 	if repeatCheckTeam.Name != "" && repeatCheckTeam.ID != inputForm.ID {
 		return utils.MakeErrJSON(400, 40004,
 			locales.I18n.T(c.GetString("lang"), "team.repeat"),
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(gin.H{
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(gin.H{
 		"Name": inputForm.Name,
 		"Logo": inputForm.Logo,
 	}).RowsAffected != 1 {
@@ -238,16 +239,16 @@ func DeleteTeam(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var team db.Team
-	db.MySQL.Where(&db.Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
+	var team dbold.Team
+	dbold.MySQL.Where(&dbold.Team{Model: gorm.Model{ID: uint(id)}}).Find(&team)
 	if team.Name == "" {
 		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Where("id = ?", uint(id)).Delete(&db.Team{}).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Where("id = ?", uint(id)).Delete(&dbold.Team{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50004,
 			locales.I18n.T(c.GetString("lang"), "team.delete_error"),
@@ -277,8 +278,8 @@ func ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	}
 
 	// Check the team existed or not.
-	var checkTeam db.Team
-	db.MySQL.Model(db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
+	var checkTeam dbold.Team
+	dbold.MySQL.Model(dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkTeam)
 	if checkTeam.Name == "" {
 		return utils.MakeErrJSON(404, 40401,
 			locales.I18n.T(c.GetString("lang"), "team.not_found"),
@@ -286,8 +287,8 @@ func ResetTeamPassword(c *gin.Context) (int, interface{}) {
 	}
 
 	newPassword := randstr.String(16)
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&db.Team{Password: utils.AddSalt(newPassword)}).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: inputForm.ID}}).Updates(&dbold.Team{Password: utils.AddSalt(newPassword)}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50005,
 			locales.I18n.T(c.GetString("lang"), "team.reset_password_error"),

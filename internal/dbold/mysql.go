@@ -1,13 +1,14 @@
-package db
+package dbold
 
 import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/locales"
-	log "unknwon.dev/clog/v2"
 )
 
 var MySQL *gorm.DB
