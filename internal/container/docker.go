@@ -10,7 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/parnurzeal/gorequest"
-	"github.com/vidar-team/Cardinal/internal/db"
+
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
@@ -97,8 +98,8 @@ func DeployFromDocker(c *gin.Context) (int, interface{}) {
 	// Pre-check
 
 	// challenge exist
-	var chall db.Challenge
-	db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: form.Challenge}}).Find(&chall)
+	var chall dbold.Challenge
+	dbold.MySQL.Model(&dbold.Challenge{}).Where(&dbold.Challenge{Model: gorm.Model{ID: form.Challenge}}).Find(&chall)
 	if chall.ID == 0 {
 		return utils.MakeErrJSON(404, 40406, "payload error")
 	}

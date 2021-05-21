@@ -5,15 +5,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
 // GetAllBulletins returns all bulletins from the database.
 func GetAllBulletins(c *gin.Context) (int, interface{}) {
-	var bulletins []db.Bulletin
-	db.MySQL.Model(&db.Bulletin{}).Order("`id` DESC").Find(&bulletins)
+	var bulletins []dbold.Bulletin
+	dbold.MySQL.Model(&dbold.Bulletin{}).Order("`id` DESC").Find(&bulletins)
 	return utils.MakeSuccessJSON(bulletins)
 }
 
@@ -31,8 +31,8 @@ func NewBulletin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Create(&db.Bulletin{
+	tx := dbold.MySQL.Begin()
+	if tx.Create(&dbold.Bulletin{
 		Title:   inputForm.Title,
 		Content: inputForm.Content,
 	}).RowsAffected != 1 {
@@ -60,20 +60,20 @@ func EditBulletin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkBulletin db.Bulletin
-	db.MySQL.Where(&db.Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
+	var checkBulletin dbold.Bulletin
+	dbold.MySQL.Where(&dbold.Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
 		return utils.MakeErrJSON(404, 40404,
 			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
 
-	newBulletin := &db.Bulletin{
+	newBulletin := &dbold.Bulletin{
 		Title:   inputForm.Title,
 		Content: inputForm.Content,
 	}
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.Bulletin{}).Where(&db.Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.Bulletin{}).Where(&dbold.Bulletin{Model: gorm.Model{ID: inputForm.ID}}).Updates(&newBulletin).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50020,
 			locales.I18n.T(c.GetString("lang"), "bulletin.put_error"),
@@ -99,16 +99,16 @@ func DeleteBulletin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkBulletin db.Bulletin
-	db.MySQL.Where(&db.Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
+	var checkBulletin dbold.Bulletin
+	dbold.MySQL.Where(&dbold.Bulletin{Model: gorm.Model{ID: uint(id)}}).Find(&checkBulletin)
 	if checkBulletin.ID == 0 {
 		return utils.MakeErrJSON(404, 40404,
 			locales.I18n.T(c.GetString("lang"), "bulletin.not_found"),
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Where("id = ?", id).Delete(&db.Bulletin{}).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Where("id = ?", id).Delete(&dbold.Bulletin{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50021,
 			locales.I18n.T(c.GetString("lang"), "bulletin.delete_error"),

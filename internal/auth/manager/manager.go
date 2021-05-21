@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -25,15 +25,15 @@ func ManagerLogin(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var manager db.Manager
-	db.MySQL.Where(&db.Manager{Name: formData.Name}).Find(&manager)
+	var manager dbold.Manager
+	dbold.MySQL.Where(&dbold.Manager{Name: formData.Name}).Find(&manager)
 
 	// The check account can't login.
 	if manager.ID != 0 && manager.Name != "" && utils.CheckPassword(formData.Password, manager.Password) && !manager.IsCheck {
 		// Login successfully
 		token := utils.GenerateToken()
-		tx := db.MySQL.Begin()
-		if tx.Model(&db.Manager{}).Where(&db.Manager{Name: manager.Name}).Updates(&db.Manager{Token: token}).RowsAffected != 1 {
+		tx := dbold.MySQL.Begin()
+		if tx.Model(&dbold.Manager{}).Where(&dbold.Manager{Name: manager.Name}).Updates(&dbold.Manager{Token: token}).RowsAffected != 1 {
 			tx.Rollback()
 			return utils.MakeErrJSON(500, 50006,
 				locales.I18n.T(c.GetString("lang"), "general.server_error"),
@@ -50,9 +50,9 @@ func ManagerLogin(c *gin.Context) (int, interface{}) {
 // ManagerLogout is the manager logout handler.
 func ManagerLogout(c *gin.Context) (int, interface{}) {
 	token := c.GetHeader("Authorization")
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	if token != "" {
-		if tx.Model(&db.Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Update(map[string]interface{}{"token": ""}).RowsAffected != 1 {
+		if tx.Model(&dbold.Manager{}).Where("`token` = ? AND `is_check` = ?", token, false).Update(map[string]interface{}{"token": ""}).RowsAffected != 1 {
 			tx.Rollback()
 		} else {
 			tx.Commit()
@@ -65,8 +65,8 @@ func ManagerLogout(c *gin.Context) (int, interface{}) {
 
 // GetAllManager returns all the manager.
 func GetAllManager(c *gin.Context) (int, interface{}) {
-	var manager []db.Manager
-	db.MySQL.Model(&db.Manager{}).Find(&manager)
+	var manager []dbold.Manager
+	dbold.MySQL.Model(&dbold.Manager{}).Find(&manager)
 	return utils.MakeSuccessJSON(manager)
 }
 
@@ -91,20 +91,20 @@ func NewManager(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkManager db.Manager
-	db.MySQL.Model(&db.Manager{}).Where(&db.Manager{Name: formData.Name}).Find(&checkManager)
+	var checkManager dbold.Manager
+	dbold.MySQL.Model(&dbold.Manager{}).Where(&dbold.Manager{Name: formData.Name}).Find(&checkManager)
 	if checkManager.ID != 0 {
 		return utils.MakeErrJSON(400, 40011,
 			locales.I18n.T(c.GetString("lang"), "manager.repeat"),
 		)
 	}
 
-	manager := db.Manager{
+	manager := dbold.Manager{
 		Name:     formData.Name,
 		IsCheck:  formData.IsCheck,
 		Password: utils.AddSalt(formData.Password),
 	}
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	if tx.Create(&manager).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50007,
@@ -135,9 +135,9 @@ func RefreshManagerToken(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	token := utils.GenerateToken()
-	if tx.Model(&db.Manager{}).Where(&db.Manager{Model: gorm.Model{ID: uint(id)}}).Update(&db.Manager{
+	if tx.Model(&dbold.Manager{}).Where(&dbold.Manager{Model: gorm.Model{ID: uint(id)}}).Update(&dbold.Manager{
 		Token: token,
 	}).RowsAffected != 1 {
 		tx.Rollback()
@@ -168,9 +168,9 @@ func ChangeManagerPassword(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	password := randstr.String(16)
-	if tx.Model(&db.Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Update(&db.Manager{
+	if tx.Model(&dbold.Manager{}).Where(map[string]interface{}{"id": uint(id), "is_check": false}).Update(&dbold.Manager{
 		Password: utils.AddSalt(password),
 	}).RowsAffected != 1 {
 		tx.Rollback()
@@ -201,8 +201,8 @@ func DeleteManager(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.Manager{}).Where("id = ?", id).Delete(&db.Manager{}).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.Manager{}).Where("id = ?", id).Delete(&dbold.Manager{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50010,
 			locales.I18n.T(c.GetString("lang"), "manager.delete_error"),

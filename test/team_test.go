@@ -10,7 +10,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
-	"github.com/vidar-team/Cardinal/internal/db"
+
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/healthy"
 	"github.com/vidar-team/Cardinal/internal/timer"
@@ -583,7 +584,7 @@ func Test_GenerateFlag(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 
 	var count int
-	db.MySQL.Model(&db.Flag{}).Count(&count)
+	dbold.MySQL.Model(&dbold.Flag{}).Count(&count)
 	assert.NotEqual(t, 0, count)
 }
 
@@ -626,8 +627,8 @@ func Test_GetFlags(t *testing.T) {
 func Test_SubmitFlag(t *testing.T) {
 	timer.Get().NowRound = 1
 
-	var flag1 db.Flag
-	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
+	var flag1 dbold.Flag
+	dbold.MySQL.Model(&dbold.Flag{}).Where(&dbold.Flag{
 		TeamID:      2,
 		ChallengeID: 1,
 		Round:       1,
@@ -635,8 +636,8 @@ func Test_SubmitFlag(t *testing.T) {
 	fmt.Println(flag1)
 	assert.NotEqual(t, flag1.Flag, "")
 
-	var flag2 db.Flag
-	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
+	var flag2 dbold.Flag
+	dbold.MySQL.Model(&dbold.Flag{}).Where(&dbold.Flag{
 		TeamID:      2,
 		ChallengeID: 3,
 		Round:       1,
@@ -644,8 +645,8 @@ func Test_SubmitFlag(t *testing.T) {
 	fmt.Println(flag2)
 	assert.NotEqual(t, flag2.Flag, "")
 
-	var flag3 db.Flag
-	db.MySQL.Model(&db.Flag{}).Where(&db.Flag{
+	var flag3 dbold.Flag
+	dbold.MySQL.Model(&dbold.Flag{}).Where(&dbold.Flag{
 		TeamID:      1,
 		ChallengeID: 3,
 		Round:       1,
@@ -810,16 +811,16 @@ func Test_CalculateRoundScore(t *testing.T) {
 
 	game.CalculateRoundScore(1)
 	// Check team score
-	var vidar db.Team
-	db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: 1}}).Find(&vidar)
-	var e99 db.Team
-	db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: 2}}).Find(&e99)
+	var vidar dbold.Team
+	dbold.MySQL.Model(&dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: 1}}).Find(&vidar)
+	var e99 dbold.Team
+	dbold.MySQL.Model(&dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: 2}}).Find(&e99)
 	assert.Equal(t, 2020.0, vidar.Score)
 	assert.Equal(t, 1980.0, e99.Score)
 
 	// Check gamebox score
-	var gameboxes []db.GameBox
-	db.MySQL.Model(&db.GameBox{}).Order("`id` ASC").Find(&gameboxes)
+	var gameboxes []dbold.GameBox
+	dbold.MySQL.Model(&dbold.GameBox{}).Order("`id` ASC").Find(&gameboxes)
 	assert.Equal(t, 1010.0, gameboxes[0].Score)
 	assert.Equal(t, 990.0, gameboxes[1].Score)
 	assert.Equal(t, 1010.0, gameboxes[2].Score)

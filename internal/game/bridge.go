@@ -2,7 +2,7 @@ package game
 
 import (
 	"github.com/vidar-team/Cardinal/internal/asteroid"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
@@ -10,8 +10,8 @@ import (
 
 func AsteroidGreetData() (result asteroid.Greet) {
 	var asteroidTeam []asteroid.Team
-	var teams []db.Team
-	db.MySQL.Model(&db.Team{}).Order("score DESC").Find(&teams)
+	var teams []dbold.Team
+	dbold.MySQL.Model(&dbold.Team{}).Order("score DESC").Find(&teams)
 	for rank, team := range teams {
 		asteroidTeam = append(asteroidTeam, asteroid.Team{
 			Id:    int(team.ID),

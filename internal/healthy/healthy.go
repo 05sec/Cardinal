@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/timer"
@@ -15,7 +15,7 @@ import (
 // HealthyCheck will be used to check whether Cardinal runs normally.
 func HealthyCheck() {
 	var teamCount int
-	db.MySQL.Model(&db.Team{}).Count(&teamCount)
+	dbold.MySQL.Model(&dbold.Team{}).Count(&teamCount)
 
 	previousRoundScore := PreviousRoundScore()
 	if math.Abs(previousRoundScore) != 0 {
@@ -44,7 +44,7 @@ func HealthyCheck() {
 func PreviousRoundScore() float64 {
 	var score []float64
 	// Pay attention if there is no action in the previous round, the SUM(`score`) will be NULL.
-	db.MySQL.Model(&db.Score{}).Where(&db.Score{Round: timer.Get().NowRound}).Pluck("IFNULL(SUM(`score`), 0)", &score)
+	dbold.MySQL.Model(&dbold.Score{}).Where(&dbold.Score{Round: timer.Get().NowRound}).Pluck("IFNULL(SUM(`score`), 0)", &score)
 	value, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", score[0]), 64)
 	return value
 }
@@ -53,7 +53,7 @@ func PreviousRoundScore() float64 {
 func TotalScore() float64 {
 	var score []float64
 	// Pay attention in the first round, the SUM(`score`) is NULL.
-	db.MySQL.Model(&db.Score{}).Pluck("IFNULL(SUM(`score`), 0)", &score)
+	dbold.MySQL.Model(&dbold.Score{}).Pluck("IFNULL(SUM(`score`), 0)", &score)
 	value, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", score[0]), 64)
 	return value
 }

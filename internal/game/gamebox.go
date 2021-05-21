@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -33,10 +33,10 @@ func GetSelfGameBoxes(c *gin.Context) (int, interface{}) {
 	}
 	teamID, _ := c.Get("teamID")
 
-	db.MySQL.Table("game_boxes").Where(&db.GameBox{TeamID: teamID.(uint), Visible: true}).Order("challenge_id").Find(&gameBoxes)
+	dbold.MySQL.Table("game_boxes").Where(&dbold.GameBox{TeamID: teamID.(uint), Visible: true}).Order("challenge_id").Find(&gameBoxes)
 	for index, gameBox := range gameBoxes {
-		var challenge db.Challenge
-		db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
+		var challenge dbold.Challenge
+		dbold.MySQL.Model(&dbold.Challenge{}).Where(&dbold.Challenge{Model: gorm.Model{ID: gameBox.ChallengeID}}).Find(&challenge)
 		gameBoxes[index].Title = challenge.Title
 	}
 	return utils.MakeSuccessJSON(gameBoxes)
@@ -61,9 +61,9 @@ func GetGameBoxes(c *gin.Context) (int, interface{}) {
 	}
 
 	var total int
-	db.MySQL.Model(&db.GameBox{}).Count(&total)
-	var gameBox []db.GameBox
-	db.MySQL.Model(&db.GameBox{}).Offset((page - 1) * perPage).Limit(perPage).Find(&gameBox)
+	dbold.MySQL.Model(&dbold.GameBox{}).Count(&total)
+	var gameBox []dbold.GameBox
+	dbold.MySQL.Model(&dbold.GameBox{}).Offset((page - 1) * perPage).Limit(perPage).Find(&gameBox)
 
 	return utils.MakeSuccessJSON(gin.H{
 		"Data":      gameBox,
@@ -98,8 +98,8 @@ func NewGameBoxes(c *gin.Context) (int, interface{}) {
 		var count int
 
 		// Check the ChallengeID
-		var challenge db.Challenge
-		db.MySQL.Model(&db.Challenge{}).Where(&db.Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Find(&challenge)
+		var challenge dbold.Challenge
+		dbold.MySQL.Model(&dbold.Challenge{}).Where(&dbold.Challenge{Model: gorm.Model{ID: item.ChallengeID}}).Find(&challenge)
 		if challenge.ID == 0 {
 			return utils.MakeErrJSON(400, 40016,
 				locales.I18n.T(c.GetString("lang"), "challenge.not_found"),
@@ -118,7 +118,7 @@ func NewGameBoxes(c *gin.Context) (int, interface{}) {
 		}
 
 		// Check the TeamID
-		db.MySQL.Model(&db.Team{}).Where(&db.Team{Model: gorm.Model{ID: item.TeamID}}).Count(&count)
+		dbold.MySQL.Model(&dbold.Team{}).Where(&dbold.Team{Model: gorm.Model{ID: item.TeamID}}).Count(&count)
 		if count != 1 {
 			return utils.MakeErrJSON(400, 40018,
 				locales.I18n.T(c.GetString("lang"), "team.not_found"),
@@ -127,7 +127,7 @@ func NewGameBoxes(c *gin.Context) (int, interface{}) {
 
 		// Check if the gamebox is existed by challenge ID and team ID,
 		// since every team should have only one gamebox for each challenge.
-		db.MySQL.Model(db.GameBox{}).Where(&db.GameBox{ChallengeID: item.ChallengeID, TeamID: item.TeamID}).Count(&count)
+		dbold.MySQL.Model(dbold.GameBox{}).Where(&dbold.GameBox{ChallengeID: item.ChallengeID, TeamID: item.TeamID}).Count(&count)
 		if count != 0 {
 			return utils.MakeErrJSON(400, 40019,
 				locales.I18n.T(c.GetString("lang"), "gamebox.repeat"),
@@ -135,9 +135,9 @@ func NewGameBoxes(c *gin.Context) (int, interface{}) {
 		}
 	}
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	for _, item := range inputForm {
-		newGameBox := &db.GameBox{
+		newGameBox := &dbold.GameBox{
 			ChallengeID: item.ChallengeID,
 			TeamID:      item.TeamID,
 			IP:          item.IP,
@@ -183,8 +183,8 @@ func EditGameBox(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.GameBox{}).Where(&db.GameBox{Model: gorm.Model{ID: inputForm.ID}}).Updates(&db.GameBox{
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.GameBox{}).Where(&dbold.GameBox{Model: gorm.Model{ID: inputForm.ID}}).Updates(&dbold.GameBox{
 		IP:          inputForm.IP,
 		Port:        inputForm.Port,
 		SSHPort:     inputForm.SSHPort,
@@ -215,19 +215,19 @@ func GetOthersGameBox(c *gin.Context) (int, interface{}) {
 		IP            string
 		Port          string
 	}
-	db.MySQL.Raw("SELECT `game_boxes`.`id`, `game_boxes`.`ip`,`game_boxes`.`port`, `challenges`.`title` AS challenge_name, `teams`.`name` AS team_name " +
+	dbold.MySQL.Raw("SELECT `game_boxes`.`id`, `game_boxes`.`ip`,`game_boxes`.`port`, `challenges`.`title` AS challenge_name, `teams`.`name` AS team_name " +
 		"FROM `game_boxes`, `teams`, `challenges` " +
 		"WHERE `game_boxes`.`visible` = 1 AND `game_boxes`.`challenge_id` = `challenges`.`id` AND `game_boxes`.`team_id` = `teams`.`id`").Scan(&gameboxs)
 	return utils.MakeSuccessJSON(gameboxs)
 }
 
 func CleanGameBoxStatus() {
-	db.MySQL.Model(&db.GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
+	dbold.MySQL.Model(&dbold.GameBox{}).Update(map[string]interface{}{"is_down": false, "is_attacked": false})
 }
 
 func ResetAllGameBoxes(c *gin.Context) (int, interface{}) {
-	db.MySQL.Model(&db.AttackAction{}).Delete(&db.AttackAction{})
-	db.MySQL.Model(&db.DownAction{}).Delete(&db.DownAction{})
+	dbold.MySQL.Model(&dbold.AttackAction{}).Delete(&dbold.AttackAction{})
+	dbold.MySQL.Model(&dbold.DownAction{}).Delete(&dbold.DownAction{})
 
 	CleanGameBoxStatus()
 	SetRankList()

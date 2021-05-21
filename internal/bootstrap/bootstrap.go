@@ -5,7 +5,7 @@ import (
 
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/install"
@@ -37,7 +37,7 @@ func LinkStart() {
 	misc.Sentry()
 
 	// Init MySQL database.
-	db.InitMySQL()
+	dbold.InitMySQL()
 
 	// Check manager
 	install.InitManager()

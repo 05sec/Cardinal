@@ -10,7 +10,7 @@ import (
 	"github.com/parnurzeal/gorequest"
 	"github.com/patrickmn/go-cache"
 	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/store"
@@ -28,8 +28,8 @@ const (
 )
 
 func GetWebHook(c *gin.Context) (int, interface{}) {
-	var webHooks []db.WebHook
-	db.MySQL.Model(&db.WebHook{}).Find(&webHooks)
+	var webHooks []dbold.WebHook
+	dbold.MySQL.Model(&dbold.WebHook{}).Find(&webHooks)
 	return utils.MakeSuccessJSON(webHooks)
 }
 
@@ -64,7 +64,7 @@ func NewWebHook(c *gin.Context) (int, interface{}) {
 		inputForm.Token = randstr.String(32)
 	}
 
-	newWebHook := &db.WebHook{
+	newWebHook := &dbold.WebHook{
 		URL:     inputForm.URL,
 		Type:    inputForm.Type,
 		Token:   inputForm.Token,
@@ -72,7 +72,7 @@ func NewWebHook(c *gin.Context) (int, interface{}) {
 		Timeout: inputForm.Timeout,
 	}
 
-	tx := db.MySQL.Begin()
+	tx := dbold.MySQL.Begin()
 	if tx.Create(&newWebHook).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50022,
@@ -103,8 +103,8 @@ func EditWebHook(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkWebHook db.WebHook
-	db.MySQL.Model(&db.WebHook{}).Where(&db.WebHook{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkWebHook)
+	var checkWebHook dbold.WebHook
+	dbold.MySQL.Model(&dbold.WebHook{}).Where(&dbold.WebHook{Model: gorm.Model{ID: inputForm.ID}}).Find(&checkWebHook)
 	if checkWebHook.ID == 0 {
 		return utils.MakeErrJSON(404, 40405,
 			locales.I18n.T(c.GetString("lang"), "webhook.not_found"),
@@ -124,7 +124,7 @@ func EditWebHook(c *gin.Context) (int, interface{}) {
 		inputForm.Token = randstr.String(32)
 	}
 
-	editWebHook := &db.WebHook{
+	editWebHook := &dbold.WebHook{
 		URL:     inputForm.URL,
 		Type:    inputForm.Type,
 		Token:   inputForm.Token,
@@ -132,8 +132,8 @@ func EditWebHook(c *gin.Context) (int, interface{}) {
 		Timeout: inputForm.Timeout,
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Model(&db.WebHook{}).Where(&db.WebHook{Model: gorm.Model{ID: inputForm.ID}}).Update(&editWebHook).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Model(&dbold.WebHook{}).Where(&dbold.WebHook{Model: gorm.Model{ID: inputForm.ID}}).Update(&editWebHook).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50023,
 			locales.I18n.T(c.GetString("lang"), "webhook.edit_error"))
@@ -158,16 +158,16 @@ func DeleteWebHook(c *gin.Context) (int, interface{}) {
 		)
 	}
 
-	var checkWebHook db.WebHook
-	db.MySQL.Model(&db.WebHook{}).Where(&db.WebHook{Model: gorm.Model{ID: uint(id)}}).Find(&checkWebHook)
+	var checkWebHook dbold.WebHook
+	dbold.MySQL.Model(&dbold.WebHook{}).Where(&dbold.WebHook{Model: gorm.Model{ID: uint(id)}}).Find(&checkWebHook)
 	if checkWebHook.ID == 0 {
 		return utils.MakeErrJSON(404, 40405,
 			locales.I18n.T(c.GetString("lang"), "webhook.not_found"),
 		)
 	}
 
-	tx := db.MySQL.Begin()
-	if tx.Where("id = ?", uint(id)).Delete(&db.WebHook{}).RowsAffected != 1 {
+	tx := dbold.MySQL.Begin()
+	if tx.Where("id = ?", uint(id)).Delete(&dbold.WebHook{}).RowsAffected != 1 {
 		tx.Rollback()
 		return utils.MakeErrJSON(500, 50024,
 			locales.I18n.T(c.GetString("lang"), "webhook.delete_error"))
@@ -179,8 +179,8 @@ func DeleteWebHook(c *gin.Context) (int, interface{}) {
 }
 
 func RefreshWebHookStore() {
-	var webHooks []db.WebHook
-	db.MySQL.Model(&db.WebHook{}).Find(&webHooks)
+	var webHooks []dbold.WebHook
+	dbold.MySQL.Model(&dbold.WebHook{}).Find(&webHooks)
 	store.Set("webHook", webHooks, cache.NoExpiration)
 }
 
@@ -195,7 +195,7 @@ func sendWebHook(webHookType string, webHookData interface{}) {
 		logger.New(logger.IMPORTANT, "webhook_cache", "WebHook 缓存获取失败！")
 		return
 	}
-	webHooks, ok := webHookStore.([]db.WebHook)
+	webHooks, ok := webHookStore.([]dbold.WebHook)
 	if !ok {
 		logger.New(logger.IMPORTANT, "webhook_cache", "WebHook 缓存获取失败！")
 		return
@@ -203,7 +203,7 @@ func sendWebHook(webHookType string, webHookData interface{}) {
 
 	for _, v := range webHooks {
 		if v.Type == webHookType || v.Type == ANY_HOOK {
-			go func(webhook db.WebHook) {
+			go func(webhook dbold.WebHook) {
 				nonce := randstr.Hex(16)
 
 				req := gorequest.New().Post(webhook.URL)

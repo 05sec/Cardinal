@@ -3,15 +3,15 @@ package dynamic_config
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
 func Init() {
-	db.MySQL.Model(&db.DynamicConfig{})
+	dbold.MySQL.Model(&dbold.DynamicConfig{})
 
-	initConfig(utils.DATBASE_VERSION, db.VERSION, utils.STRING)
+	initConfig(utils.DATBASE_VERSION, dbold.VERSION, utils.STRING)
 	initConfig(utils.TITLE_CONF, "HCTF", utils.STRING)
 	initConfig(utils.FLAG_PREFIX_CONF, "hctf{", utils.STRING)
 	initConfig(utils.FLAG_SUFFIX_CONF, "}", utils.STRING)
@@ -28,7 +28,7 @@ func initConfig(key string, value string, kind int8, option ...string) {
 		opt = option[0]
 	}
 
-	db.MySQL.Model(&db.DynamicConfig{}).FirstOrCreate(&db.DynamicConfig{
+	dbold.MySQL.Model(&dbold.DynamicConfig{}).FirstOrCreate(&dbold.DynamicConfig{
 		Key:     key,
 		Value:   value,
 		Kind:    kind,
@@ -43,7 +43,7 @@ func Set(key string, value string) {
 		return
 	}
 
-	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` = ?", key).Update(&db.DynamicConfig{
+	dbold.MySQL.Model(&dbold.DynamicConfig{}).Where("`key` = ?", key).Update(&dbold.DynamicConfig{
 		Key:   key,
 		Value: value,
 	})
@@ -51,8 +51,8 @@ func Set(key string, value string) {
 
 // Get returns the config value.
 func Get(key string) string {
-	var config db.DynamicConfig
-	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` = ?", key).Find(&config)
+	var config dbold.DynamicConfig
+	dbold.MySQL.Model(&dbold.DynamicConfig{}).Where("`key` = ?", key).Find(&config)
 	return config.Value
 }
 
@@ -88,7 +88,7 @@ func GetConfig(c *gin.Context) (int, interface{}) {
 
 // GetAllConfig is the HTTP handler used to return the all the configs.
 func GetAllConfig(c *gin.Context) (int, interface{}) {
-	var config []db.DynamicConfig
-	db.MySQL.Model(&db.DynamicConfig{}).Where("`key` != ?", utils.DATBASE_VERSION).Find(&config)
+	var config []dbold.DynamicConfig
+	dbold.MySQL.Model(&dbold.DynamicConfig{}).Where("`key` != ?", utils.DATBASE_VERSION).Find(&config)
 	return utils.MakeSuccessJSON(config)
 }

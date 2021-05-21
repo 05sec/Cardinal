@@ -16,6 +16,43 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run golangci-lint
-        uses: actions-contrib/golangci-lint@v1
+        uses: golangci/golangci-lint-action@v2
         with:
-          args: 'run --timeout=30m'
+          version: latest
+          args: --timeout=30m
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: cardinal_passw0rd
+          MYSQL_DATABASE: old_test_db
+        ports:
+          - 3306:3306
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Cache downloaded modules
+        uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Run tests
+        # add `-race` to check data race
+        run: go test -v ./...
+        env:
+          DBPORT: 3306
+          DBHOST: localhost
+          DBUSER: root
+          DBPASSWORD: cardinal_passw0rd
+          DBNAME: old_test_db    # For old database test
+          CARDINAL_TEST: true

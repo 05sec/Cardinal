@@ -8,7 +8,7 @@ import (
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/bootstrap"
-	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
 	"github.com/vidar-team/Cardinal/internal/livelog"
@@ -51,10 +51,10 @@ func prepare() {
 	conf.Init()
 
 	// Init MySQL database.
-	db.InitMySQL()
+	dbold.InitMySQL()
 
 	// Test manager account e99:qwe1qwe2qwe3
-	db.MySQL.Create(&db.Manager{
+	dbold.MySQL.Create(&dbold.Manager{
 		Name:     "e99",
 		Password: utils.AddSalt("qwe1qwe2qwe3"),
 		Token:    managerToken,
