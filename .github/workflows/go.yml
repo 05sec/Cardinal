@@ -25,10 +25,11 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     services:
-      postgres:
+      mysql:
         image: mysql
         env:
           MYSQL_ROOT_PASSWORD: cardinal_passw0rd
+          MYSQL_DATABASE: old_test_db
         ports:
           - 3306:3306
     steps:
@@ -52,4 +53,5 @@ jobs:
           DBHOST: localhost
           DBUSER: root
           DBPASSWORD: cardinal_passw0rd
+          DBNAME: old_test_db    # For old database test
           CARDINAL_TEST: true

@@ -39,10 +39,10 @@ func Init() {
 				AttackScore:    10,
 			},
 			MySQL: MySQL{
-				DBHost:     "127.0.0.1:3306",
-				DBUsername: "root",
-				DBPassword: os.Getenv("TEST_DB_PASSWORD"),
-				DBName:     os.Getenv("TEST_DB_NAME"),
+				DBHost:     os.ExpandEnv("$DBHOST:$DBPORT"),
+				DBUsername: os.Getenv("DBUSER"),
+				DBPassword: os.Getenv("DBPASSWORD"),
+				DBName: os.Getenv("DBNAME"),
 			},
 		}
 	}
