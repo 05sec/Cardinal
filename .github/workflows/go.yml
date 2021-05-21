@@ -51,4 +51,4 @@ jobs:
           DBPORT: 3306
           DBHOST: localhost
           DBUSER: root
-          PGPASSWORD: cardinal_passw0rd
+          DBPASSWORD: cardinal_passw0rd
