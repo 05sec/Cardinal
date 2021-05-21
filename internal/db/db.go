@@ -26,7 +26,10 @@ func Init(username, password, host, name string) error {
 
 	// Migrate databases.
 	if db.AutoMigrate(
+		&Bulletin{},
 		&Challenge{},
+		&Manager{},
+		&Team{},
 	) != nil {
 		return errors.Wrap(err, "auto migrate")
 	}
@@ -36,7 +39,9 @@ func Init(username, password, host, name string) error {
 		return ErrBadCharset
 	}
 
+	Bulletins = NewBulletinsStore(db)
 	Challenges = NewChallengesStore(db)
+	Teams = NewTeamsStore(db)
 
 	return nil
 }
