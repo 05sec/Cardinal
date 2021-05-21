@@ -219,7 +219,7 @@ func testTeamsChangePassword(t *testing.T, ctx context.Context, db *teams) {
 	assert.NotEqual(t, oldPassword, newPassword)
 
 	err = db.ChangePassword(ctx, 2, "user_not_found")
-	assert.Nil(t, nil)
+	assert.Nil(t, err)
 }
 
 func testTeamsUpdate(t *testing.T, ctx context.Context, db *teams) {
