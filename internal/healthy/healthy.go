@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/vidar-team/Cardinal/conf"
-	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -16,7 +15,7 @@ import (
 // HealthyCheck will be used to check whether Cardinal runs normally.
 func HealthyCheck() {
 	var teamCount int
-	dbold.MySQL.Model(&db.Team{}).Count(&teamCount)
+	dbold.MySQL.Model(&dbold.Team{}).Count(&teamCount)
 
 	previousRoundScore := PreviousRoundScore()
 	if math.Abs(previousRoundScore) != 0 {
