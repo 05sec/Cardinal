@@ -47,6 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Run tests
+        # add `-race` to check data race
         run: go test -v ./...
         env:
           DBPORT: 3306
