@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-go-
       - name: Run tests
         # add `-race` to check data race
-        run: go test -v ./...
+        run: go test -v -coverprofile=coverage.txt -covermode=atomic ./...
         env:
           DBPORT: 3306
           DBHOST: localhost
@@ -56,3 +56,9 @@ jobs:
           DBPASSWORD: cardinal_passw0rd
           DBNAME: old_test_db    # For old database test
           CARDINAL_TEST: true
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
