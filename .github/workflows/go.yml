@@ -47,7 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Run tests
-        run: go test -v -race ./...
+        run: go test -v ./...
         env:
           DBPORT: 3306
           DBHOST: localhost
