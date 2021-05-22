@@ -55,8 +55,8 @@ type Manager struct {
 	gorm.Model
 
 	Name           string
-	Salt           string
 	Password       string
+	Salt           string
 	IsCheckAccount bool
 }
 
