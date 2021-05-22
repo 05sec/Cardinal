@@ -44,7 +44,7 @@ type Challenge struct {
 	gorm.Model
 
 	Title            string
-	BaseScore        int
+	BaseScore        float64
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
@@ -55,7 +55,7 @@ type challenges struct {
 
 type CreateChallengeOptions struct {
 	Title            string
-	BaseScore        int
+	BaseScore        float64
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
@@ -103,7 +103,7 @@ func (db *challenges) GetByID(ctx context.Context, id uint) (*Challenge, error) 
 
 type UpdateChallengeOptions struct {
 	Title            string
-	BaseScore        int
+	BaseScore        float64
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
