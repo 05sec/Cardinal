@@ -59,9 +59,9 @@ type GameBox struct {
 	gorm.Model
 
 	TeamID      uint
-	Team        *Team `db:"-"`
+	Team        *Team `gorm:"-"`
 	ChallengeID uint
-	Challenge   *Challenge `db:"-"`
+	Challenge   *Challenge `gorm:"-"`
 
 	Address     string
 	Description string
@@ -105,7 +105,8 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 	}
 
 	challengesStore := NewChallengesStore(db.DB)
-	if _, err := challengesStore.GetByID(ctx, opts.ChallengeID); err != nil {
+	challenge, err := challengesStore.GetByID(ctx, opts.ChallengeID)
+	if err != nil {
 		if err == ErrChallengeNotExists {
 			return 0, ErrChallengeNotExists
 		}
@@ -114,7 +115,7 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 
 	var gameBox GameBox
 
-	if err := db.WithContext(ctx).Where("team_id = ? AND challenge_id = ?", opts.TeamID, opts.ChallengeID).First(&gameBox).Error; err == nil {
+	if err := db.WithContext(ctx).Model(&GameBox{}).Where("team_id = ? AND challenge_id = ?", opts.TeamID, opts.ChallengeID).First(&gameBox).Error; err == nil {
 		return 0, ErrGameBoxAlreadyExists
 	} else if err != gorm.ErrRecordNotFound {
 		return 0, errors.Wrap(err, "get")
@@ -129,7 +130,7 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 		InternalSSHUser:     opts.InternalSSH.User,
 		InternalSSHPassword: opts.InternalSSH.Password,
 		Visible:             false,
-		Score:               0,
+		Score:               challenge.BaseScore,
 		Status:              GameBoxStatusUp,
 	}
 
@@ -229,7 +230,7 @@ func (db *gameboxes) SetScore(ctx context.Context, id uint, score float64) error
 }
 
 func (db *gameboxes) SetVisible(ctx context.Context, id uint, isVisible bool) error {
-	return db.WithContext(ctx).Model(&GameBox{}).Where("visible = ?", id).Update("visible", isVisible).Error
+	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("visible", isVisible).Error
 }
 
 var ErrBadGameBoxsStatus = errors.New("bad game box status")

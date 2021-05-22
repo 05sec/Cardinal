@@ -20,6 +20,7 @@ var ErrBadCharset = errors.New("bad charset")
 var allTables = []interface{}{
 	&Bulletin{},
 	&Challenge{},
+	&GameBox{},
 	&Manager{},
 	&Team{},
 }
