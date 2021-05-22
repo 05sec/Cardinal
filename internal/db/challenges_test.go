@@ -53,8 +53,8 @@ func testChallengesCreate(t *testing.T, ctx context.Context, db *challenges) {
 		AutoRenewFlag:    true,
 		RenewFlagCommand: "echo {{flag}} > /flag",
 	})
-	assert.Equal(t, uint(1), id)
 	assert.Nil(t, err)
+	assert.Equal(t, uint(1), id)
 
 	_, err = db.Create(ctx, CreateChallengeOptions{
 		Title:            "Web1",

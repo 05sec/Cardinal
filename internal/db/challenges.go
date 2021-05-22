@@ -65,7 +65,7 @@ var ErrChallengeAlreadyExists = errors.New("challenge already exits")
 func (db *challenges) Create(ctx context.Context, opts CreateChallengeOptions) (uint, error) {
 	var challenge Challenge
 	if err := db.WithContext(ctx).Model(&Challenge{}).Where("title = ?", opts.Title).First(&challenge).Error; err == nil {
-		return 0, ErrTeamAlreadyExists
+		return 0, ErrChallengeAlreadyExists
 	} else if err != gorm.ErrRecordNotFound {
 		return 0, errors.Wrap(err, "get")
 	}
@@ -80,7 +80,7 @@ func (db *challenges) Create(ctx context.Context, opts CreateChallengeOptions) (
 		return 0, err
 	}
 
-	return challenge.ID, nil
+	return c.ID, nil
 }
 
 func (db *challenges) Get(ctx context.Context) ([]*Challenge, error) {
