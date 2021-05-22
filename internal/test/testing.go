@@ -18,13 +18,19 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
 var flagParseOnce sync.Once
 
 func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 	dsn := os.ExpandEnv("postgres://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE?sslmode=$PGSSLMODE")
-	db, err := gorm.Open(postgres.Open(dsn))
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		NowFunc: func() time.Time {
+			return dbutil.Now()
+		},
+	})
 	if err != nil {
 		t.Fatalf("Failed to open connection: %v", err)
 	}
@@ -46,7 +52,11 @@ func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 
 	flagParseOnce.Do(flag.Parse)
 
-	testDB, err = gorm.Open(postgres.Open(cfg.String()))
+	testDB, err = gorm.Open(postgres.Open(cfg.String()), &gorm.Config{
+		NowFunc: func() time.Time {
+			return dbutil.Now()
+		},
+	})
 	if err != nil {
 		t.Fatalf("Failed to open test connection: %v", err)
 	}
