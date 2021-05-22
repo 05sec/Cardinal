@@ -55,6 +55,14 @@ func testChallengesCreate(t *testing.T, ctx context.Context, db *challenges) {
 	})
 	assert.Equal(t, uint(1), id)
 	assert.Nil(t, err)
+
+	_, err = db.Create(ctx, CreateChallengeOptions{
+		Title:            "Web1",
+		BaseScore:        1500,
+		AutoRenewFlag:    true,
+		RenewFlagCommand: "echo {{flag}} > /flag",
+	})
+	assert.Nil(t, ErrChallengeAlreadyExists)
 }
 
 func testChallengesGet(t *testing.T, ctx context.Context, db *challenges) {

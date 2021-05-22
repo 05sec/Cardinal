@@ -60,14 +60,23 @@ type CreateChallengeOptions struct {
 	RenewFlagCommand string
 }
 
+var ErrChallengeAlreadyExists = errors.New("challenge already exits")
+
 func (db *challenges) Create(ctx context.Context, opts CreateChallengeOptions) (uint, error) {
-	challenge := &Challenge{
+	var challenge Challenge
+	if err := db.WithContext(ctx).Model(&Challenge{}).Where("title = ?", opts.Title).First(&challenge).Error; err == nil {
+		return 0, ErrTeamAlreadyExists
+	} else if err != gorm.ErrRecordNotFound {
+		return 0, errors.Wrap(err, "get")
+	}
+
+	c := &Challenge{
 		Title:            opts.Title,
 		BaseScore:        opts.BaseScore,
 		AutoRenewFlag:    opts.AutoRenewFlag,
 		RenewFlagCommand: opts.RenewFlagCommand,
 	}
-	if err := db.WithContext(ctx).Create(challenge).Error; err != nil {
+	if err := db.WithContext(ctx).Create(c).Error; err != nil {
 		return 0, err
 	}
 
