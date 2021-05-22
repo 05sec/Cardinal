@@ -21,8 +21,6 @@ func TestChallenges(t *testing.T) {
 	t.Parallel()
 
 	db, cleanup := newTestDB(t)
-	err := db.AutoMigrate(&Challenge{})
-	assert.Nil(t, err)
 	store := NewChallengesStore(db)
 
 	for _, tc := range []struct {

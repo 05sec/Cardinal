@@ -6,36 +6,43 @@ package db
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pkg/errors"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/vidar-team/Cardinal/internal/dbold"
+	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
 var ErrBadCharset = errors.New("bad charset")
 
+var allTables = []interface{}{
+	&Bulletin{},
+	&Challenge{},
+	&Manager{},
+	&Team{},
+}
+
 // Init initializes the database.
-func Init(username, password, host, name string) error {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&loc=Local&charset=utf8mb4,utf8", username, password, host, name)
-	db, err := gorm.Open(mysql.Open(dsn))
+func Init(username, password, host, port, name, sslMode string) error {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", username, password, host, port, name, sslMode)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		NowFunc: func() time.Time {
+			return dbutil.Now()
+		},
+	})
 	if err != nil {
 		return errors.Wrap(err, "open connection")
 	}
 
 	// Migrate databases.
-	if db.AutoMigrate(
-		&Bulletin{},
-		&Challenge{},
-		&Manager{},
-		&Team{},
-	) != nil {
+	if db.AutoMigrate(allTables...) != nil {
 		return errors.Wrap(err, "auto migrate")
 	}
 
 	// Test database charset, we should support Chinese input.
-	if dbold.MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
+	if db.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
 		return ErrBadCharset
 	}
 

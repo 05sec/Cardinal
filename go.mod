@@ -1,14 +1,14 @@
 module github.com/vidar-team/Cardinal
 
-go 1.13
+go 1.16
 
 require (
 	github.com/BurntSushi/toml v0.3.1
-	github.com/Microsoft/go-winio v0.4.14 // indirect
+	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
-	github.com/aws/aws-sdk-go v1.30.20 // indirect
-	github.com/containerd/containerd v1.3.6 // indirect
+	github.com/containerd/containerd v1.4.1 // indirect
+	github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v17.12.0-ce-rc1.0.20200728121027-0f41a77c6993+incompatible
@@ -21,14 +21,16 @@ require (
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.5.0
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
-	github.com/gorilla/context v1.1.1 // indirect
+	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/gorilla/mux v1.7.4 // indirect
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/gosimple/slug v1.9.0 // indirect
-	github.com/jinzhu/configor v1.2.0 // indirect
 	github.com/jinzhu/gorm v1.9.12
+	github.com/lib/pq v1.8.0 // indirect
 	github.com/moby/term v0.0.0-20200611042045-63b9a826fb74 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
@@ -50,7 +52,7 @@ require (
 	github.com/qor/session v0.0.0-20170907035918-8206b0adab70 // indirect
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46 // indirect
 	github.com/satori/go.uuid v1.2.0
-	github.com/sirupsen/logrus v1.6.0 // indirect
+	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/thanhpk/randstr v1.0.4
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
@@ -59,14 +61,17 @@ require (
 	github.com/vidar-team/Cardinal_frontend v0.7.3
 	github.com/vidar-team/Cardinal_manager_frontend v0.7.3
 	github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd // indirect
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
-	golang.org/x/text v0.3.0
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/text v0.3.3
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
-	google.golang.org/grpc v1.30.0 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/genproto v0.0.0-20201030142918-24207fddd1c3 // indirect
+	google.golang.org/grpc v1.33.1 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gorm.io/driver/mysql v1.1.0
+	gopkg.in/yaml.v2 v2.2.8 // indirect
+	gorm.io/driver/postgres v1.1.0
 	gorm.io/gorm v1.21.9
-	gotest.tools v2.2.0+incompatible // indirect
 	moul.io/http2curl v1.0.0 // indirect
 	unknwon.dev/clog/v2 v2.1.2
 )

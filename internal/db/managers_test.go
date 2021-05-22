@@ -21,8 +21,6 @@ func TestManagers(t *testing.T) {
 	t.Parallel()
 
 	db, cleanup := newTestDB(t)
-	err := db.AutoMigrate(&Manager{})
-	assert.Nil(t, err)
 	store := NewManagersStore(db)
 
 	for _, tc := range []struct {
