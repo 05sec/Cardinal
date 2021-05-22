@@ -12,7 +12,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
@@ -43,7 +42,7 @@ func Init(username, password, host, port, name, sslMode string) error {
 	}
 
 	// Test database charset, we should support Chinese input.
-	if dbold.MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
+	if db.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
 		return ErrBadCharset
 	}
 
