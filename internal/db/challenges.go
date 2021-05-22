@@ -44,7 +44,7 @@ type Challenge struct {
 	gorm.Model
 
 	Title            string
-	BaseScore        int
+	BaseScore        float64
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
@@ -55,23 +55,32 @@ type challenges struct {
 
 type CreateChallengeOptions struct {
 	Title            string
-	BaseScore        int
+	BaseScore        float64
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
 
+var ErrChallengeAlreadyExists = errors.New("challenge already exits")
+
 func (db *challenges) Create(ctx context.Context, opts CreateChallengeOptions) (uint, error) {
-	challenge := &Challenge{
+	var challenge Challenge
+	if err := db.WithContext(ctx).Model(&Challenge{}).Where("title = ?", opts.Title).First(&challenge).Error; err == nil {
+		return 0, ErrChallengeAlreadyExists
+	} else if err != gorm.ErrRecordNotFound {
+		return 0, errors.Wrap(err, "get")
+	}
+
+	c := &Challenge{
 		Title:            opts.Title,
 		BaseScore:        opts.BaseScore,
 		AutoRenewFlag:    opts.AutoRenewFlag,
 		RenewFlagCommand: opts.RenewFlagCommand,
 	}
-	if err := db.WithContext(ctx).Create(challenge).Error; err != nil {
+	if err := db.WithContext(ctx).Create(c).Error; err != nil {
 		return 0, err
 	}
 
-	return challenge.ID, nil
+	return c.ID, nil
 }
 
 func (db *challenges) Get(ctx context.Context) ([]*Challenge, error) {
@@ -94,7 +103,7 @@ func (db *challenges) GetByID(ctx context.Context, id uint) (*Challenge, error) 
 
 type UpdateChallengeOptions struct {
 	Title            string
-	BaseScore        int
+	BaseScore        float64
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
