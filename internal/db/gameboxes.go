@@ -142,19 +142,68 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 
 func (db *gameboxes) Get(ctx context.Context) ([]*GameBox, error) {
 	var gameBoxes []*GameBox
-	return gameBoxes, db.DB.WithContext(ctx).Model(&GameBox{}).Order("id ASC").Find(&gameBoxes).Error
+	err := db.DB.WithContext(ctx).Model(&GameBox{}).Order("id ASC").Find(&gameBoxes).Error
+	if err != nil {
+		return nil, err
+	}
+
+	teamIDs := map[uint]struct{}{}
+	challengeIDs := map[uint]struct{}{}
+	for _, gameBox := range gameBoxes {
+		teamIDs[gameBox.TeamID] = struct{}{}
+		challengeIDs[gameBox.ChallengeID] = struct{}{}
+	}
+
+	teamsStore := NewTeamsStore(db.DB)
+	teamSets := map[uint]*Team{}
+	for teamID := range teamIDs {
+		teamSets[teamID], err = teamsStore.GetByID(ctx, teamID)
+		if err != nil {
+			return nil, errors.Wrap(err, "get team")
+		}
+	}
+
+	challengeStore := NewChallengesStore(db.DB)
+	challengeSets := map[uint]*Challenge{}
+	for challengeID := range challengeIDs {
+		challengeSets[challengeID], err = challengeStore.GetByID(ctx, challengeID)
+		if err != nil {
+			return nil, errors.Wrap(err, "get challenge")
+		}
+	}
+
+	for _, gameBox := range gameBoxes {
+		gameBox.Team = teamSets[gameBox.TeamID]
+		gameBox.Challenge = challengeSets[gameBox.ChallengeID]
+	}
+
+	return gameBoxes, nil
 }
 
 var ErrGameBoxNotExists = errors.New("game box does not exist")
 
 func (db *gameboxes) GetByID(ctx context.Context, id uint) (*GameBox, error) {
 	var gameBox GameBox
-	if err := db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).First(&gameBox).Error; err != nil {
+	err := db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).First(&gameBox).Error
+	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrGameBoxNotExists
 		}
 		return nil, errors.Wrap(err, "get")
 	}
+
+	teamsStore := NewTeamsStore(db.DB)
+	gameBox.Team, err = teamsStore.GetByID(ctx, gameBox.TeamID)
+	if err != nil {
+		return nil, errors.Wrap(err, "get team")
+	}
+
+	challengeStore := NewChallengesStore(db.DB)
+	gameBox.Challenge, err = challengeStore.GetByID(ctx, gameBox.ChallengeID)
+	if err != nil {
+		return nil, errors.Wrap(err, "get challenge")
+	}
+
 	return &gameBox, nil
 }
 
