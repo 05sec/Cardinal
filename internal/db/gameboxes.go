@@ -96,6 +96,22 @@ type CreateGameBoxOptions struct {
 var ErrGameBoxAlreadyExists = errors.New("game box already exits")
 
 func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uint, error) {
+	teamsStore := NewTeamsStore(db.DB)
+	if _, err := teamsStore.GetByID(ctx, opts.TeamID); err != nil {
+		if err == ErrTeamNotExists {
+			return 0, ErrTeamNotExists
+		}
+		return 0, errors.Wrap(err, "get team")
+	}
+
+	challengesStore := NewChallengesStore(db.DB)
+	if _, err := challengesStore.GetByID(ctx, opts.ChallengeID); err != nil {
+		if err == ErrChallengeNotExists {
+			return 0, ErrChallengeNotExists
+		}
+		return 0, errors.Wrap(err, "get challenge")
+	}
+
 	var gameBox GameBox
 
 	if err := db.WithContext(ctx).Where("team_id = ? AND challenge_id = ?", opts.TeamID, opts.ChallengeID).First(&gameBox).Error; err == nil {
