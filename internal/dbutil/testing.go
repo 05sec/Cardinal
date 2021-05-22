@@ -2,7 +2,7 @@
 // Use of this source code is governed by Apache-2.0
 // license that can be found in the LICENSE file.
 
-package test
+package dbutil
 
 import (
 	"context"
@@ -18,17 +18,15 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
 var flagParseOnce sync.Once
 
-func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
+func NewTestDB(t *testing.T, migrationTables ...interface{}) (testDB *gorm.DB, cleanup func(...string) error) {
 	dsn := os.ExpandEnv("postgres://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE?sslmode=$PGSSLMODE")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NowFunc: func() time.Time {
-			return dbutil.Now()
+			return Now()
 		},
 	})
 	if err != nil {
@@ -54,11 +52,16 @@ func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 
 	testDB, err = gorm.Open(postgres.Open(cfg.String()), &gorm.Config{
 		NowFunc: func() time.Time {
-			return dbutil.Now()
+			return Now()
 		},
 	})
 	if err != nil {
 		t.Fatalf("Failed to open test connection: %v", err)
+	}
+
+	err = testDB.AutoMigrate(migrationTables...)
+	if err != nil {
+		t.Fatalf("Failed to auto migrate tables: %v", err)
 	}
 
 	t.Cleanup(func() {

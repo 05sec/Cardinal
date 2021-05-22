@@ -21,8 +21,6 @@ func TestBulletins(t *testing.T) {
 	t.Parallel()
 
 	db, cleanup := newTestDB(t)
-	err := db.AutoMigrate(&Bulletin{})
-	assert.Nil(t, err)
 	store := NewBulletinsStore(db)
 
 	for _, tc := range []struct {

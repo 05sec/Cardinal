@@ -18,6 +18,13 @@ import (
 
 var ErrBadCharset = errors.New("bad charset")
 
+var allTables = []interface{}{
+	&Bulletin{},
+	&Challenge{},
+	&Manager{},
+	&Team{},
+}
+
 // Init initializes the database.
 func Init(username, password, host, port, name, sslMode string) error {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", username, password, host, port, name, sslMode)
@@ -31,12 +38,7 @@ func Init(username, password, host, port, name, sslMode string) error {
 	}
 
 	// Migrate databases.
-	if db.AutoMigrate(
-		&Bulletin{},
-		&Challenge{},
-		&Manager{},
-		&Team{},
-	) != nil {
+	if db.AutoMigrate(allTables...) != nil {
 		return errors.Wrap(err, "auto migrate")
 	}
 

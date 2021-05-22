@@ -9,9 +9,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/vidar-team/Cardinal/internal/test"
+	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
 func newTestDB(t *testing.T) (*gorm.DB, func(...string) error) {
-	return test.NewTestDB(t)
+	return dbutil.NewTestDB(t, allTables...)
 }
