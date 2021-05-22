@@ -62,7 +62,7 @@ func testChallengesCreate(t *testing.T, ctx context.Context, db *challenges) {
 		AutoRenewFlag:    true,
 		RenewFlagCommand: "echo {{flag}} > /flag",
 	})
-	assert.Nil(t, ErrChallengeAlreadyExists)
+	assert.Equal(t, ErrChallengeAlreadyExists, err)
 }
 
 func testChallengesGet(t *testing.T, ctx context.Context, db *challenges) {
