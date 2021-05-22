@@ -33,6 +33,18 @@ jobs:
           MYSQL_DATABASE: old_test_db
         ports:
           - 3306:3306
+
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
@@ -56,6 +68,13 @@ jobs:
           DBUSER: root
           DBPASSWORD: cardinal_passw0rd
           DBNAME: old_test_db    # For old database test
+
+          PGPORT: 5432
+          PGHOST: localhost
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGSSLMODE: disable
+
           CARDINAL_TEST: true
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

@@ -6,20 +6,25 @@ package test
 
 import (
 	"context"
+	"flag"
 	"math/rand"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+var flagParseOnce sync.Once
+
 func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
-	dsn := os.ExpandEnv("$DBUSER:$DBPASSWORD@tcp($DBHOST:$DBPORT)/?parseTime=true&loc=Local&charset=utf8mb4,utf8")
-	db, err := gorm.Open(mysql.Open(dsn))
+	dsn := os.ExpandEnv("postgres://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE?sslmode=$PGSSLMODE")
+	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {
 		t.Fatalf("Failed to open connection: %v", err)
 	}
@@ -33,8 +38,15 @@ func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 		t.Fatalf("Failed to create test database: %v", err)
 	}
 
-	dsn = os.ExpandEnv("$DBUSER:$DBPASSWORD@tcp($DBHOST:$DBPORT)/" + dbname + "?parseTime=true&loc=Local&charset=utf8mb4,utf8")
-	testDB, err = gorm.Open(mysql.Open(dsn))
+	cfg, err := url.Parse(dsn)
+	if err != nil {
+		t.Fatalf("Failed to parse DSN: %v", err)
+	}
+	cfg.Path = "/" + dbname
+
+	flagParseOnce.Do(flag.Parse)
+
+	testDB, err = gorm.Open(postgres.Open(cfg.String()))
 	if err != nil {
 		t.Fatalf("Failed to open test connection: %v", err)
 	}
@@ -51,7 +63,17 @@ func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 			return
 		}
 
-		err := testDB.WithContext(ctx).Exec(`DROP DATABASE ` + QuoteIdentifier(dbname)).Error
+		database, err := testDB.DB()
+		if err != nil {
+			t.Fatalf("Failed to get currently open database: %v", err)
+		}
+
+		err = database.Close()
+		if err != nil {
+			t.Fatalf("Failed to close currently open database: %v", err)
+		}
+
+		err = db.WithContext(ctx).Exec(`DROP DATABASE ` + QuoteIdentifier(dbname)).Error
 		if err != nil {
 			t.Fatalf("Failed to drop test database: %v", err)
 		}
@@ -63,7 +85,7 @@ func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 		}
 
 		for _, table := range tables {
-			err := testDB.WithContext(ctx).Exec(`TRUNCATE TABLE ` + QuoteIdentifier(table)).Error
+			err := testDB.WithContext(ctx).Exec(`TRUNCATE TABLE ` + QuoteIdentifier(table) + ` RESTART IDENTITY CASCADE`).Error
 			if err != nil {
 				return err
 			}
@@ -74,10 +96,6 @@ func NewTestDB(t *testing.T) (testDB *gorm.DB, cleanup func(...string) error) {
 
 // QuoteIdentifier quotes an "identifier" (e.g. a table or a column name) to be
 // used as part of an SQL statement.
-func QuoteIdentifier(name string) string {
-	end := strings.IndexRune(name, 0)
-	if end > -1 {
-		name = name[:end]
-	}
-	return "`" + strings.Replace(name, "`", "``", -1) + "`"
+func QuoteIdentifier(s string) string {
+	return `"` + strings.Replace(s, `"`, `""`, -1) + `"`
 }

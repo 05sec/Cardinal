@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/vidar-team/Cardinal/internal/dbold"
@@ -17,9 +17,9 @@ import (
 var ErrBadCharset = errors.New("bad charset")
 
 // Init initializes the database.
-func Init(username, password, host, name string) error {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&loc=Local&charset=utf8mb4,utf8", username, password, host, name)
-	db, err := gorm.Open(mysql.Open(dsn))
+func Init(username, password, host, port, name, sslMode string) error {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", username, password, host, port, name, sslMode)
+	db, err := gorm.Open(postgres.Open(dsn))
 	if err != nil {
 		return errors.Wrap(err, "open connection")
 	}
