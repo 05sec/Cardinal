@@ -110,5 +110,5 @@ func NewTestDB(t *testing.T, migrationTables ...interface{}) (testDB *gorm.DB, c
 // QuoteIdentifier quotes an "identifier" (e.g. a table or a column name) to be
 // used as part of an SQL statement.
 func QuoteIdentifier(s string) string {
-	return `"` + strings.Replace(s, `"`, `""`, -1) + `"`
+	return `"` + strings.ReplaceAll(s, `"`, `""`) + `"`
 }
