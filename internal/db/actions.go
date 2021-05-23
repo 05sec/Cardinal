@@ -83,10 +83,14 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 	if err != nil {
 		// NOTE: How to check if error type is DUPLICATE KEY in GORM.
 		// https://github.com/go-gorm/gorm/issues/4037
-		var mysqlErr mysql.MySQLError
+
+		// Postgres
 		if pgError, ok := err.(*pgconn.PgError); ok && errors.Is(err, pgError) && pgError.Code == "23505" {
 			return ErrDuplicateAction
-		} else if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+		}
+		// MySQL
+		var mysqlErr mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 			return ErrDuplicateAction
 		}
 		return err
