@@ -22,6 +22,7 @@ var allTables = []interface{}{
 	&Challenge{},
 	&Flag{},
 	&GameBox{},
+	&Log{},
 	&Manager{},
 	&Team{},
 }
