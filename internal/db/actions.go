@@ -58,8 +58,6 @@ type actions struct {
 
 type CreateActionOptions struct {
 	Type           ActionType
-	TeamID         uint
-	ChallengeID    uint
 	GameBoxID      uint
 	AttackerTeamID uint
 	Round          uint
@@ -72,13 +70,19 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 		opts.AttackerTeamID = 0
 	}
 
+	gameBoxStore := NewGameBoxesStore(db.DB)
+	gameBox, err := gameBoxStore.GetByID(ctx, opts.GameBoxID)
+	if err != nil {
+		return err
+	}
+
 	tx := db.WithContext(ctx).Begin()
 	var action Action
-	err := tx.Model(&Action{}).Where(&Action{
+	err = tx.Model(&Action{}).Where(&Action{
 		Type:           opts.Type,
-		TeamID:         opts.TeamID,
-		ChallengeID:    opts.ChallengeID,
-		GameBoxID:      opts.GameBoxID,
+		TeamID:         gameBox.TeamID,
+		ChallengeID:    gameBox.ChallengeID,
+		GameBoxID:      gameBox.ID,
 		AttackerTeamID: opts.AttackerTeamID,
 		Round:          opts.Round,
 	}).First(&action).Error
@@ -92,9 +96,9 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 
 	err = tx.Create(&Action{
 		Type:           opts.Type,
-		TeamID:         opts.TeamID,
-		ChallengeID:    opts.ChallengeID,
-		GameBoxID:      opts.GameBoxID,
+		TeamID:         gameBox.TeamID,
+		ChallengeID:    gameBox.ChallengeID,
+		GameBoxID:      gameBox.ID,
 		AttackerTeamID: opts.AttackerTeamID,
 		Round:          opts.Round,
 	}).Error
