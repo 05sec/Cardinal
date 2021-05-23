@@ -21,7 +21,7 @@ require (
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.5.0
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.1 // indirect
@@ -29,6 +29,7 @@ require (
 	github.com/gorilla/sessions v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/gosimple/slug v1.9.0 // indirect
+	github.com/jackc/pgconn v1.8.1
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.8.0 // indirect
 	github.com/moby/term v0.0.0-20200611042045-63b9a826fb74 // indirect

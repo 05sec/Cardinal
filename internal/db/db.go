@@ -18,6 +18,7 @@ import (
 var ErrBadCharset = errors.New("bad charset")
 
 var allTables = []interface{}{
+	&Action{},
 	&Bulletin{},
 	&Challenge{},
 	&Flag{},
