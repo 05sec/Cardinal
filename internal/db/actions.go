@@ -7,6 +7,8 @@ package db
 import (
 	"context"
 
+	"github.com/go-sql-driver/mysql"
+	"github.com/jackc/pgconn"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -79,7 +81,14 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 		Round:          opts.Round,
 	}).Error
 	if err != nil {
-		// TODO return duplicate error
+		// NOTE: How to check if error type is DUPLICATE KEY in GORM.
+		// https://github.com/go-gorm/gorm/issues/4037
+		var mysqlErr mysql.MySQLError
+		if pgError, ok := err.(*pgconn.PgError); ok && errors.Is(err, pgError) && pgError.Code == "23505" {
+			return ErrDuplicateAction
+		} else if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+			return ErrDuplicateAction
+		}
 		return err
 	}
 	return nil

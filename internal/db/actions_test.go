@@ -53,6 +53,16 @@ func testActionsCreate(t *testing.T, ctx context.Context, db *actions) {
 		Round:          1,
 	})
 	assert.Nil(t, err)
+
+	err = db.Create(ctx, CreateActionOptions{
+		Type:           ActionTypeAttack,
+		TeamID:         1,
+		ChallengeID:    1,
+		GameBoxID:      1,
+		AttackerTeamID: 2,
+		Round:          1,
+	})
+	assert.Equal(t, ErrDuplicateAction, err)
 }
 
 func testActionsGet(t *testing.T, ctx context.Context, db *actions) {
