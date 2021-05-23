@@ -72,7 +72,25 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 		opts.AttackerTeamID = 0
 	}
 
-	err := db.WithContext(ctx).Create(&Action{
+	tx := db.WithContext(ctx).Begin()
+	var action Action
+	err := tx.Model(&Action{}).Where(&Action{
+		Type:           opts.Type,
+		TeamID:         opts.TeamID,
+		ChallengeID:    opts.ChallengeID,
+		GameBoxID:      opts.GameBoxID,
+		AttackerTeamID: opts.AttackerTeamID,
+		Round:          opts.Round,
+	}).First(&action).Error
+	if err == nil {
+		tx.Rollback()
+		return ErrDuplicateAction
+	} else if err != gorm.ErrRecordNotFound {
+		tx.Rollback()
+		return errors.Wrap(err, "get action")
+	}
+
+	err = tx.Create(&Action{
 		Type:           opts.Type,
 		TeamID:         opts.TeamID,
 		ChallengeID:    opts.ChallengeID,
@@ -81,6 +99,8 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 		Round:          opts.Round,
 	}).Error
 	if err != nil {
+		tx.Rollback()
+
 		// NOTE: How to check if error type is DUPLICATE KEY in GORM.
 		// https://github.com/go-gorm/gorm/issues/4037
 
@@ -95,7 +115,8 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 		}
 		return err
 	}
-	return nil
+
+	return tx.Commit().Error
 }
 
 type GetActionOptions struct {
