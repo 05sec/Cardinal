@@ -16,7 +16,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
-	github.com/fatih/color v1.9.0 // indirect
+	github.com/flamego/flamego v0.0.0-20210525090435-cdb552aa0e32
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
@@ -31,6 +31,7 @@ require (
 	github.com/gosimple/slug v1.9.0 // indirect
 	github.com/jackc/pgconn v1.8.1
 	github.com/jinzhu/gorm v1.9.12
+	github.com/json-iterator/go v1.1.8
 	github.com/lib/pq v1.8.0 // indirect
 	github.com/moby/term v0.0.0-20200611042045-63b9a826fb74 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
@@ -54,11 +55,12 @@ require (
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.7.0 // indirect
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.7.0
 	github.com/thanhpk/randstr v1.0.4
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
 	github.com/theplant/testingutils v0.0.0-20190603093022-26d8b4d95c61 // indirect
+	github.com/urfave/cli/v2 v2.3.0
 	github.com/vidar-team/Cardinal_frontend v0.7.3
 	github.com/vidar-team/Cardinal_manager_frontend v0.7.3
 	github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd // indirect
