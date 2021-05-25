@@ -88,6 +88,8 @@ func TestActions(t *testing.T) {
 	}{
 		{"Create", testActionsCreate},
 		{"Get", testActionsGet},
+		{"SetScore", testActionsSetScore},
+		{"GetEmptyScore", testActionsGetEmptyScore},
 		{"DeleteAll", testActionsDeleteAll},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -188,6 +190,82 @@ func testActionsGet(t *testing.T, ctx context.Context, db *actions) {
 			Round:          1,
 		},
 	}
+	assert.Equal(t, want, got)
+}
+
+func testActionsSetScore(t *testing.T, ctx context.Context, db *actions) {
+	err := db.Create(ctx, CreateActionOptions{
+		Type:           ActionTypeAttack,
+		GameBoxID:      1,
+		AttackerTeamID: 2,
+		Round:          1,
+	})
+	assert.Nil(t, err)
+
+	err = db.SetScore(ctx, 1, 1, 50)
+	assert.Nil(t, err)
+	action, err := db.Get(ctx, GetActionOptions{
+		GameBoxID: 1,
+		Round:     1,
+	})
+	assert.Nil(t, err)
+	assert.NotZero(t, action)
+	assert.Equal(t, float64(50), action[0].Score)
+
+	// Replace score
+	err = db.SetScore(ctx, 1, 1, 60, true)
+	assert.Nil(t, err)
+	action, err = db.Get(ctx, GetActionOptions{
+		GameBoxID: 1,
+		Round:     1,
+	})
+	assert.Nil(t, err)
+	assert.NotZero(t, action)
+	assert.Equal(t, float64(60), action[0].Score)
+
+	err = db.SetScore(ctx, 2, 1, 50)
+	assert.Equal(t, ErrActionNotExists, err)
+}
+
+func testActionsGetEmptyScore(t *testing.T, ctx context.Context, db *actions) {
+	err := db.Create(ctx, CreateActionOptions{
+		Type:           ActionTypeAttack,
+		GameBoxID:      1,
+		AttackerTeamID: 2,
+		Round:          1,
+	})
+	assert.Nil(t, err)
+
+	got, err := db.GetEmptyScore(ctx, 1, ActionTypeAttack)
+	assert.Nil(t, err)
+
+	for _, score := range got {
+		score.CreatedAt = time.Time{}
+		score.UpdatedAt = time.Time{}
+	}
+
+	want := []*Action{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Type:           ActionTypeAttack,
+			TeamID:         1,
+			ChallengeID:    1,
+			GameBoxID:      1,
+			AttackerTeamID: 2,
+			Round:          1,
+			Score:          0,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	err = db.SetScore(ctx, 1, 1, 60, true)
+	assert.Nil(t, err)
+
+	got, err = db.GetEmptyScore(ctx, 1, ActionTypeAttack)
+	assert.Nil(t, err)
+	want = []*Action{}
 	assert.Equal(t, want, got)
 }
 

@@ -22,8 +22,12 @@ var Actions ActionsStore
 type ActionsStore interface {
 	// Create creates a new action and persists to database.
 	Create(ctx context.Context, opts CreateActionOptions) error
-	// Get returns all the actions.
+	// Get returns the actions according to the given options.
 	Get(ctx context.Context, opts GetActionOptions) ([]*Action, error)
+	// SetScore updates the action's score.
+	SetScore(ctx context.Context, round, gameBoxID uint, score float64, replace ...bool) error
+	// GetEmptyScore returns the empty score actions in the given round.
+	GetEmptyScore(ctx context.Context, round uint, actionType ActionType) ([]*Action, error)
 	// DeleteAll deletes all the actions.
 	DeleteAll(ctx context.Context) error
 }
@@ -36,8 +40,10 @@ func NewActionsStore(db *gorm.DB) ActionsStore {
 type ActionType uint
 
 const (
-	ActionTypeAttack ActionType = iota
+	ActionTypeBeenAttack ActionType = iota
 	ActionTypeCheckDown
+	ActionTypeAttack
+	ActionTypeServiceOnline
 )
 
 // Action represents the action such as check down or being attacked.
@@ -50,6 +56,8 @@ type Action struct {
 	GameBoxID      uint       `gorm:"uniqueIndex:action_unique_idx"`
 	AttackerTeamID uint       `gorm:"uniqueIndex:action_unique_idx"`
 	Round          uint       `gorm:"uniqueIndex:action_unique_idx"`
+
+	Score float64
 }
 
 type actions struct {
@@ -142,6 +150,32 @@ func (db *actions) Get(ctx context.Context, opts GetActionOptions) ([]*Action, e
 		AttackerTeamID: opts.AttackerTeamID,
 		Round:          opts.Round,
 	}).Find(&actions).Error
+}
+
+var ErrActionNotExists = errors.New("action does not exist")
+
+func (db *actions) SetScore(ctx context.Context, round, gameBoxID uint, score float64, replace ...bool) error {
+	actions, err := db.Get(ctx, GetActionOptions{
+		GameBoxID: gameBoxID,
+		Round:     round,
+	})
+	if err != nil {
+		return errors.Wrap(err, "get action")
+	}
+	if len(actions) == 0 {
+		return ErrActionNotExists
+	}
+
+	action := actions[0]
+	if action.Score == 0 || (len(replace) == 1 && replace[0]) {
+		return db.WithContext(ctx).Model(&Action{}).Where("id = ?", action.ID).Update("score", score).Error
+	}
+	return nil
+}
+
+func (db *actions) GetEmptyScore(ctx context.Context, round uint, actionType ActionType) ([]*Action, error) {
+	var actions []*Action
+	return actions, db.WithContext(ctx).Model(&Action{}).Where("round = ? AND type = ? AND score = 0", round, actionType).Find(&actions).Error
 }
 
 func (db *actions) DeleteAll(ctx context.Context) error {
