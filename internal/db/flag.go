@@ -39,9 +39,9 @@ func NewFlagsStore(db *gorm.DB) FlagsStore {
 type Flag struct {
 	gorm.Model
 
-	TeamID      uint `gorm:"uniqueIndex:gamebox_unique_idx"`
-	ChallengeID uint `gorm:"uniqueIndex:gamebox_unique_idx"`
-	GameBoxID   uint `gorm:"uniqueIndex:gamebox_unique_idx"`
+	TeamID      uint `gorm:"uniqueIndex:flag_unique_idx"`
+	ChallengeID uint `gorm:"uniqueIndex:flag_unique_idx"`
+	GameBoxID   uint `gorm:"uniqueIndex:flag_unique_idx"`
 
 	Round uint
 	Value string
