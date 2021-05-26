@@ -32,6 +32,8 @@ func runWeb(c *cli.Context) error {
 		f.Any("/", general.Hello)
 	})
 
+	f.NotFound(general.NotFound)
+
 	f.Use(context.Contexter())
 
 	log.Info("Listen on http://0.0.0.0:%d", c.Int("port"))

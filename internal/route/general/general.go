@@ -8,6 +8,10 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 )
 
-func Hello(ctx context.Context) error {
-	return ctx.Success("Hello Cardinal!")
+func Hello(c context.Context) error {
+	return c.Success("Hello Cardinal!")
+}
+
+func NotFound(c context.Context) error {
+	return c.Error(40400, "not found")
 }
