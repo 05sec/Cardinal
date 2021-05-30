@@ -55,6 +55,8 @@ zh-CN:
     post_success: "添加靶机成功！"
     put_error: "修改靶机信息失败！"
     put_success: "修改靶机信息成功！"
+    delete_error: "删除靶机失败！"
+    delete_success: "删除靶机成功！"
     visibility_success: "修改靶机可见状态成功！"
     repeat: "存在重复添加的靶机，请检查"
     not_found: "靶机不存在！"

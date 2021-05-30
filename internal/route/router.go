@@ -119,6 +119,7 @@ func Init() *gin.Engine {
 		managerRouter.GET("/gameboxes", __(game.GetGameBoxes))
 		managerRouter.POST("/gameboxes", __(game.NewGameBoxes))
 		managerRouter.PUT("/gamebox", __(game.EditGameBox))
+		managerRouter.DELETE("/gamebox", __(game.DeleteGameBox))
 		managerRouter.GET("/gameboxes/sshTest", __(game.TestAllSSH))
 		managerRouter.POST("/gameboxes/sshTest", __(game.TestSSH))
 		managerRouter.GET("/gameboxes/refreshFlag", func(c *gin.Context) {
