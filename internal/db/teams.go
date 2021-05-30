@@ -29,8 +29,8 @@ type TeamsStore interface {
 	// Create creates a new team and persists to database.
 	// It returns the team when it created.
 	Create(ctx context.Context, opts CreateTeamOptions) (*Team, error)
-	// Get returns all the teams.
-	Get(ctx context.Context) ([]*Team, error)
+	// Get returns the team list.
+	Get(ctx context.Context, opts GetTeamsOptions) ([]*Team, error)
 	// GetByID returns the team with given id.
 	// It returns ErrTeamNotExists when not found.
 	GetByID(ctx context.Context, id uint) (*Team, error)
@@ -60,6 +60,7 @@ type Team struct {
 	Salt     string
 	Logo     string
 	Score    float64
+	Rank     uint
 	Token    string
 }
 
@@ -120,7 +121,6 @@ func (db *teams) Create(ctx context.Context, opts CreateTeamOptions) (*Team, err
 		Password: opts.Password,
 		Salt:     getTeamSalt(),
 		Logo:     opts.Logo,
-		Score:    0,
 		Token:    randstr.Hex(16), // Random token.
 	}
 	t.EncodePassword()
@@ -128,16 +128,39 @@ func (db *teams) Create(ctx context.Context, opts CreateTeamOptions) (*Team, err
 	return t, db.WithContext(ctx).Create(t).Error
 }
 
-func (db *teams) Get(ctx context.Context) ([]*Team, error) {
+type GetTeamsOptions struct {
+	OrderBy  string
+	Page     int
+	PageSize int
+}
+
+func (db *teams) Get(ctx context.Context, opts GetTeamsOptions) ([]*Team, error) {
+	if opts.Page <= 0 {
+		opts.Page = 1
+	}
+
+	if opts.OrderBy == "" {
+		opts.OrderBy = "id ASC"
+	}
+
 	var teams []*Team
-	return teams, db.WithContext(ctx).Model(&Team{}).Order("id ASC").Find(&teams).Error
+	return teams, db.WithContext(ctx).Model(&Team{}).
+		Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}).
+		Offset((opts.Page - 1) * opts.PageSize).
+		Limit(opts.PageSize).
+		Order(opts.OrderBy).Find(&teams).Error
 }
 
 var ErrTeamNotExists = errors.New("team dose not exist")
 
 func (db *teams) GetByID(ctx context.Context, id uint) (*Team, error) {
 	var team Team
-	if err := db.WithContext(ctx).Model(&Team{}).Where("id = ?", id).First(&team).Error; err != nil {
+	if err := db.WithContext(ctx).
+		Table("(?) as teams",
+			db.WithContext(ctx).Model(&Team{}).
+				Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}),
+		).
+		Where("id = ?", id).First(&team).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrTeamNotExists
 		}

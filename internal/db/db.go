@@ -12,10 +12,9 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
-
-var ErrBadCharset = errors.New("bad charset")
 
 var allTables = []interface{}{
 	&Action{},
@@ -29,8 +28,14 @@ var allTables = []interface{}{
 }
 
 // Init initializes the database.
-func Init(username, password, host, port, name, sslMode string) error {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", username, password, host, port, name, sslMode)
+func Init() error {
+	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
+		conf.Database.User,
+		conf.Database.Password,
+		conf.Database.Host,
+		conf.Database.Name,
+		conf.Database.SSLMode,
+	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NowFunc: func() time.Time {
 			return dbutil.Now()
@@ -45,13 +50,13 @@ func Init(username, password, host, port, name, sslMode string) error {
 		return errors.Wrap(err, "auto migrate")
 	}
 
-	// Test database charset, we should support Chinese input.
-	if db.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
-		return ErrBadCharset
-	}
-
+	Actions = NewActionsStore(db)
 	Bulletins = NewBulletinsStore(db)
 	Challenges = NewChallengesStore(db)
+	Flags = NewFlagsStore(db)
+	GameBoxes = NewGameBoxesStore(db)
+	Logs = NewLogsStore(db)
+	Managers = NewManagersStore(db)
 	Teams = NewTeamsStore(db)
 
 	return nil
