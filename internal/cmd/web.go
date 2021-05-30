@@ -9,8 +9,11 @@ import (
 	"github.com/urfave/cli/v2"
 	log "unknwon.dev/clog/v2"
 
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/context"
+	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/route/general"
+	"github.com/vidar-team/Cardinal/internal/route/team"
 )
 
 var Web = &cli.Command{
@@ -26,10 +29,23 @@ and it takes care of all the other things for you`,
 }
 
 func runWeb(c *cli.Context) error {
+	err := conf.Init(c.String("config"))
+	if err != nil {
+		log.Fatal("Failed to load config: %v", err)
+	}
+
+	if err = db.Init(); err != nil {
+		log.Fatal("Failed to init database: %v", err)
+	}
+
 	f := flamego.Classic()
 
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
+
+		f.Group("/team", func() {
+			f.Get("/info", team.GetInfo)
+		}, team.Authenticator)
 	})
 
 	f.NotFound(general.NotFound)
