@@ -13,6 +13,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/route/general"
+	"github.com/vidar-team/Cardinal/internal/route/manager"
 	"github.com/vidar-team/Cardinal/internal/route/team"
 )
 
@@ -46,6 +47,20 @@ func runWeb(c *cli.Context) error {
 		f.Group("/team", func() {
 			f.Get("/info", team.GetInfo)
 		}, team.Authenticator)
+
+		f.Group("/manager", func() {
+			// Team
+			f.Combo("/teams").
+				Get(manager.Teams).
+				Post(manager.NewTeams)
+			f.Group("/team", func() {
+				f.Combo("").
+					Put(manager.UpdateTeam).
+					Delete(manager.DeleteTeam)
+				f.Get("/resetPassword", manager.ResetTeamPassword)
+			})
+
+		}, manager.Authenticator)
 	})
 
 	f.NotFound(general.NotFound)
