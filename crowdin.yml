@@ -1,0 +1,3 @@
+files:
+  - source: /locales/zh_CN.yml
+    translation: /locales/%locale_with_underscore%.yml
