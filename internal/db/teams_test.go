@@ -153,6 +153,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 			Salt:     team1.Salt,
 			Logo:     "https://vidar.club/logo.png",
 			Score:    0,
+			Rank:     1,
 			Token:    team1.Token,
 		},
 		{
@@ -164,6 +165,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 			Salt:     team2.Salt,
 			Logo:     "https://github.red/",
 			Score:    0,
+			Rank:     1,
 			Token:    team2.Token,
 		},
 		{
@@ -175,6 +177,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 			Salt:     team3.Salt,
 			Logo:     "https://cosmos.red/",
 			Score:    0,
+			Rank:     1,
 			Token:    team3.Token,
 		},
 	}
@@ -288,6 +291,7 @@ func testTeamsUpdate(t *testing.T, ctx context.Context, db *teams) {
 		Salt:     team.Salt,
 		Logo:     "https://vidar.club/new_logo.png",
 		Score:    0,
+		Rank:     1,
 		Token:    "new_t0ken",
 	}
 	want.EncodePassword()
