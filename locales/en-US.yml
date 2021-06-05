@@ -55,6 +55,8 @@ en-US:
     post_success: "Add Gamebox Succeeded!"
     put_error: "Edit Gamebox Information Failed!"
     put_success: "Edit Gamebox Information Succeeded!"
+    delete_error: "Delete Gamebox Failed!"
+    delete_success: "Delete Gamebox Succeeded!"
     visibility_success: "Edit Gamebox Visibility Succeeded!"
     repeat: "Duplicated Gamebox Found!"
     not_found: "Gamebox Not Found!"

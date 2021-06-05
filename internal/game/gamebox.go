@@ -202,6 +202,29 @@ func EditGameBox(c *gin.Context) (int, interface{}) {
 	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.put_success"))
 }
 
+// DeleteGameBox deletes the game box for manager.
+func DeleteGameBox(c *gin.Context) (int, interface{}) {
+	idStr, ok := c.GetQuery("id")
+	if !ok {
+		return utils.MakeErrJSON(400, 40030,
+			locales.I18n.T(c.GetString("lang"), "general.error_query"),
+		)
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return utils.MakeErrJSON(400, 40030,
+			locales.I18n.T(c.GetString("lang"), "general.must_be_number", gin.H{"key": "id"}),
+		)
+	}
+
+	if err := dbold.MySQL.Delete(&dbold.GameBox{}, "id = ?", id).Error; err != nil {
+		return utils.MakeErrJSON(500, 50013,
+			locales.I18n.T(c.GetString("lang"), "gamebox.delete_error"),
+		)
+	}
+	return utils.MakeSuccessJSON(locales.I18n.T(c.GetString("lang"), "gamebox.delete_success"))
+}
+
 // GetOthersGameBox returns the other teams' gameboxes if the config is set to true.
 func GetOthersGameBox(c *gin.Context) (int, interface{}) {
 	animateAsteroid, _ := strconv.ParseBool(dynamic_config.Get(utils.SHOW_OTHERS_GAMEBOX))
