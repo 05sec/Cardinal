@@ -48,9 +48,7 @@ func runWeb(c *cli.Context) error {
 		ReadIDFunc: func(r *http.Request) string {
 			return r.Header.Get("Authorization")
 		},
-		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {
-			return
-		},
+		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {},
 	}))
 
 	f.Group("/api", func() {
