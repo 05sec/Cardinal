@@ -17,6 +17,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/flamego/flamego v0.0.0-20210525090435-cdb552aa0e32
+	github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2 // indirect
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2

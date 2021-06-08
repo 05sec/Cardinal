@@ -5,7 +5,10 @@
 package cmd
 
 import (
+	"net/http"
+
 	"github.com/flamego/flamego"
+	"github.com/flamego/session"
 	"github.com/urfave/cli/v2"
 	log "unknwon.dev/clog/v2"
 
@@ -41,24 +44,34 @@ func runWeb(c *cli.Context) error {
 
 	f := flamego.Classic()
 
+	f.Use(session.Sessioner(session.Options{
+		ReadIDFunc: func(r *http.Request) string {
+			return r.Header.Get("Authorization")
+		},
+		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {
+			return
+		},
+	}))
+
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
 
 		f.Group("/team", func() {
-			f.Get("/info", team.GetInfo)
-		}, team.Authenticator)
+			f.Post("/login", team.Login)
+			f.Post("/logout", team.Logout)
+
+			f.Group("", func() {
+				f.Get("/info", team.GetInfo)
+			}, team.Authenticator)
+		})
 
 		f.Group("/manager", func() {
 			// Team
-			f.Combo("/teams").
-				Get(manager.Teams).
-				Post(manager.NewTeams)
-			f.Group("/team", func() {
-				f.Combo("").
-					Put(manager.UpdateTeam).
-					Delete(manager.DeleteTeam)
-				f.Get("/resetPassword", manager.ResetTeamPassword)
-			})
+			f.Get("/teams", manager.Teams)
+			f.Post("/teams", manager.Teams)
+			f.Put("/team", manager.UpdateTeam)
+			f.Delete("/team", manager.DeleteTeam)
+			f.Get("/team/resetPassword", manager.ResetTeamPassword)
 
 		}, manager.Authenticator)
 	})

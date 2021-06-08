@@ -118,8 +118,11 @@ github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5Kwzbycv
 github.com/fatih/color v1.10.0 h1:s36xzo75JdqLaaWoiEHk767eHiwo0598uUxyfiPkDsg=
 github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
+github.com/flamego/flamego v0.0.0-20210516144321-6b13a8d6f9bf/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
 github.com/flamego/flamego v0.0.0-20210525090435-cdb552aa0e32 h1:NVuLsqYsokgs9ftCwVYf1gvNs3H5LuRS8tc7k0V1ztA=
 github.com/flamego/flamego v0.0.0-20210525090435-cdb552aa0e32/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
+github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2 h1:ajz9HXHgGkbv2eXA833AMGo7ODRXrNjhdhJTdFZVpi0=
+github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2/go.mod h1:cBFYt6d3oHXm10wllmcKE5FHLTuFof3dtmvEnNYFf50=
 github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4/go.mod h1:T9YF2M40nIgbVgp3rreNmTged+9HrbNTIQf1PsaIiTA=
 github.com/franela/goblin v0.0.0-20200105215937-c9ffbefa60db/go.mod h1:7dvUGVsVBjqR7JHJk0brhHOZYGmfBYOrK0ZhYMEtBr4=
 github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8/go.mod h1:ZhphrRTfi2rbfLwlschooIH4+wKKDR4Pdxhh+TRoA20=
