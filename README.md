@@ -1,19 +1,11 @@
 [![Cardinal Logo](https://img.cdn.n3ko.co/lsky/2020/02/16/e75b82afd0932.png)](https://cardinal.ink)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Go](https://github.com/vidar-team/Cardinal/actions/workflows/go.yml/badge.svg)](https://github.com/vidar-team/Cardinal/actions/workflows/go.yml)
 [![Code Scanning - Action](https://github.com/vidar-team/Cardinal/actions/workflows/codeql.yml/badge.svg)](https://github.com/vidar-team/Cardinal/actions/workflows/codeql.yml)
 [![codecov](https://codecov.io/gh/vidar-team/Cardinal/branch/master/graph/badge.svg?token=FZ9WKD0YE4)](https://codecov.io/gh/vidar-team/Cardinal)
 [![GoReport](https://goreportcard.com/badge/github.com/vidar-team/Cardinal)](https://goreportcard.com/report/github.com/vidar-team/Cardinal)
 [![Sourcegraph](https://img.shields.io/badge/view%20on-Sourcegraph-brightgreen.svg?logo=sourcegraph)](https://sourcegraph.com/github.com/vidar-team/Cardinal)
 [![QQ Group](https://img.shields.io/badge/QQ%E7%BE%A4-130818749-blue.svg?logo=Tencent%20QQ)](https://shang.qq.com/wpa/qunwpa?idkey=c6a35c5fbec05fdcd2d2605e08b4b5f8d6e5854471fefd8c03d370d14870b818)
-[![Discord](https://img.shields.io/discord/721936261778243615?label=Discord&logo=Discord)](https://discord.gg/F2EfgbM)
-
-**[我有好点子 / 我想吐槽](https://support.qq.com/products/293679/)**
 
 # [Cardinal](https://cardinal.ink) —— CTF AWD 线下赛平台
 
@@ -121,42 +113,13 @@ curl https://sh.cardinal.ink | bash
 * 选手端 `http://localhost:19999/`
 * 后台管理 `http://localhost:19999/manager`
 
-## Contributors ✨
-
-[提交 Bug](https://github.com/vidar-team/Cardinal/issues/new)
-| [Fork & Pull Request](https://github.com/vidar-team/Cardinal/fork)
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/wuhan005"><img src="https://avatars3.githubusercontent.com/u/12731778?v=4" width="100px;" alt=""/><br /><sub><b>E99p1ant</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Code">💻</a> <a href="#design-wuhan005" title="Design">🎨</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=wuhan005" title="Documentation">📖</a> <a href="#maintenance-wuhan005" title="Maintenance">🚧</a></td>
-    <td align="center"><a href="https://github.com/Moesang"><img src="https://avatars2.githubusercontent.com/u/46858006?v=4" width="100px;" alt=""/><br /><sub><b>Moesang</b></sub></a><br /><a href="https://github.com/vidar-team/Cardinal/commits?author=Moesang" title="Code">💻</a> <a href="https://github.com/vidar-team/Cardinal/commits?author=Moesang" title="Documentation">📖</a> <a href="#maintenance-Moesang" title="Maintenance">🚧</a></td>
-    <td align="center"><a href="https://github.com/michaelfyc"><img src="https://avatars2.githubusercontent.com/u/45136049?v=4" width="100px;" alt=""/><br /><sub><b>michaelfyc</b></sub></a><br /><a href="#translation-michaelfyc" title="Translation">🌍</a></td>
-  </tr>
-</table>
-
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-十分欢迎您和我们一起改进 Cardinal，您可以改进现有程序，加入新功能，完善文档，优化代码等。
-
 ## 使用 Cardinal 的团队及组织
 
 <a><img src="https://cardinal.ink/brand/QLNU.jpg" height="65px"  style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 <a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 
-## 协议与许可
+## 开源协议
 
 © Vidar-Team
 
-本项目使用 APACHE LICENSE VERSION 2.0 进行许可。
-
-若您安装及/或使用 Cardinal 及其相关软件、文档，即表示您已充分阅读、理解并同意接受本协议。
-
-我们接受并允许各大高校、安全团队、技术爱好者使用 Cardinal 作为比赛训练平台或举办内部训练赛。
-
-但不允许在未经许可授权的情况下，使用 Cardinal 的代码、文档、相关软件等开展商业培训、商业比赛、产品销售等任何营利性行为。禁止恶意更换、去除 Cardinal 及其相关软件、文档版权信息。
-
-一经发现，严肃处理。Vidar-Team 保留追究其法律责任的权力。
+Apache License Version 2.0.
