@@ -129,7 +129,7 @@ zh-CN:
     delete_challenge: "题目 [{{.title}}] 被删除"
     new_gamebox: "共 {{.count}} 个靶机被创建"
     set_challenge_visible: "设置题目 [{{.challenge}}] 状态为可见"
-    set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"ß
+    set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
     generate_flag: "生成 Flag 完成！共 {{.total}} 个。耗时 {{.time}} s。"
     score_success: "第 {{.round}} 轮分数结算完成！耗时 {{.time}} s。"
     new_manager: "新的管理员账号 [ {{.name}} ] 被添加"
