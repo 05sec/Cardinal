@@ -116,7 +116,7 @@ en-US:
     delete_challenge: "Challenge [{{.title}}] Deleted."
     new_gamebox: "Total {{.count}} Game boxes Created."
     set_challenge_visible: "Challenge [{{.challenge}}] is now Visible."
-    set_challenge_invisible: "Challenge [{{.challenge}}] is now Invisible."
+    set_challenge_invisible: "设置题目 [{{.challenge}}] 状态为不可见"
     generate_flag: "Flag Generated! There are now {{.total}} flags in total. The process took {{.time}} s."
     score_success: "Round {{.round}} Score Calculation Done!The process took {{.time}} s."
     new_manager: "New Admin Account [ {{.name}} ] Created."
