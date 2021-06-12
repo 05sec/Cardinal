@@ -89,8 +89,8 @@ func runWeb(c *cli.Context) error {
 			f.Post("/challenge/visible", binding.Bind(form.SetChallengeVisible{}), manager.SetChallengeVisible)
 
 			// Team
-			f.Get("/teams", manager.Teams)
-			f.Post("/teams", manager.Teams)
+			f.Get("/teams", manager.GetTeams)
+			f.Post("/teams", manager.NewTeams)
 			f.Put("/team", manager.UpdateTeam)
 			f.Delete("/team", manager.DeleteTeam)
 			f.Get("/team/resetPassword", manager.ResetTeamPassword)
