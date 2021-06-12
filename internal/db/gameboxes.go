@@ -223,19 +223,14 @@ func (db *gameboxes) GetByID(ctx context.Context, id uint) (*GameBox, error) {
 		return nil, errors.Wrap(err, "get")
 	}
 
-	teamsStore := NewTeamsStore(db.DB)
-	gameBox.Team, err = teamsStore.GetByID(ctx, gameBox.TeamID)
+	gameBoxes, err := db.loadAttributes(ctx, []*GameBox{&gameBox})
 	if err != nil {
-		return nil, errors.Wrap(err, "get team")
+		return nil, errors.Wrap(err, "load attributes")
 	}
-
-	challengeStore := NewChallengesStore(db.DB)
-	gameBox.Challenge, err = challengeStore.GetByID(ctx, gameBox.ChallengeID)
-	if err != nil {
-		return nil, errors.Wrap(err, "get challenge")
+	if len(gameBoxes) == 0 {
+		return nil, errors.New("empty game boxes after loading attributes")
 	}
-
-	return &gameBox, nil
+	return gameBoxes[0], nil
 }
 
 type UpdateGameBoxOptions struct {
