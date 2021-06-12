@@ -90,7 +90,7 @@ func runWeb(c *cli.Context) error {
 
 			// Team
 			f.Get("/teams", manager.GetTeams)
-			f.Post("/teams", manager.NewTeams)
+			f.Post("/teams", binding.Bind(form.NewTeam{}), manager.NewTeams)
 			f.Put("/team", manager.UpdateTeam)
 			f.Delete("/team", manager.DeleteTeam)
 			f.Get("/team/resetPassword", manager.ResetTeamPassword)

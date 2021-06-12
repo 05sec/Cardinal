@@ -8,3 +8,8 @@ type TeamLogin struct {
 	Name     string `binding:"Required;MaxSize(255)"`
 	Password string `binding:"Required;MaxSize(255)"`
 }
+
+type NewTeam []struct {
+	Name string `binding:"Required;MaxSize(255)"`
+	Logo string `binding:"Required;MaxSize(255)"`
+}

@@ -5,10 +5,12 @@
 package manager
 
 import (
+	"github.com/thanhpk/randstr"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/form"
 )
 
 // GetTeams returns all the teams.
@@ -42,8 +44,39 @@ func (*Handler) GetTeams(ctx context.Context) error {
 	return ctx.Success(teamList)
 }
 
-func (*Handler) NewTeams(ctx context.Context) error {
-	return nil
+// NewTeams creates a new team with the given options.
+func (*Handler) NewTeams(ctx context.Context, f form.NewTeam) error {
+	type teamInfo struct {
+		Name     string `json:"Name"`
+		Password string `json:"Password"`
+	}
+
+	teamInfos := make([]*teamInfo, 0, len(f))
+
+	for _, team := range f {
+		password := randstr.String(16)
+
+		// TODO add transaction
+		_, err := db.Teams.Create(ctx.Request().Context(), db.CreateTeamOptions{
+			Name:     team.Name,
+			Password: password,
+			Logo:     team.Logo,
+		})
+		if err != nil {
+			if err == db.ErrTeamAlreadyExists {
+				return ctx.Error(40000, "Team %q already existed.")
+			}
+			log.Error("Failed to create new team: %v", err)
+			return ctx.ServerError()
+		}
+
+		teamInfos = append(teamInfos, &teamInfo{
+			Name:     team.Name,
+			Password: password,
+		})
+	}
+
+	return ctx.Success(teamInfos)
 }
 
 func (*Handler) UpdateTeam(ctx context.Context) error {
