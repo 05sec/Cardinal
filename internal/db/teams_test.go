@@ -131,7 +131,10 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 	})
 	assert.Nil(t, err)
 
-	got, err := db.Get(ctx)
+	got, err := db.Get(ctx, GetTeamsOptions{
+		Page:     1,
+		PageSize: 5,
+	})
 
 	for k := range got {
 		got[k].CreatedAt = time.Time{}
@@ -150,6 +153,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 			Salt:     team1.Salt,
 			Logo:     "https://vidar.club/logo.png",
 			Score:    0,
+			Rank:     1,
 			Token:    team1.Token,
 		},
 		{
@@ -161,6 +165,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 			Salt:     team2.Salt,
 			Logo:     "https://github.red/",
 			Score:    0,
+			Rank:     1,
 			Token:    team2.Token,
 		},
 		{
@@ -172,6 +177,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 			Salt:     team3.Salt,
 			Logo:     "https://cosmos.red/",
 			Score:    0,
+			Rank:     1,
 			Token:    team3.Token,
 		},
 	}
@@ -188,6 +194,7 @@ func testTeamsGetByID(t *testing.T, ctx context.Context, db *teams) {
 		Logo:     "https://vidar.club/logo.png",
 	})
 	assert.Nil(t, err)
+	want.Rank = 1
 
 	got, err := db.GetByID(ctx, 1)
 	assert.Nil(t, err)
@@ -195,6 +202,41 @@ func testTeamsGetByID(t *testing.T, ctx context.Context, db *teams) {
 
 	_, err = db.GetByID(ctx, 2)
 	assert.Equal(t, ErrTeamNotExists, err)
+
+	// Update score, test rank.
+	_, err = db.Create(ctx, CreateTeamOptions{
+		Name:     "E99p1ant",
+		Password: "abcdef",
+		Logo:     "https://github.red/",
+	})
+	assert.Nil(t, err)
+	err = db.SetScore(ctx, 2, 1000)
+	assert.Nil(t, err)
+
+	got, err = db.GetByID(ctx, 2)
+	assert.Nil(t, err)
+
+	got.CreatedAt = time.Time{}
+	got.UpdatedAt = time.Time{}
+
+	want = &Team{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		Name:     "E99p1ant",
+		Password: "abcdef",
+		Salt:     got.Salt,
+		Logo:     "https://github.red/",
+		Score:    1000,
+		Rank:     1,
+		Token:    got.Token,
+	}
+	want.EncodePassword()
+	assert.Equal(t, want, got)
+
+	got, err = db.GetByID(ctx, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, uint(2), got.Rank)
 }
 
 func testTeamsChangePassword(t *testing.T, ctx context.Context, db *teams) {
@@ -249,6 +291,7 @@ func testTeamsUpdate(t *testing.T, ctx context.Context, db *teams) {
 		Salt:     team.Salt,
 		Logo:     "https://vidar.club/new_logo.png",
 		Score:    0,
+		Rank:     1,
 		Token:    "new_t0ken",
 	}
 	want.EncodePassword()
@@ -313,7 +356,7 @@ func testTeamsDeleteAll(t *testing.T, ctx context.Context, db *teams) {
 	err = db.DeleteAll(ctx)
 	assert.Nil(t, err)
 
-	got, err := db.Get(ctx)
+	got, err := db.Get(ctx, GetTeamsOptions{})
 	assert.Nil(t, err)
 	want := []*Team{}
 	assert.Equal(t, want, got)

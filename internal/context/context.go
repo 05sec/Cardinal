@@ -5,7 +5,6 @@
 package context
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/flamego/flamego"
@@ -16,7 +15,6 @@ import (
 // Context represents context of a request.
 type Context struct {
 	flamego.Context
-	Ctx context.Context
 }
 
 func (c *Context) Success(data interface{}) error {
@@ -63,7 +61,6 @@ func Contexter() flamego.Handler {
 	return func(ctx flamego.Context) {
 		c := Context{
 			Context: ctx,
-			Ctx:     ctx.Request().Context(),
 		}
 
 		c.Map(c)

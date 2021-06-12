@@ -112,7 +112,7 @@ func testGameBoxesCreate(t *testing.T, ctx context.Context, db *gameboxes) {
 
 func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 	// Get empty game box list.
-	gameboxes, err := db.Get(ctx)
+	gameboxes, err := db.Get(ctx, GetGameBoxesOption{})
 	assert.Nil(t, err)
 	assert.Empty(t, gameboxes)
 
@@ -144,7 +144,8 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 	assert.Equal(t, uint(2), id)
 	assert.Nil(t, err)
 
-	got, err := db.Get(ctx)
+	// Get all the game boxes.
+	got, err := db.Get(ctx, GetGameBoxesOption{})
 	assert.Nil(t, err)
 
 	for _, gameBox := range got {
@@ -199,6 +200,169 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 		},
 	}
 
+	assert.Equal(t, want, got)
+
+	// Get the team 1 game box.
+	got, err = db.Get(ctx, GetGameBoxesOption{
+		TeamID: 1,
+	})
+	assert.Nil(t, err)
+
+	for _, gameBox := range got {
+		gameBox.CreatedAt = time.Time{}
+		gameBox.UpdatedAt = time.Time{}
+	}
+
+	want = []*GameBox{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			TeamID:              1,
+			Team:                team1,
+			ChallengeID:         1,
+			Challenge:           challenge,
+			Address:             "192.168.1.1",
+			Description:         "Web1 For Vidar",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
+			Visible:             false,
+			Score:               1000,
+			Status:              GameBoxStatusUp,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	id, err = db.Create(ctx, CreateGameBoxOptions{
+		TeamID:      2,
+		ChallengeID: 2,
+		Address:     "192.168.2.2",
+		Description: "Web2 For E99p1ant",
+		InternalSSH: SSHConfig{
+			Port:     22,
+			User:     "root",
+			Password: "s3crets",
+		},
+	})
+	assert.Equal(t, uint(3), id)
+	assert.Nil(t, err)
+
+	// Get the challenge 1 game box.
+	got, err = db.Get(ctx, GetGameBoxesOption{
+		ChallengeID: 1,
+	})
+	assert.Nil(t, err)
+
+	for _, gameBox := range got {
+		gameBox.CreatedAt = time.Time{}
+		gameBox.UpdatedAt = time.Time{}
+	}
+
+	want = []*GameBox{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			TeamID:              1,
+			Team:                team1,
+			ChallengeID:         1,
+			Challenge:           challenge,
+			Address:             "192.168.1.1",
+			Description:         "Web1 For Vidar",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
+			Visible:             false,
+			Score:               1000,
+			Status:              GameBoxStatusUp,
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			TeamID:              2,
+			Team:                team2,
+			ChallengeID:         1,
+			Challenge:           challenge,
+			Address:             "192.168.2.1",
+			Description:         "Web1 For E99p1ant",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3crets",
+			Visible:             false,
+			Score:               1000,
+			Status:              GameBoxStatusUp,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	// Get team 2, challenge 1 game box.
+	got, err = db.Get(ctx, GetGameBoxesOption{
+		TeamID:      2,
+		ChallengeID: 1,
+	})
+	assert.Nil(t, err)
+
+	for _, gameBox := range got {
+		gameBox.CreatedAt = time.Time{}
+		gameBox.UpdatedAt = time.Time{}
+	}
+
+	want = []*GameBox{
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			TeamID:              2,
+			Team:                team2,
+			ChallengeID:         1,
+			Challenge:           challenge,
+			Address:             "192.168.2.1",
+			Description:         "Web1 For E99p1ant",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3crets",
+			Visible:             false,
+			Score:               1000,
+			Status:              GameBoxStatusUp,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	// Set game box 2 to visible.
+	err = db.SetVisible(ctx, 2, true)
+	assert.Nil(t, err)
+	// Get visible game box.
+	got, err = db.Get(ctx, GetGameBoxesOption{
+		Visible: true,
+	})
+	assert.Nil(t, err)
+
+	for _, gameBox := range got {
+		gameBox.CreatedAt = time.Time{}
+		gameBox.UpdatedAt = time.Time{}
+	}
+
+	want = []*GameBox{
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			TeamID:              2,
+			Team:                team2,
+			ChallengeID:         1,
+			Challenge:           challenge,
+			Address:             "192.168.2.1",
+			Description:         "Web1 For E99p1ant",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3crets",
+			Visible:             true,
+			Score:               1000,
+			Status:              GameBoxStatusUp,
+		},
+	}
 	assert.Equal(t, want, got)
 }
 
@@ -560,7 +724,7 @@ func testGameBoxesDeleteAll(t *testing.T, ctx context.Context, db *gameboxes) {
 	err = db.DeleteAll(ctx)
 	assert.Nil(t, err)
 
-	got, err := db.Get(ctx)
+	got, err := db.Get(ctx, GetGameBoxesOption{})
 	assert.Nil(t, err)
 	want := []*GameBox{}
 	assert.Equal(t, want, got)
