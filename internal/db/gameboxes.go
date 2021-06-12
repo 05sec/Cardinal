@@ -22,8 +22,8 @@ type GameBoxesStore interface {
 	// Create creates a new game box and persists to database.
 	// It returns the game box ID when game box created.
 	Create(ctx context.Context, opts CreateGameBoxOptions) (uint, error)
-	// Get returns all the game boxes.
-	Get(ctx context.Context) ([]*GameBox, error)
+	// Get returns the game boxes with the given options.
+	Get(ctx context.Context, opts GetGameBoxesOption) ([]*GameBox, error)
 	// GetByID returns the game box with given id.
 	// It returns ErrGameBoxNotExists when not found.
 	GetByID(ctx context.Context, id uint) (*GameBox, error)
@@ -141,13 +141,7 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 	return g.ID, nil
 }
 
-func (db *gameboxes) Get(ctx context.Context) ([]*GameBox, error) {
-	var gameBoxes []*GameBox
-	err := db.DB.WithContext(ctx).Model(&GameBox{}).Order("id ASC").Find(&gameBoxes).Error
-	if err != nil {
-		return nil, err
-	}
-
+func (db *gameboxes) loadAttributes(ctx context.Context, gameBoxes []*GameBox) ([]*GameBox, error) {
 	teamIDs := map[uint]struct{}{}
 	challengeIDs := map[uint]struct{}{}
 	for _, gameBox := range gameBoxes {
@@ -155,18 +149,22 @@ func (db *gameboxes) Get(ctx context.Context) ([]*GameBox, error) {
 		challengeIDs[gameBox.ChallengeID] = struct{}{}
 	}
 
+	// Get game box's team.
 	teamsStore := NewTeamsStore(db.DB)
 	teamSets := map[uint]*Team{}
 	for teamID := range teamIDs {
+		var err error
 		teamSets[teamID], err = teamsStore.GetByID(ctx, teamID)
 		if err != nil {
 			return nil, errors.Wrap(err, "get team")
 		}
 	}
 
+	// Get game box's challenge.
 	challengeStore := NewChallengesStore(db.DB)
 	challengeSets := map[uint]*Challenge{}
 	for challengeID := range challengeIDs {
+		var err error
 		challengeSets[challengeID], err = challengeStore.GetByID(ctx, challengeID)
 		if err != nil {
 			return nil, errors.Wrap(err, "get challenge")
@@ -179,6 +177,38 @@ func (db *gameboxes) Get(ctx context.Context) ([]*GameBox, error) {
 	}
 
 	return gameBoxes, nil
+}
+
+type GetGameBoxesOption struct {
+	TeamID      uint
+	ChallengeID uint
+	Visible     bool // If Visible is `false`, it returns the visible and invisible game boxes.
+	Status      GameBoxStatus
+}
+
+func (db *gameboxes) Get(ctx context.Context, opts GetGameBoxesOption) ([]*GameBox, error) {
+	var gameBoxes []*GameBox
+	query := db.DB.WithContext(ctx).Model(&GameBox{})
+
+	if opts.TeamID != 0 {
+		query = query.Where("team_id = ?", opts.TeamID)
+	}
+	if opts.ChallengeID != 0 {
+		query = query.Where("challenge_id = ?", opts.ChallengeID)
+	}
+	if opts.Visible {
+		query = query.Where("visible = ?", opts.Visible)
+	}
+	if opts.Status != "" {
+		query = query.Where("status = ?", opts.Status)
+	}
+
+	err := query.Order("id ASC").Find(&gameBoxes).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return db.loadAttributes(ctx, gameBoxes)
 }
 
 var ErrGameBoxNotExists = errors.New("game box does not exist")
