@@ -132,3 +132,37 @@ func (*Handler) DeleteChallenge(ctx context.Context) error {
 	// TODO i18n
 	return ctx.Success("Success")
 }
+
+// SetChallengeVisible sets the challenge's visible.
+func (*Handler) SetChallengeVisible(ctx context.Context, f form.SetChallengeVisible) error {
+	// Check if the challenge exists.
+	challenge, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
+	if err != nil {
+		if err == db.ErrChallengeNotExists {
+			// TODO i18n
+			return ctx.Error(40000, "Challenge does not exist.")
+		}
+		log.Error("Failed to get challenge: %v", err)
+		return ctx.ServerError()
+	}
+
+	// Get all the game boxes which belong to this challenge.
+	gameBoxes, err := db.GameBoxes.Get(ctx.Request().Context(), db.GetGameBoxesOption{
+		ChallengeID: challenge.ID,
+	})
+	if err != nil {
+		log.Error("Failed to get game boxes list: %v", err)
+		return ctx.ServerError()
+	}
+
+	for _, gameBox := range gameBoxes {
+		err := db.GameBoxes.SetVisible(ctx.Request().Context(), gameBox.ID, f.Visible)
+		if err != nil {
+			log.Error("Failed to set game box visible: %v", err)
+			return ctx.ServerError()
+		}
+	}
+
+	// TODO i18n
+	return ctx.Success("Success")
+}

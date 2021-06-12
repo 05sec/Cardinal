@@ -18,3 +18,8 @@ type UpdateChallenge struct {
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
+
+type SetChallengeVisible struct {
+	ID      uint `binding:"Required"`
+	Visible bool
+}
