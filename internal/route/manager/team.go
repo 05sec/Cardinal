@@ -115,13 +115,13 @@ func (*Handler) DeleteTeam(ctx context.Context) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the team exist or not.
-	_, err := db.Teams.GetByID(ctx.Request().Context(), id)
+	team, err := db.Teams.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		log.Error("Failed to get team by ID: %v", err)
 		return ctx.ServerError()
 	}
 
-	err = db.Teams.DeleteByID(ctx.Request().Context(), id)
+	err = db.Teams.DeleteByID(ctx.Request().Context(), team.ID)
 	if err != nil {
 		log.Error("Failed to delete team: %v", err)
 		return ctx.ServerError()
@@ -130,6 +130,23 @@ func (*Handler) DeleteTeam(ctx context.Context) error {
 	return ctx.Success("")
 }
 
+// ResetTeamPassword resets team password with the given id.
 func (*Handler) ResetTeamPassword(ctx context.Context) error {
-	return nil
+	id := uint(ctx.QueryInt("id"))
+
+	// Check the team exist or not.
+	team, err := db.Teams.GetByID(ctx.Request().Context(), id)
+	if err != nil {
+		log.Error("Failed to get team by ID: %v", err)
+		return ctx.ServerError()
+	}
+
+	newPassword := randstr.String(16)
+	err = db.Teams.ChangePassword(ctx.Request().Context(), team.ID, newPassword)
+	if err != nil {
+		log.Error("Failed to change password: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success(newPassword)
 }
