@@ -18,7 +18,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
 	"github.com/vidar-team/Cardinal/internal/route"
-	"github.com/vidar-team/Cardinal/internal/route/general"
 	"github.com/vidar-team/Cardinal/internal/route/manager"
 )
 
@@ -34,7 +33,6 @@ and it takes care of all the other things for you`,
 	},
 }
 
-//
 func runWeb(c *cli.Context) error {
 	err := conf.Init(c.String("config"))
 	if err != nil {
@@ -48,24 +46,26 @@ func runWeb(c *cli.Context) error {
 	f := flamego.Classic()
 
 	f.Use(session.Sessioner(session.Options{
-		ReadIDFunc: func(r *http.Request) string {
-			return r.Header.Get("Authorization")
-		},
+		ReadIDFunc:  func(r *http.Request) string { return r.Header.Get("Authorization") },
 		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {},
 	}))
 
-	bind := binding.Bind
+	general := route.NewGeneralHandler()
+	f.NotFound(general.NotFound)
 
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
+		f.Get("/init", general.Init)
 
 		team := route.NewTeamHandler()
 		f.Group("/team", func() {
-			f.Post("/login", bind(form.TeamLogin{}), team.Login)
+			f.Post("/login", binding.Bind(form.TeamLogin{}), team.Login)
 			f.Post("/logout", team.Logout)
 
 			f.Group("", func() {
 				f.Get("/info", team.Info)
+				f.Get("/game_boxes", team.GameBoxes)
+				f.Get("/bulletins", team.Bulletins)
 			}, team.Authenticator)
 		})
 
@@ -79,8 +79,6 @@ func runWeb(c *cli.Context) error {
 
 		}, manager.Authenticator)
 	})
-
-	f.NotFound(general.NotFound)
 
 	f.Use(context.Contexter())
 
