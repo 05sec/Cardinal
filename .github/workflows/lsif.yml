@@ -1,0 +1,22 @@
+name: LSIF
+on:
+  push:
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.github/workflows/lsif.yml'
+env:
+  GOPROXY: "https://proxy.golang.org"
+
+jobs:
+  lsif-go:
+    runs-on: ubuntu-latest
+    container: sourcegraph/lsif-go:v1.3.1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Generate LSIF data
+        run: lsif-go
+      - name: Upload LSIF data
+        run: src lsif upload -github-token=${{ secrets.GITHUB_TOKEN }} -repo github.com/${{ github.repository }}
+        
