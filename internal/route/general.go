@@ -17,7 +17,11 @@ func NewGeneralHandler() *GeneralHandler {
 }
 
 func (*GeneralHandler) Hello(c context.Context) error {
-	return c.Success("Hello Cardinal!")
+	return c.Success(map[string]interface{}{
+		// TODO get the info from main.go
+		"Version": "",
+		"Commit":  "",
+	})
 }
 
 func (*GeneralHandler) Init(c context.Context) error {

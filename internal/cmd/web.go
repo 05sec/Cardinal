@@ -82,8 +82,8 @@ func runWeb(c *cli.Context) error {
 			f.Get("/rank")
 
 			// Challenge
-			f.Get("/challenges")
-			f.Post("/challenge")
+			f.Get("/challenges", manager.GetChallenges)
+			f.Post("/challenge", binding.Bind(form.NewChallenge{}), manager.NewChallenge)
 			f.Put("/challenge")
 			f.Delete("/challenge")
 			f.Post("/challenge/visible")
