@@ -34,6 +34,9 @@ type TeamsStore interface {
 	// GetByID returns the team with given id.
 	// It returns ErrTeamNotExists when not found.
 	GetByID(ctx context.Context, id uint) (*Team, error)
+	// GetByName returns the team with given name.
+	// It returns ErrTeamNotExists when not found.
+	GetByName(ctx context.Context, name string) (*Team, error)
 	// ChangePassword changes the team's password with given id.
 	ChangePassword(ctx context.Context, id uint, newPassword string) error
 	// Update updates the team with given id.
@@ -161,6 +164,23 @@ func (db *teams) GetByID(ctx context.Context, id uint) (*Team, error) {
 				Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}),
 		).
 		Where("id = ?", id).First(&team).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrTeamNotExists
+		}
+		return nil, err
+	}
+
+	return &team, nil
+}
+
+func (db *teams) GetByName(ctx context.Context, name string) (*Team, error) {
+	var team Team
+	if err := db.WithContext(ctx).
+		Table("(?) as teams",
+			db.WithContext(ctx).Model(&Team{}).
+				Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}),
+		).
+		Where("name = ?", name).First(&team).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrTeamNotExists
 		}

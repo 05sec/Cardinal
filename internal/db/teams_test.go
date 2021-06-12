@@ -31,6 +31,7 @@ func TestTeams(t *testing.T) {
 		{"Create", testTeamsCreate},
 		{"Get", testTeamsGet},
 		{"GetByID", testTeamsGetByID},
+		{"GetByName", testTeamsGetByName},
 		{"ChangePassword", testTeamsChangePassword},
 		{"Update", testTeamsUpdate},
 		{"SetScore", testTeamsSetScore},
@@ -235,6 +236,58 @@ func testTeamsGetByID(t *testing.T, ctx context.Context, db *teams) {
 	assert.Equal(t, want, got)
 
 	got, err = db.GetByID(ctx, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, uint(2), got.Rank)
+}
+
+func testTeamsGetByName(t *testing.T, ctx context.Context, db *teams) {
+	want, err := db.Create(ctx, CreateTeamOptions{
+		Name:     "Vidar",
+		Password: "123456",
+		Logo:     "https://vidar.club/logo.png",
+	})
+	assert.Nil(t, err)
+	want.Rank = 1
+
+	got, err := db.GetByName(ctx, "Vidar")
+	assert.Nil(t, err)
+	assert.Equal(t, want, got)
+
+	_, err = db.GetByName(ctx, "")
+	assert.Equal(t, ErrTeamNotExists, err)
+
+	// Update score, test rank.
+	_, err = db.Create(ctx, CreateTeamOptions{
+		Name:     "E99p1ant",
+		Password: "abcdef",
+		Logo:     "https://github.red/",
+	})
+	assert.Nil(t, err)
+	err = db.SetScore(ctx, 2, 1000)
+	assert.Nil(t, err)
+
+	got, err = db.GetByName(ctx, "E99p1ant")
+	assert.Nil(t, err)
+
+	got.CreatedAt = time.Time{}
+	got.UpdatedAt = time.Time{}
+
+	want = &Team{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		Name:     "E99p1ant",
+		Password: "abcdef",
+		Salt:     got.Salt,
+		Logo:     "https://github.red/",
+		Score:    1000,
+		Rank:     1,
+		Token:    got.Token,
+	}
+	want.EncodePassword()
+	assert.Equal(t, want, got)
+
+	got, err = db.GetByName(ctx, "Vidar")
 	assert.Nil(t, err)
 	assert.Equal(t, uint(2), got.Rank)
 }
