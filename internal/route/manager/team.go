@@ -110,8 +110,24 @@ func (*Handler) UpdateTeam(ctx context.Context, f form.UpdateTeam) error {
 	return ctx.Success("")
 }
 
+// DeleteTeam deletes the team with the given ID.
 func (*Handler) DeleteTeam(ctx context.Context) error {
-	return nil
+	id := uint(ctx.QueryInt("id"))
+
+	// Check the team exist or not.
+	_, err := db.Teams.GetByID(ctx.Request().Context(), id)
+	if err != nil {
+		log.Error("Failed to get team by ID: %v", err)
+		return ctx.ServerError()
+	}
+
+	err = db.Teams.DeleteByID(ctx.Request().Context(), id)
+	if err != nil {
+		log.Error("Failed to delete team: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success("")
 }
 
 func (*Handler) ResetTeamPassword(ctx context.Context) error {
