@@ -80,3 +80,30 @@ func (*Handler) NewChallenge(ctx context.Context, f form.NewChallenge) error {
 	// TODO i18n
 	return ctx.Success("Success")
 }
+
+// UpdateChallenge updates the challenge with the given ID.
+func (*Handler) UpdateChallenge(ctx context.Context, f form.UpdateChallenge) error {
+	// Check if the challenge exists.
+	_, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
+	if err != nil {
+		if err == db.ErrChallengeNotExists {
+			// TODO i18n
+			return ctx.Error(40000, "Challenge does not exist.")
+		}
+		log.Error("Failed to get challenge: %v", err)
+		return ctx.ServerError()
+	}
+
+	err = db.Challenges.Update(ctx.Request().Context(), f.ID, db.UpdateChallengeOptions{
+		Title:            f.Title,
+		BaseScore:        f.BaseScore,
+		AutoRenewFlag:    f.AutoRenewFlag,
+		RenewFlagCommand: f.RenewFlagCommand,
+	})
+	if err != nil {
+		log.Error("Failed to update challenge: %v", err)
+		return ctx.ServerError()
+	}
+	// TODO i18n
+	return ctx.Success("Success")
+}

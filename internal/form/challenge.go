@@ -10,3 +10,11 @@ type NewChallenge struct {
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
+
+type UpdateChallenge struct {
+	ID               uint    `binding:"Required"`
+	Title            string  `binding:"Required;MaxSize(255)"`
+	BaseScore        float64 `binding:"Required;Range(0,10000)"`
+	AutoRenewFlag    bool
+	RenewFlagCommand string
+}
