@@ -5,15 +5,30 @@
 package manager
 
 import (
+	"github.com/flamego/session"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 )
 
-func Authenticator(ctx context.Context) error {
-	// TODO: get the manager id from authorization header.
-	manager, err := db.Managers.GetByID(ctx.Request().Context(), 1)
+// Handler is the manager request handler.
+type Handler struct{}
+
+// NewHandler creates and returns a new manager Handler.
+func NewHandler() *Handler {
+	return &Handler{}
+}
+
+const managerIDSessionKey = "TeamID"
+
+func (*Handler) Authenticator(ctx context.Context, session session.Session) error {
+	managerID, ok := session.Get(managerIDSessionKey).(uint)
+	if !ok {
+		return ctx.Error(40300, "")
+	}
+
+	manager, err := db.Managers.GetByID(ctx.Request().Context(), managerID)
 	if err != nil {
 		if err == db.ErrManagerNotExists {
 			return ctx.Error(40300, "")

@@ -8,22 +8,22 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 )
 
-func Teams(ctx context.Context) error {
+func (*Handler) Teams(ctx context.Context) error {
 	return nil
 }
 
-func NewTeams(ctx context.Context) error {
+func (*Handler) NewTeams(ctx context.Context) error {
 	return nil
 }
 
-func UpdateTeam(ctx context.Context) error {
+func (*Handler) UpdateTeam(ctx context.Context) error {
 	return nil
 }
 
-func DeleteTeam(ctx context.Context) error {
+func (*Handler) DeleteTeam(ctx context.Context) error {
 	return nil
 }
 
-func ResetTeamPassword(ctx context.Context) error {
+func (*Handler) ResetTeamPassword(ctx context.Context) error {
 	return nil
 }

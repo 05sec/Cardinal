@@ -56,6 +56,9 @@ func runWeb(c *cli.Context) error {
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
 		f.Get("/init", general.Init)
+		f.Get("/time")
+		f.Get("/uploads")
+		f.Get("/asteroid")
 
 		team := route.NewTeamHandler()
 		f.Group("/team", func() {
@@ -63,14 +66,28 @@ func runWeb(c *cli.Context) error {
 			f.Post("/logout", team.Logout)
 
 			f.Group("", func() {
-				f.Post("/submit_flag", team.SubmitFlag)
+				f.Post("/submitFlag", team.SubmitFlag)
 				f.Get("/info", team.Info)
-				f.Get("/game_boxes", team.GameBoxes)
+				f.Get("/gameBoxes", team.GameBoxes)
 				f.Get("/bulletins", team.Bulletins)
+				f.Get("/liveLog")
 			}, team.Authenticator)
 		})
 
+		manager := manager.NewHandler()
 		f.Group("/manager", func() {
+			// Panel
+			f.Get("/panel")
+			f.Get("/logs")
+			f.Get("/rank")
+
+			// Challenge
+			f.Get("/challenges")
+			f.Post("/challenge")
+			f.Put("/challenge")
+			f.Delete("/challenge")
+			f.Post("/challenge/visible")
+
 			// Team
 			f.Get("/teams", manager.Teams)
 			f.Post("/teams", manager.Teams)
@@ -78,7 +95,41 @@ func runWeb(c *cli.Context) error {
 			f.Delete("/team", manager.DeleteTeam)
 			f.Get("/team/resetPassword", manager.ResetTeamPassword)
 
-		}, manager.Authenticator)
+			// Game Box
+			f.Get("/gameBoxes")
+			f.Post("/gameBoxes")
+			f.Post("/gameBoxes/reset")
+			f.Put("/gameBox")
+			f.Post("/gameBox/sshTest")
+			f.Post("/gameBox/refreshFlag")
+
+			// Flag
+			f.Get("/flags")
+			f.Post("/flags")
+			f.Get("/flags/export")
+
+			// Bulletins
+			f.Get("/bulletins")
+			f.Post("/bulletin")
+			f.Put("/bulletin")
+			f.Delete("/bulletin")
+
+			// Asteroid
+			f.Group("/asteroid", func() {
+				f.Get("/status")
+				f.Post("/attack")
+				f.Post("/rank")
+				f.Post("/status")
+				f.Post("/round")
+				f.Post("/easterEgg")
+				f.Post("/time")
+				f.Post("/clear")
+			})
+
+			// Check
+			f.Get("/checkDown")
+
+		})
 	})
 
 	f.Use(context.Contexter())
