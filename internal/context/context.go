@@ -6,9 +6,11 @@ package context
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/flamego/flamego"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/unknwon/com"
 	log "unknwon.dev/clog/v2"
 )
 
@@ -54,6 +56,27 @@ func (c *Context) Error(errorCode uint, message string) error {
 		log.Error("Failed to encode: %v", err)
 	}
 	return nil
+}
+
+// Query queries form parameter.
+func (c *Context) Query(name string) string {
+	return c.Request().URL.Query().Get(name)
+}
+
+// QueryInt returns query result in int type.
+func (c *Context) QueryInt(name string) int {
+	return com.StrTo(c.Query(name)).MustInt()
+}
+
+// QueryInt64 returns query result in int64 type.
+func (c *Context) QueryInt64(name string) int64 {
+	return com.StrTo(c.Query(name)).MustInt64()
+}
+
+// QueryFloat64 returns query result in float64 type.
+func (c *Context) QueryFloat64(name string) float64 {
+	v, _ := strconv.ParseFloat(c.Query(name), 64)
+	return v
 }
 
 // Contexter initializes a classic context for a request.

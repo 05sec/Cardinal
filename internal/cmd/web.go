@@ -85,7 +85,7 @@ func runWeb(c *cli.Context) error {
 			f.Get("/challenges", manager.GetChallenges)
 			f.Post("/challenge", binding.Bind(form.NewChallenge{}), manager.NewChallenge)
 			f.Put("/challenge", binding.Bind(form.UpdateChallenge{}), manager.UpdateChallenge)
-			f.Delete("/challenge")
+			f.Delete("/challenge", manager.DeleteChallenge)
 			f.Post("/challenge/visible")
 
 			// Team
@@ -128,7 +128,6 @@ func runWeb(c *cli.Context) error {
 
 			// Check
 			f.Get("/checkDown")
-
 		})
 	})
 

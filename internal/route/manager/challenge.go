@@ -107,3 +107,28 @@ func (*Handler) UpdateChallenge(ctx context.Context, f form.UpdateChallenge) err
 	// TODO i18n
 	return ctx.Success("Success")
 }
+
+// DeleteChallenge deletes the challenge with the given ID.
+func (*Handler) DeleteChallenge(ctx context.Context) error {
+	id := uint(ctx.QueryInt("id"))
+
+	// Check if the challenge exists.
+	_, err := db.Challenges.GetByID(ctx.Request().Context(), id)
+	if err != nil {
+		if err == db.ErrChallengeNotExists {
+			// TODO i18n
+			return ctx.Error(40000, "Challenge does not exist.")
+		}
+		log.Error("Failed to get challenge: %v", err)
+		return ctx.ServerError()
+	}
+
+	err = db.Challenges.DeleteByID(ctx.Request().Context(), id)
+	if err != nil {
+		log.Error("Failed to delete challenge: %v", err)
+		return ctx.ServerError()
+	}
+
+	// TODO i18n
+	return ctx.Success("Success")
+}
