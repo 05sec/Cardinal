@@ -63,6 +63,7 @@ func runWeb(c *cli.Context) error {
 			f.Post("/logout", team.Logout)
 
 			f.Group("", func() {
+				f.Post("/submit_flag", team.SubmitFlag)
 				f.Get("/info", team.Info)
 				f.Get("/game_boxes", team.GameBoxes)
 				f.Get("/bulletins", team.Bulletins)

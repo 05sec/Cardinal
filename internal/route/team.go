@@ -5,6 +5,8 @@
 package route
 
 import (
+	"time"
+
 	"github.com/flamego/session"
 	log "unknwon.dev/clog/v2"
 
@@ -61,6 +63,10 @@ func (*TeamHandler) Logout(ctx context.Context, session session.Session) error {
 	return ctx.Success("")
 }
 
+func (*TeamHandler) SubmitFlag(ctx context.Context, team *db.Team) error {
+	panic("implement me")
+}
+
 // Info returns the current logged in team's information.
 func (*TeamHandler) Info(ctx context.Context, team *db.Team) error {
 	return ctx.Success(map[string]interface{}{
@@ -70,4 +76,61 @@ func (*TeamHandler) Info(ctx context.Context, team *db.Team) error {
 		"Rank":  team.Rank,
 		"Token": team.Token,
 	})
+}
+
+func (*TeamHandler) GameBoxes(ctx context.Context, team *db.Team) error {
+	gameBoxes, err := db.GameBoxes.Get(ctx.Request().Context(), db.GetGameBoxesOption{
+		TeamID:  team.ID,
+		Visible: true,
+	})
+	if err != nil {
+		log.Error("Failed to get team game boxes: %v", err)
+		return ctx.ServerError()
+	}
+
+	type gameBox struct {
+		Title       string           `json:"Title"`
+		Address     string           `json:"Address"`
+		Description string           `json:"Description"`
+		Score       float64          `json:"Score"`
+		Status      db.GameBoxStatus `json:"Status"`
+	}
+
+	gameBoxList := make([]*gameBox, 0, len(gameBoxes))
+	for _, gb := range gameBoxes {
+		gameBoxList = append(gameBoxList, &gameBox{
+			Title:       gb.Challenge.Title,
+			Address:     gb.Address,
+			Description: gb.Description,
+			Score:       gb.Score,
+			Status:      gb.Status,
+		})
+	}
+
+	return ctx.Success(gameBoxList)
+}
+
+func (*TeamHandler) Bulletins(ctx context.Context) error {
+	bulletins, err := db.Bulletins.Get(ctx.Request().Context())
+	if err != nil {
+		log.Error("Failed to get bulletins: %v", err)
+		return ctx.ServerError()
+	}
+
+	type bulletin struct {
+		Title     string    `json:"Title"`
+		Body      string    `json:"Body"`
+		CreatedAt time.Time `json:"CreatedAt"`
+	}
+
+	bulletinList := make([]*bulletin, 0, len(bulletins))
+	for _, b := range bulletins {
+		bulletinList = append(bulletinList, &bulletin{
+			Title:     b.Title,
+			Body:      b.Body,
+			CreatedAt: b.CreatedAt,
+		})
+	}
+
+	return ctx.Success(bulletinList)
 }
