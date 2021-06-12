@@ -6,11 +6,11 @@ package form
 
 type NewBulletin struct {
 	Title string `binding:"Required;MaxSize(255)"`
-	Body  string `binding:"Required;MaxSize(255)"`
+	Body  string `binding:"Required;MaxSize(1000)"`
 }
 
 type UpdateBulletin struct {
 	ID    uint   `binding:"Required"`
 	Title string `binding:"Required;MaxSize(255)"`
-	Body  string `binding:"Required;MaxSize(255)"`
+	Body  string `binding:"Required;MaxSize(1000)"`
 }
