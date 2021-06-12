@@ -79,8 +79,35 @@ func (*Handler) NewTeams(ctx context.Context, f form.NewTeam) error {
 	return ctx.Success(teamInfos)
 }
 
-func (*Handler) UpdateTeam(ctx context.Context) error {
-	return nil
+// UpdateTeam updates the team with the given options.
+func (*Handler) UpdateTeam(ctx context.Context, f form.UpdateTeam) error {
+	// Check the team exist or not.
+	team, err := db.Teams.GetByID(ctx.Request().Context(), f.ID)
+	if err != nil {
+		log.Error("Failed to get team by ID: %v", err)
+		return ctx.ServerError()
+	}
+
+	newTeam, err := db.Teams.GetByName(ctx.Request().Context(), f.Name)
+	if err != nil {
+		log.Error("Failed to get team by name: %v", err)
+		return ctx.ServerError()
+	}
+
+	if team.ID != newTeam.ID {
+		// TODO i18n
+		return ctx.Error(40000, "Team name %q repeat.")
+	}
+
+	err = db.Teams.Update(ctx.Request().Context(), f.ID, db.UpdateTeamOptions{
+		Name: f.Name,
+		Logo: f.Logo,
+	})
+	if err != nil {
+		log.Error("Failed to update team: %v", err)
+		return ctx.ServerError()
+	}
+	return ctx.Success("")
 }
 
 func (*Handler) DeleteTeam(ctx context.Context) error {
