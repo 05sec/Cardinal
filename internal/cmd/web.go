@@ -109,10 +109,10 @@ func runWeb(c *cli.Context) error {
 			f.Get("/flags/export")
 
 			// Bulletins
-			f.Get("/bulletins")
-			f.Post("/bulletin")
-			f.Put("/bulletin")
-			f.Delete("/bulletin")
+			f.Get("/bulletins", manager.GetBulletins)
+			f.Post("/bulletin", binding.Bind(form.NewBulletin{}), manager.NewBulletin)
+			f.Put("/bulletin", binding.Bind(form.UpdateBulletin{}), manager.UpdateBulletin)
+			f.Delete("/bulletin", manager.DeleteBulletin)
 
 			// Asteroid
 			f.Group("/asteroid", func() {
