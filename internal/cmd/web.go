@@ -7,6 +7,7 @@ package cmd
 import (
 	"net/http"
 
+	"github.com/Cardinal-Platform/binding"
 	"github.com/flamego/flamego"
 	"github.com/flamego/session"
 	"github.com/urfave/cli/v2"
@@ -15,9 +16,10 @@ import (
 	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/route"
 	"github.com/vidar-team/Cardinal/internal/route/general"
 	"github.com/vidar-team/Cardinal/internal/route/manager"
-	"github.com/vidar-team/Cardinal/internal/route/team"
 )
 
 var Web = &cli.Command{
@@ -32,6 +34,7 @@ and it takes care of all the other things for you`,
 	},
 }
 
+//
 func runWeb(c *cli.Context) error {
 	err := conf.Init(c.String("config"))
 	if err != nil {
@@ -51,15 +54,18 @@ func runWeb(c *cli.Context) error {
 		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {},
 	}))
 
+	bind := binding.Bind
+
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
 
+		team := route.NewTeamHandler()
 		f.Group("/team", func() {
-			f.Post("/login", team.Login)
+			f.Post("/login", bind(form.TeamLogin{}), team.Login)
 			f.Post("/logout", team.Logout)
 
 			f.Group("", func() {
-				f.Get("/info", team.GetInfo)
+				f.Get("/info", team.Info)
 			}, team.Authenticator)
 		})
 

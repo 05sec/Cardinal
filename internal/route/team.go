@@ -2,7 +2,7 @@
 // Use of this source code is governed by Apache-2.0
 // license that can be found in the LICENSE file.
 
-package team
+package route
 
 import (
 	"github.com/flamego/session"
@@ -10,11 +10,20 @@ import (
 
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
+	"github.com/vidar-team/Cardinal/internal/form"
 )
+
+// TeamHandler is the team request handler.
+type TeamHandler struct{}
+
+// NewTeamHandler creates and returns a new TeamHandler.
+func NewTeamHandler() *TeamHandler {
+	return &TeamHandler{}
+}
 
 const teamIDSessionKey = "TeamID"
 
-func Authenticator(ctx context.Context, session session.Session) error {
+func (*TeamHandler) Authenticator(ctx context.Context, session session.Session) error {
 	teamID, ok := session.Get(teamIDSessionKey).(uint)
 	if !ok {
 		return ctx.Error(40300, "")
@@ -34,9 +43,8 @@ func Authenticator(ctx context.Context, session session.Session) error {
 	return nil
 }
 
-func Login(ctx context.Context, session session.Session) error {
-	// TODO: get the name and password from binding.
-	team, err := db.Teams.Authenticate(ctx.Request().Context(), "", "")
+func (*TeamHandler) Login(ctx context.Context, session session.Session, f form.TeamLogin) error {
+	team, err := db.Teams.Authenticate(ctx.Request().Context(), f.Name, f.Password)
 	if err == db.ErrBadCredentials {
 		return ctx.Error(40300, "bad credentials")
 	} else if err != nil {
@@ -48,13 +56,13 @@ func Login(ctx context.Context, session session.Session) error {
 	return ctx.Success(session.ID())
 }
 
-func Logout(ctx context.Context, session session.Session) error {
+func (*TeamHandler) Logout(ctx context.Context, session session.Session) error {
 	session.Flush()
 	return ctx.Success("")
 }
 
-// GetInfo returns the current logged in team's information.
-func GetInfo(ctx context.Context, team *db.Team) error {
+// Info returns the current logged in team's information.
+func (*TeamHandler) Info(ctx context.Context, team *db.Team) error {
 	return ctx.Success(map[string]interface{}{
 		"Name":  team.Name,
 		"Logo":  team.Logo,
