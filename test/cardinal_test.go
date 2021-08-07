@@ -5,9 +5,11 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vidar-team/Cardinal/conf"
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/bootstrap"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
@@ -17,7 +19,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	log "unknwon.dev/clog/v2"
 )
 
 var managerToken = utils.GenerateToken()
@@ -43,12 +44,15 @@ func TestMain(m *testing.M) {
 
 func prepare() {
 	_ = log.NewConsole(100)
-	
+
 	log.Trace("Prepare for Cardinal test environment...")
 
 	gin.SetMode(gin.ReleaseMode)
 
-	conf.Init()
+	err := conf.TestInit()
+	if err != nil {
+		panic(err)
+	}
 
 	// Init MySQL database.
 	dbold.InitMySQL()

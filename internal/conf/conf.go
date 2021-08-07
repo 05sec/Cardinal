@@ -1,12 +1,14 @@
 // Copyright 2021 E99p1ant. All rights reserved.
-// Use of this source code is governed by Apache-2.0
+// Use of this source code is governed by an AGPL-style
 // license that can be found in the LICENSE file.
 
 package conf
 
 import (
+	"os"
+
+	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
-	"gopkg.in/ini.v1"
 	log "unknwon.dev/clog/v2"
 )
 
@@ -17,36 +19,51 @@ func init() {
 	}
 }
 
-// File is the configuration object.
-var File *ini.File
-
 func Init(customConf string) error {
 	if customConf == "" {
-		customConf = "./conf/Cardinal.ini"
+		customConf = "./conf/Cardinal.toml"
 	}
 
-	var err error
-	File, err = ini.Load(customConf)
+	config, err := toml.LoadFile(customConf)
 	if err != nil {
-		return errors.Wrap(err, "load ini")
+		return errors.Wrap(err, "load toml config file")
 	}
+	return parse(config)
+}
 
-	if err := File.Section("App").MapTo(&App); err != nil {
+// parseTree parses the given toml Tree.
+func parse(config *toml.Tree) error {
+	if err := config.Get("App").(*toml.Tree).Unmarshal(&App); err != nil {
 		return errors.Wrap(err, "mapping [App] section")
 	}
 
-	if err := File.Section("Database").MapTo(&Database); err != nil {
+	if err := config.Get("Database").(*toml.Tree).Unmarshal(&Database); err != nil {
 		return errors.Wrap(err, "mapping [Database] section")
 	}
 
-	if err := File.Section("Game").MapTo(&Game); err != nil {
+	if err := config.Get("Game").(*toml.Tree).Unmarshal(&Game); err != nil {
 		return errors.Wrap(err, "mapping [Game] section")
 	}
-	// TODO Check pause time.
 
-	if err := File.Section("Server").MapTo(&Server); err != nil {
-		return errors.Wrap(err, "mapping [Server] section")
+	return nil
+}
+
+func Save(customConf string) error {
+	if customConf == "" {
+		customConf = "./conf/Cardinal.toml"
 	}
 
+	configBytes, err := toml.Marshal(map[string]interface{}{
+		"App":      App,
+		"Database": Database,
+		"Game":     Game,
+	})
+	if err != nil {
+		return errors.Wrap(err, "marshal")
+	}
+
+	if err := os.WriteFile(customConf, configBytes, 0644); err != nil {
+		return errors.Wrap(err, "write file")
+	}
 	return nil
 }

@@ -3,7 +3,6 @@ module github.com/vidar-team/Cardinal
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v0.3.1
 	github.com/Cardinal-Platform/binding v1.1.3
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5 // indirect
 	github.com/alecthomas/participle/v2 v2.0.0-alpha6 // indirect
@@ -37,6 +36,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.8
 	github.com/lib/pq v1.8.0 // indirect
+	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/moby/term v0.0.0-20200611042045-63b9a826fb74 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
@@ -44,6 +44,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pelletier/go-toml v1.9.3
 	github.com/pkg/errors v0.9.1
 	github.com/qor/admin v0.0.0-20200229145930-e279f96c8c05 // indirect
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect
@@ -60,7 +61,7 @@ require (
 	github.com/qor/validations v0.0.0-20171228122639-f364bca61b46 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.7.0 // indirect
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1-0.20210427113832-6241f9ab9942
 	github.com/thanhpk/randstr v1.0.4
 	github.com/theplant/cldr v0.0.0-20190423050709-9f76f7ce4ee8 // indirect
 	github.com/theplant/htmltestingutils v0.0.0-20190423050759-0e06de7b6967 // indirect
@@ -79,7 +80,6 @@ require (
 	google.golang.org/grpc v1.33.1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/ini.v1 v1.62.0
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 	gorm.io/driver/postgres v1.1.0
 	gorm.io/gorm v1.21.9

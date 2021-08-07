@@ -6,13 +6,13 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 
-	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/frontend"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/auth"
 	"github.com/vidar-team/Cardinal/internal/auth/manager"
 	"github.com/vidar-team/Cardinal/internal/auth/team"
 	"github.com/vidar-team/Cardinal/internal/bulletin"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/container"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
@@ -40,14 +40,14 @@ func Init() *gin.Engine {
 	api := r.Group("/api")
 	api.Use(locales.Middleware()) // i18n
 	// Sentry
-	if conf.Get().Sentry {
+	if conf.App.EnableSentry {
 		api.Use(sentrygin.New(sentrygin.Options{
 			Repanic: true,
 		}))
 	}
 
 	// Frontend
-	if !conf.Get().SeparateFrontend {
+	if !conf.App.SeparateFrontend {
 		r.Use(static.Serve("/", frontend.FS()))
 	}
 

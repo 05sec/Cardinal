@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vidar-team/Cardinal/conf"
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/internal/asteroid"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/misc/webhook"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	log "unknwon.dev/clog/v2"
 )
 
 var t = new(timer)
@@ -59,11 +60,16 @@ func Init() {
 		log.Fatal("Timer bridge error, the function should be not nil.")
 	}
 
+	restTime := make([][]time.Time, 0, len(conf.Game.PauseTime))
+	for _, t := range conf.Game.PauseTime {
+		restTime = append(restTime, []time.Time{t.StartAt.In(time.Local), t.EndAt.In(time.Local)})
+	}
+
 	t = &timer{
-		BeginTime: conf.Get().BeginTime,
-		EndTime:   conf.Get().EndTime,
-		Duration:  conf.Get().Duration,
-		RestTime:  conf.Get().RestTime,
+		BeginTime: conf.Game.StartAt.In(time.Local),
+		EndTime:   conf.Game.EndAt.In(time.Local),
+		Duration:  conf.Game.Duration,
+		RestTime:  restTime,
 		NowRound:  -1,
 	}
 	checkTimeConfig()
@@ -110,11 +116,11 @@ func Init() {
 	}
 	t.TotalRound = int(totalTime / 60 / int64(t.Duration))
 
-	log.Trace(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_round", gin.H{
+	log.Trace(string(locales.I18n.T(conf.App.Language, "timer.total_round", gin.H{
 		"round": t.TotalRound,
 	})))
 
-	log.Trace(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.total_time", gin.H{
+	log.Trace(string(locales.I18n.T(conf.App.Language, "timer.total_time", gin.H{
 		"time": int(totalTime / 60),
 	})))
 
@@ -212,7 +218,7 @@ func timerProcess() {
 				go CalculateRoundScore(t.TotalRound)
 				// Game over hook
 				go webhook.Add(webhook.END_HOOK, nil)
-				logger.New(logger.IMPORTANT, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "timer.end")))
+				logger.New(logger.IMPORTANT, "system", string(locales.I18n.T(conf.App.Language, "timer.end")))
 			}
 
 			t.Status = "end"
@@ -224,16 +230,16 @@ func timerProcess() {
 
 func checkTimeConfig() {
 	if t.BeginTime.Unix() > t.EndTime.Unix() {
-		log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.start_time_error")))
+		log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.start_time_error")))
 	}
 
 	// Check the RestTime in config file is correct.
 	for key, dur := range t.RestTime {
 		if len(dur) != 2 {
-			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.single_rest_time_error")))
+			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.single_rest_time_error")))
 		}
 		if dur[0].Unix() >= dur[1].Unix() {
-			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_start_error",
+			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.rest_time_start_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
@@ -241,7 +247,7 @@ func checkTimeConfig() {
 			)))
 		}
 		if dur[0].Unix() <= t.BeginTime.Unix() || dur[1].Unix() >= t.EndTime.Unix() {
-			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_overflow_error",
+			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.rest_time_overflow_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
@@ -250,7 +256,7 @@ func checkTimeConfig() {
 		}
 		// RestTime should in order.
 		if key != 0 && dur[0].Unix() <= t.RestTime[key-1][0].Unix() {
-			log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "timer.rest_time_order_error",
+			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.rest_time_order_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),

@@ -1,5 +1,5 @@
 // Copyright 2021 E99p1ant. All rights reserved.
-// Use of this source code is governed by Apache-2.0
+// Use of this source code is governed by an AGPL-style
 // license that can be found in the LICENSE file.
 
 package cmd
@@ -17,6 +17,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/route"
 	"github.com/vidar-team/Cardinal/internal/route/manager"
 )
@@ -38,6 +39,7 @@ func runWeb(c *cli.Context) error {
 	if err != nil {
 		log.Fatal("Failed to load config: %v", err)
 	}
+	log.Trace(string(locales.I18n.T(conf.App.Language, "config.load_success")))
 
 	if err = db.Init(); err != nil {
 		log.Fatal("Failed to init database: %v", err)

@@ -15,8 +15,9 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
-	"github.com/vidar-team/Cardinal/conf"
 	"golang.org/x/crypto/ssh"
+
+	"github.com/vidar-team/Cardinal/internal/conf"
 )
 
 // MakeErrJSON makes the error response JSON for gin.
@@ -29,13 +30,13 @@ func MakeSuccessJSON(data interface{}) (int, interface{}) {
 	return 200, gin.H{"error": 0, "msg": "success", "data": data}
 }
 
-// CheckPassword: Add salt and check the password.
+// CheckPassword adds salt and check the password.
 func CheckPassword(inputPassword string, realPassword string) bool {
 	// sha1( sha1(password) + salt )
-	return HmacSha1Encode(inputPassword, conf.Get().Salt) == realPassword
+	return HmacSha1Encode(inputPassword, conf.App.SecuritySalt) == realPassword
 }
 
-// Sha1Encode: Sha1 encode input string.
+// Sha1Encode Sha1 encode input string.
 func Sha1Encode(input string) string {
 	h := sha1.New()
 	_, _ = h.Write([]byte(input))
@@ -43,19 +44,19 @@ func Sha1Encode(input string) string {
 	return fmt.Sprintf("%x", bs)
 }
 
-// AddSalt: Use the config salt as key to HmacSha1Encode.
+// AddSalt uses the config salt as key to HmacSha1Encode.
 func AddSalt(input string) string {
-	return HmacSha1Encode(input, conf.Get().Salt)
+	return HmacSha1Encode(input, conf.App.SecuritySalt)
 }
 
-// HmacSha1Encode: HMAC SHA1 encode
+// HmacSha1Encode HMAC SHA1 encode
 func HmacSha1Encode(input string, key string) string {
 	h := hmac.New(sha1.New, []byte(key))
 	_, _ = io.WriteString(h, input)
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-// GenerateToken: return UUID v4 string.
+// GenerateToken returns UUID v4 string.
 func GenerateToken() string {
 	return uuid.NewV4().String()
 }
