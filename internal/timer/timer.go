@@ -116,13 +116,9 @@ func Init() {
 	}
 	t.TotalRound = int(totalTime / 60 / int64(t.Duration))
 
-	log.Trace(string(locales.I18n.T(conf.App.Language, "timer.total_round", gin.H{
-		"round": t.TotalRound,
-	})))
+	log.Trace(locales.T("timer.total_round", gin.H{"round": t.TotalRound}))
 
-	log.Trace(string(locales.I18n.T(conf.App.Language, "timer.total_time", gin.H{
-		"time": int(totalTime / 60),
-	})))
+	log.Trace(locales.T("timer.total_time", gin.H{"time": int(totalTime / 60)}))
 
 	go timerProcess()
 }
@@ -218,7 +214,7 @@ func timerProcess() {
 				go CalculateRoundScore(t.TotalRound)
 				// Game over hook
 				go webhook.Add(webhook.END_HOOK, nil)
-				logger.New(logger.IMPORTANT, "system", string(locales.I18n.T(conf.App.Language, "timer.end")))
+				logger.New(logger.IMPORTANT, "system", locales.T("timer.end"))
 			}
 
 			t.Status = "end"
@@ -230,38 +226,38 @@ func timerProcess() {
 
 func checkTimeConfig() {
 	if t.BeginTime.Unix() > t.EndTime.Unix() {
-		log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.start_time_error")))
+		log.Fatal(locales.T("timer.start_time_error"))
 	}
 
 	// Check the RestTime in config file is correct.
 	for key, dur := range t.RestTime {
 		if len(dur) != 2 {
-			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.single_rest_time_error")))
+			log.Fatal(locales.T("timer.single_rest_time_error"))
 		}
 		if dur[0].Unix() >= dur[1].Unix() {
-			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.rest_time_start_error",
+			log.Fatal(locales.T("timer.rest_time_start_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
 				},
-			)))
+			))
 		}
 		if dur[0].Unix() <= t.BeginTime.Unix() || dur[1].Unix() >= t.EndTime.Unix() {
-			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.rest_time_overflow_error",
+			log.Fatal(locales.T("timer.rest_time_overflow_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
 				},
-			)))
+			))
 		}
 		// RestTime should in order.
 		if key != 0 && dur[0].Unix() <= t.RestTime[key-1][0].Unix() {
-			log.Fatal(string(locales.I18n.T(conf.App.Language, "timer.rest_time_order_error",
+			log.Fatal(locales.T("timer.rest_time_order_error",
 				gin.H{
 					"from": dur[0].String(),
 					"to":   dur[1].String(),
 				},
-			)))
+			))
 		}
 	}
 }

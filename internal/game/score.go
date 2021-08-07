@@ -39,7 +39,7 @@ func CalculateRoundScore(round int) {
 
 	endTime := time.Now().UnixNano()
 	logger.New(logger.WARNING, "system", string(
-		locales.I18n.T(conf.App.Language, "log.score_success",
+		locales.T("log.score_success",
 			gin.H{
 				"round": round,
 				"time":  float64(endTime-startTime) / float64(time.Second),

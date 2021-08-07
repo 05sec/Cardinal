@@ -13,7 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
 
-	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
@@ -35,10 +34,10 @@ func CheckVersion() {
 		if err == nil {
 			// Compare version.
 			if !utils.CompareVersion(utils.VERSION, releaseData.TagName) {
-				log.Info(string(locales.I18n.T(conf.App.Language, "misc.version_out_of_date", gin.H{
+				log.Info(locales.T("misc.version_out_of_date", gin.H{
 					"currentVersion": utils.VERSION,
 					"latestVersion":  releaseData.TagName,
-				})))
+				}))
 			}
 		}
 	}
@@ -49,6 +48,6 @@ func CheckVersion() {
 func CheckDatabaseVersion() {
 	databaseVersion := dynamic_config.Get(utils.DATBASE_VERSION)
 	if databaseVersion != dbold.VERSION {
-		log.Warn(string(locales.I18n.T(conf.App.Language, "misc.database_version_out_of_date")))
+		log.Warn(locales.T("misc.database_version_out_of_date"))
 	}
 }
