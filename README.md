@@ -122,4 +122,4 @@ curl https://sh.cardinal.ink | bash
 
 © Vidar-Team
 
-Apache License Version 2.0.
+GNU Affero General Public License v3.0
