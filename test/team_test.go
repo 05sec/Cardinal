@@ -63,7 +63,7 @@ func Test_NewTeams(t *testing.T) {
 	w = httptest.NewRecorder()
 	jsonData, _ = json.Marshal([]map[string]interface{}{{
 		"Name": "vidar",
-		"Logo": "",
+		"Logo": "test_vidar.png",
 	}, {
 		"Name": "E99",
 		"Logo": "test_image.png",
