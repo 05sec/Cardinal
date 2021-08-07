@@ -3,7 +3,6 @@ module github.com/vidar-team/Cardinal
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v0.3.1
 	github.com/Cardinal-Platform/binding v1.1.3
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5 // indirect
 	github.com/alecthomas/participle/v2 v2.0.0-alpha6 // indirect
@@ -37,6 +36,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.8
 	github.com/lib/pq v1.8.0 // indirect
+	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/moby/term v0.0.0-20200611042045-63b9a826fb74 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
@@ -45,7 +45,6 @@ require (
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.9.3
-	github.com/pelletier/go-toml/v2 v2.0.0-beta.3
 	github.com/pkg/errors v0.9.1
 	github.com/qor/admin v0.0.0-20200229145930-e279f96c8c05 // indirect
 	github.com/qor/assetfs v0.0.0-20170713023933-ff57fdc13a14 // indirect

@@ -1,17 +1,15 @@
 package install
 
 import (
-	"bytes"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"text/template"
-	"time"
 
+	"github.com/manifoldco/promptui"
+	"github.com/pelletier/go-toml"
+	"github.com/pkg/errors"
 	"github.com/thanhpk/randstr"
 	log "unknwon.dev/clog/v2"
 
@@ -22,36 +20,10 @@ import (
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
-// DOCKER_ENV: docker environment sign.
+// DOCKER_ENV is docker environment sign.
 const DOCKER_ENV = "CARDINAL_DOCKER"
 
-const configTemplate = `
-[base]
-SystemLanguage="zh-CN"
-BeginTime="{{ .BeginTime }}"
-RestTime=[
-#    ["2020-02-16T17:00:00+08:00","2020-02-16T18:00:00+08:00"],
-]
-EndTime="{{ .EndTime }}"
-Duration={{ .Duration }}
-SeparateFrontend={{ .SeparateFrontend }}
-Sentry={{ .Sentry }}
-
-Salt="{{ .Salt }}"
-
-Port=":{{ .Port }}"
-
-CheckDownScore={{ .CheckDownScore }}
-AttackScore={{ .AttackScore }}
-
-[mysql]
-DBHost="{{ .DBHost }}"
-DBUsername="{{ .DBUsername }}"
-DBPassword="{{ .DBPassword }}"
-DBName="{{ .DBName }}"
-`
-
-func Init() {
+func prepare() {
 	// Check `uploads` folder exist
 	if !utils.FileIsExist("./uploads") {
 		err := os.Mkdir("./uploads", os.ModePerm)
@@ -75,106 +47,155 @@ func Init() {
 			log.Fatal("Failed to create ./locales folder: %v", err)
 		}
 	}
+}
+
+func Init() {
+	prepare()
+
+	if utils.FileIsExist("./conf/Cardinal.toml") {
+		return
+	}
 
 	// Check language file exist
 	files, err := ioutil.ReadDir("./locales")
 	if err != nil {
 		log.Fatal("Failed to read ./locales folder: %v", err)
 	}
-	languages := map[string]string{}
-	index := 0 // Use a outside `index` variable instead of the loop `index`. Not all the files is `.yml`.
+
+	languages := make([]string, 0, len(files))
 	for _, file := range files {
 		if !file.IsDir() && filepath.Ext(file.Name()) == ".yml" {
-			index++
-			languages[strconv.Itoa(index)] = strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+			languages = append(languages, strings.TrimSuffix(file.Name(), filepath.Ext(file.Name())))
 		}
 	}
 	if len(languages) == 0 {
-		log.Fatal("Can not find the language file!")
+		log.Fatal("Failed to find the language file!")
 	}
 
-	if !utils.FileIsExist("./conf/Cardinal.toml") {
-		log.Info("Please select a preferred language for the installation guide:")
-		for index, lang := range languages {
-			fmt.Printf("%s - %s\n", index, lang)
-		}
-		fmt.Println("")
-
-		// Select a language
-		index := "0"
-		for languages[index] == "" {
-			utils.InputString(&index, "type 1, 2... to select")
-		}
-
-		content, err := GenerateConfigFileGuide(languages[index])
-		if err != nil {
-			log.Fatal("Failed to start config file guide: %v", err)
-		}
-		err = ioutil.WriteFile("./conf/Cardinal.toml", content, 0644)
-		if err != nil {
-			log.Fatal("Failed to write config file: %v", err)
-		}
-		log.Info(string(locales.I18n.T(languages[index], "install.create_config_success")))
+	prompt := promptui.Select{
+		Label: "Please select a preferred language for the installation guide",
+		Items: languages,
 	}
+	_, language, err := prompt.Run()
+	if err != nil {
+		log.Fatal("Failed to select language: %v", err)
+	}
+
+	conf.App.Language = language
+
+	if err := SetConfigFileGuide(language); err != nil {
+		log.Fatal("Failed to start config file guide: %v", err)
+	}
+	log.Info(string(locales.I18n.T(language, "install.create_config_success")))
 }
 
-// GenerateConfigFileGuide can lead the user to fill in the config file.
-func GenerateConfigFileGuide(lang string) ([]byte, error) {
-	input := struct {
-		BeginTime, RestTime, EndTime, SeparateFrontend, Sentry, Duration, Port, Salt, CheckDownScore, AttackScore, DBHost, DBUsername, DBPassword, DBName string
-	}{
-		SeparateFrontend: "false",
-		Sentry:           "true",
-		Duration:         "2",
-		Port:             "19999",
-		CheckDownScore:   "50",
-		AttackScore:      "50",
-		DBHost:           "localhost:3306",
-		DBName:           "cardinal",
-	}
-
+// SetConfigFileGuide can lead the user to fill in the config file.
+func SetConfigFileGuide(lang string) error {
 	log.Info(string(locales.I18n.T(lang, "install.greet")))
 
-	var beginTime time.Time
-	err := errors.New("")
-	for err != nil {
-		utils.InputString(&input.BeginTime, string(locales.I18n.T(lang, "install.begin_time")))
-		beginTime, err = time.ParseInLocation("2006-01-02 15:04:05", input.BeginTime, time.Local)
+	// Game start time.
+	beginTime, err := inputDateTime(string(locales.I18n.T(lang, "install.begin_time")))
+	if err != nil {
+		return errors.Wrap(err, "input begin time")
 	}
-	input.BeginTime = beginTime.Format(time.RFC3339)
+	conf.Game.StartAt = toml.LocalDateTimeOf(beginTime)
 
-	var endTime time.Time
-	err = errors.New("")
-	for err != nil {
-		utils.InputString(&input.EndTime, string(locales.I18n.T(lang, "install.end_time")))
-		endTime, err = time.ParseInLocation("2006-01-02 15:04:05 ", input.EndTime, time.Local)
+	// Game end time.
+	endTime, err := inputDateTime(string(locales.I18n.T(lang, "install.end_time")))
+	if err != nil {
+		return errors.Wrap(err, "input end time")
 	}
-	input.EndTime = endTime.Format(time.RFC3339)
+	conf.Game.EndAt = toml.LocalDateTimeOf(endTime)
 
-	utils.InputString(&input.Duration, string(locales.I18n.T(lang, "install.duration")))
-	utils.InputString(&input.Port, string(locales.I18n.T(lang, "install.port")))
-	utils.InputString(&input.CheckDownScore, string(locales.I18n.T(lang, "install.checkdown_score")))
-	utils.InputString(&input.AttackScore, string(locales.I18n.T(lang, "install.attack_score")))
-	utils.InputString(&input.SeparateFrontend, string(locales.I18n.T(lang, "install.separate_frontend")))
-	utils.InputString(&input.Sentry, string(locales.I18n.T(lang, "install.sentry")))
-	utils.InputString(&input.DBHost, string(locales.I18n.T(lang, "install.db_host")))
-	utils.InputString(&input.DBUsername, string(locales.I18n.T(lang, "install.db_username")))
-	utils.InputString(&input.DBPassword, string(locales.I18n.T(lang, "install.db_password")))
-	utils.InputString(&input.DBName, string(locales.I18n.T(lang, "install.db_name")))
+	// Game duration.
+	duration, err := inputInt(string(locales.I18n.T(lang, "install.duration")), 2)
+	if err != nil {
+		return errors.Wrap(err, "input duration")
+	}
+	conf.Game.Duration = uint(duration)
+
+	// App HTTP service port.
+	port, err := inputInt(string(locales.I18n.T(lang, "install.port")), 19999, func(port int) error {
+		if port <= 0 || port >= 65536 {
+			return errors.Errorf("wrong tcp port number: %v", port)
+		}
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "input port")
+	}
+	conf.App.HTTPAddr = fmt.Sprintf(":%d", port)
+
+	// Game checkdown score.
+	checkdownScore, err := inputInt(string(locales.I18n.T(lang, "install.checkdown_score")), 50, func(score int) error {
+		if score < 0 {
+			return errors.Errorf("wrong check down score: %v", port)
+		}
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "input check down score")
+	}
+	conf.Game.CheckDownScore = checkdownScore
+
+	// Game attack score.
+	attackScore, err := inputInt(string(locales.I18n.T(lang, "install.attack_score")), 50, func(score int) error {
+		if score < 0 {
+			return errors.Errorf("wrong attack score: %v", port)
+		}
+		return nil
+	})
+	if err != nil {
+		return errors.Wrap(err, "input attack score")
+	}
+	conf.Game.AttackScore = attackScore
+
+	separateFrontend, err := inputConfirm(string(locales.I18n.T(lang, "install.separate_frontend")), false)
+	if err != nil {
+		return errors.Wrap(err, "input separate frontend")
+	}
+	conf.App.SeparateFrontend = separateFrontend
+
+	enableSentry, err := inputConfirm(string(locales.I18n.T(lang, "install.sentry")), true)
+	if err != nil {
+		return errors.Wrap(err, "input separate frontend")
+	}
+	conf.App.EnableSentry = enableSentry
+
+	databaseHost, err := inputString(string(locales.I18n.T(lang, "install.db_host")), "localhost:3306")
+	if err != nil {
+		return errors.Wrap(err, "input database host")
+	}
+	conf.Database.Host = databaseHost
+
+	databaseUser, err := inputString(string(locales.I18n.T(lang, "install.db_username")), "root")
+	if err != nil {
+		return errors.Wrap(err, "input database user name")
+	}
+	conf.Database.User = databaseUser
+
+	databasePassword, err := inputPassword(string(locales.I18n.T(lang, "install.db_password")))
+	if err != nil {
+		return errors.Wrap(err, "input database password")
+	}
+	conf.Database.Password = databasePassword
+
+	databaseName, err := inputString(string(locales.I18n.T(lang, "install.db_name")), "cardinal")
+	if err != nil {
+		return errors.Wrap(err, "input database name")
+	}
+	conf.Database.Name = databaseName
+
+	conf.Database.MaxOpenConns = 200
+	conf.Database.MaxIdleConns = 150
 
 	// Generate Salt
-	input.Salt = randstr.String(64)
+	conf.App.SecuritySalt = randstr.String(64)
 
-	var wr bytes.Buffer
-	configTmpl, err := template.New("").Parse(configTemplate)
-	if err != nil {
-		return nil, err
+	if err := conf.Save("./conf/Cardinal.toml"); err != nil {
+		return errors.Wrap(err, "save config file")
 	}
-	err = configTmpl.Execute(&wr, input)
-	if err != nil {
-		return nil, err
-	}
-	return wr.Bytes(), nil
+	return nil
 }
 
 func InitManager() {
@@ -194,8 +215,15 @@ func InitManager() {
 			fmt.Printf("Manager Password: %s\n", managerPassword)
 			fmt.Printf("=======================================\n\n\n")
 		} else {
-			utils.InputString(&managerName, string(locales.I18n.T(conf.App.Language, "install.manager_name")))
-			utils.InputString(&managerPassword, string(locales.I18n.T(conf.App.Language, "install.manager_password")))
+			var err error
+			managerName, err = inputString(string(locales.I18n.T(conf.App.Language, "install.manager_name")), "admin")
+			if err != nil {
+				log.Fatal("Failed to get manager name input: %v", err)
+			}
+			managerPassword, err = inputPassword(string(locales.I18n.T(conf.App.Language, "install.manager_password")))
+			if err != nil {
+				log.Fatal("Failed to get manager password input: %v", err)
+			}
 		}
 
 		// Create manager account if managers table is empty.

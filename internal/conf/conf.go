@@ -5,6 +5,8 @@
 package conf
 
 import (
+	"os"
+
 	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	log "unknwon.dev/clog/v2"
@@ -43,5 +45,25 @@ func parse(config *toml.Tree) error {
 		return errors.Wrap(err, "mapping [Game] section")
 	}
 
+	return nil
+}
+
+func Save(customConf string) error {
+	if customConf == "" {
+		customConf = "./conf/Cardinal.toml"
+	}
+
+	configBytes, err := toml.Marshal(map[string]interface{}{
+		"App":      App,
+		"Database": Database,
+		"Game":     Game,
+	})
+	if err != nil {
+		return errors.Wrap(err, "marshal")
+	}
+
+	if err := os.WriteFile(customConf, configBytes, 0644); err != nil {
+		return errors.Wrap(err, "write file")
+	}
 	return nil
 }
