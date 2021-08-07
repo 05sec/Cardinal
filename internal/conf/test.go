@@ -24,7 +24,7 @@ EnableSentry = false
 
 [Database]
 Type = "mysql"
-SSLMode = "disabled"
+SSLMode = "disable"
 MaxOpenConns = 50
 MaxIdleConns = 50
 

@@ -50,7 +50,7 @@ var (
 		PauseTime []Period
 		Duration  uint
 
-		AttackScore    uint
-		CheckDownScore uint
+		AttackScore    int
+		CheckDownScore int
 	}
 )
