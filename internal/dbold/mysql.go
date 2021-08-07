@@ -53,6 +53,6 @@ func InitMySQL() {
 
 	// Test the database charset.
 	if MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
-		log.Fatal(string(locales.I18n.T(conf.App.Language, "general.database_charset_error")))
+		log.Fatal(locales.T("general.database_charset_error"))
 	}
 }

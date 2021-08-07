@@ -216,11 +216,11 @@ func InitManager() {
 			fmt.Printf("=======================================\n\n\n")
 		} else {
 			var err error
-			managerName, err = inputString(string(locales.I18n.T(conf.App.Language, "install.manager_name")), "admin")
+			managerName, err = inputString(locales.T("install.manager_name"), "admin")
 			if err != nil {
 				log.Fatal("Failed to get manager name input: %v", err)
 			}
-			managerPassword, err = inputPassword(string(locales.I18n.T(conf.App.Language, "install.manager_password")))
+			managerPassword, err = inputPassword(locales.T("install.manager_password"))
 			if err != nil {
 				log.Fatal("Failed to get manager password input: %v", err)
 			}
@@ -231,7 +231,7 @@ func InitManager() {
 			Name:     managerName,
 			Password: utils.AddSalt(managerPassword),
 		})
-		logger.New(logger.WARNING, "system", string(locales.I18n.T(conf.App.Language, "install.manager_success")))
-		log.Info(string(locales.I18n.T(conf.App.Language, "install.manager_success")))
+		logger.New(logger.WARNING, "system", locales.T("install.manager_success"))
+		log.Info(locales.T("install.manager_success"))
 	}
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/yaml"
 	"golang.org/x/text/language"
+
+	"github.com/vidar-team/Cardinal/internal/conf"
 )
 
 // I18n is the i18n constant.
@@ -14,6 +16,11 @@ func init() {
 	I18n = i18n.New(
 		yaml.New("./locales"),
 	)
+}
+
+// T returns the translation of the given key in the default language.
+func T(key string, args ...interface{}) string {
+	return string(I18n.T(conf.App.Language, key, args...))
 }
 
 // Middleware is an i18n middleware. Get client language from Accept-Language header.

@@ -39,7 +39,7 @@ func runWeb(c *cli.Context) error {
 	if err != nil {
 		log.Fatal("Failed to load config: %v", err)
 	}
-	log.Trace(string(locales.I18n.T(conf.App.Language, "config.load_success")))
+	log.Trace(locales.T("config.load_success"))
 
 	if err = db.Init(); err != nil {
 		log.Fatal("Failed to init database: %v", err)
