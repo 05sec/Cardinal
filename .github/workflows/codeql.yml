@@ -3,7 +3,15 @@ name: "Code Scanning - Action"
 on:
   push:
     branches: [ master ]
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.github/workflows/codeql.yml'
   pull_request:
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - '.github/workflows/codeql.yml'
   schedule:
     #        ┌───────────── minute (0 - 59)
     #        │  ┌───────────── hour (0 - 23)
