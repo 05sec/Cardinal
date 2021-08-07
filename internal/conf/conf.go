@@ -5,8 +5,8 @@
 package conf
 
 import (
+	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
-	"gopkg.in/ini.v1"
 	log "unknwon.dev/clog/v2"
 )
 
@@ -17,35 +17,26 @@ func init() {
 	}
 }
 
-// File is the configuration object.
-var File *ini.File
-
 func Init(customConf string) error {
 	if customConf == "" {
-		customConf = "./conf/Cardinal.ini"
+		customConf = "./conf/Cardinal.toml"
 	}
 
-	var err error
-	File, err = ini.Load(customConf)
+	config, err := toml.LoadFile(customConf)
 	if err != nil {
-		return errors.Wrap(err, "load ini")
+		return errors.Wrap(err, "load toml config file")
 	}
 
-	if err := File.Section("App").MapTo(&App); err != nil {
+	if err := config.Get("App").(*toml.Tree).Unmarshal(&App); err != nil {
 		return errors.Wrap(err, "mapping [App] section")
 	}
 
-	if err := File.Section("Database").MapTo(&Database); err != nil {
+	if err := config.Get("Database").(*toml.Tree).Unmarshal(&Database); err != nil {
 		return errors.Wrap(err, "mapping [Database] section")
 	}
 
-	if err := File.Section("Game").MapTo(&Game); err != nil {
+	if err := config.Get("Game").(*toml.Tree).Unmarshal(&Game); err != nil {
 		return errors.Wrap(err, "mapping [Game] section")
-	}
-	// TODO Check pause time.
-
-	if err := File.Section("Server").MapTo(&Server); err != nil {
-		return errors.Wrap(err, "mapping [Server] section")
 	}
 
 	return nil

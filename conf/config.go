@@ -42,7 +42,7 @@ func Init() {
 				DBHost:     os.ExpandEnv("$DBHOST:$DBPORT"),
 				DBUsername: os.Getenv("DBUSER"),
 				DBPassword: os.Getenv("DBPASSWORD"),
-				DBName: os.Getenv("DBNAME"),
+				DBName:     os.Getenv("DBNAME"),
 			},
 		}
 	}

@@ -5,7 +5,7 @@
 package conf
 
 import (
-	"time"
+	"github.com/pelletier/go-toml"
 )
 
 // Build time and commit information.
@@ -16,15 +16,17 @@ var (
 )
 
 type Period struct {
-	StartAt time.Time
-	EndAt   time.Time
+	StartAt toml.LocalDateTime
+	EndAt   toml.LocalDateTime
 }
 
 var (
 	// App is the application settings.
 	App struct {
-		Version  string `ini:"-"` // Version should only be set by the main package.
-		Language string
+		Version          string `toml:"-"` // Version should only be set by the main package.
+		Language         string
+		HTTPAddr         string
+		SeparateFrontend bool
 	}
 
 	// Database is the database settings.
@@ -41,17 +43,12 @@ var (
 
 	// Game is the game settings.
 	Game struct {
-		Period    Period
-		PauseTime []Period `ini:"PauseTime.Period,,,nonunique"`
+		StartAt   toml.LocalDateTime
+		EndAt     toml.LocalDateTime
+		PauseTime []Period
 		Duration  uint
 
 		AttackScore    uint
 		CheckDownScore uint
-	}
-
-	// Server is the web server settings.
-	Server struct {
-		HTTPAddr         string
-		SeparateFrontend bool
 	}
 )

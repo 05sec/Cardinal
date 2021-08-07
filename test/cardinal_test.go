@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/bootstrap"
@@ -17,7 +19,6 @@ import (
 	"github.com/vidar-team/Cardinal/internal/store"
 	"github.com/vidar-team/Cardinal/internal/timer"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	log "unknwon.dev/clog/v2"
 )
 
 var managerToken = utils.GenerateToken()
@@ -43,7 +44,7 @@ func TestMain(m *testing.M) {
 
 func prepare() {
 	_ = log.NewConsole(100)
-	
+
 	log.Trace("Prepare for Cardinal test environment...")
 
 	gin.SetMode(gin.ReleaseMode)
