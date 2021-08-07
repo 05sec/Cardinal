@@ -27,6 +27,8 @@ var (
 		Language         string
 		HTTPAddr         string
 		SeparateFrontend bool
+		EnableSentry     bool
+		SecuritySalt     string
 	}
 
 	// Database is the database settings.

@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"time"
 
+	log "unknwon.dev/clog/v2"
+
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/locales"
-	log "unknwon.dev/clog/v2"
 
 	"github.com/gin-gonic/gin"
 	"github.com/parnurzeal/gorequest"
-	"github.com/vidar-team/Cardinal/conf"
+
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
@@ -33,7 +35,7 @@ func CheckVersion() {
 		if err == nil {
 			// Compare version.
 			if !utils.CompareVersion(utils.VERSION, releaseData.TagName) {
-				log.Info(string(locales.I18n.T(conf.Get().SystemLanguage, "misc.version_out_of_date", gin.H{
+				log.Info(string(locales.I18n.T(conf.App.Language, "misc.version_out_of_date", gin.H{
 					"currentVersion": utils.VERSION,
 					"latestVersion":  releaseData.TagName,
 				})))
@@ -47,6 +49,6 @@ func CheckVersion() {
 func CheckDatabaseVersion() {
 	databaseVersion := dynamic_config.Get(utils.DATBASE_VERSION)
 	if databaseVersion != dbold.VERSION {
-		log.Warn(string(locales.I18n.T(conf.Get().SystemLanguage, "misc.database_version_out_of_date")))
+		log.Warn(string(locales.I18n.T(conf.App.Language, "misc.database_version_out_of_date")))
 	}
 }

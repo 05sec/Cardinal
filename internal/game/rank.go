@@ -3,7 +3,7 @@ package game
 import (
 	"github.com/patrickmn/go-cache"
 
-	"github.com/vidar-team/Cardinal/conf"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -75,7 +75,7 @@ func SetRankListTitle() {
 	}
 	store.Set("rankListTitle", visibleChallengeTitle, cache.NoExpiration) // Save challenge title into cache.
 
-	logger.New(logger.NORMAL, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "log.rank_list_success")))
+	logger.New(logger.NORMAL, "system", string(locales.I18n.T(conf.App.Language, "log.rank_list_success")))
 }
 
 // SetRankList will calculate the ranking list.

@@ -26,7 +26,11 @@ func Init(customConf string) error {
 	if err != nil {
 		return errors.Wrap(err, "load toml config file")
 	}
+	return parse(config)
+}
 
+// parseTree parses the given toml Tree.
+func parse(config *toml.Tree) error {
 	if err := config.Get("App").(*toml.Tree).Unmarshal(&App); err != nil {
 		return errors.Wrap(err, "mapping [App] section")
 	}

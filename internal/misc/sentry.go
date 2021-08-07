@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	"github.com/getsentry/sentry-go"
-	"github.com/vidar-team/Cardinal/conf"
+
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
@@ -14,7 +15,7 @@ func Sentry() {
 	cardinalVersion := utils.VERSION
 	cardinalCommitSHA := utils.COMMIT_SHA
 
-	if !conf.Get().Sentry {
+	if !conf.App.EnableSentry {
 		return
 	}
 

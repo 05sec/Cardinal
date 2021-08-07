@@ -13,12 +13,13 @@ import (
 	"time"
 
 	"github.com/thanhpk/randstr"
-	"github.com/vidar-team/Cardinal/conf"
+	log "unknwon.dev/clog/v2"
+
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
 	"github.com/vidar-team/Cardinal/internal/utils"
-	log "unknwon.dev/clog/v2"
 )
 
 // DOCKER_ENV: docker environment sign.
@@ -193,8 +194,8 @@ func InitManager() {
 			fmt.Printf("Manager Password: %s\n", managerPassword)
 			fmt.Printf("=======================================\n\n\n")
 		} else {
-			utils.InputString(&managerName, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_name")))
-			utils.InputString(&managerPassword, string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_password")))
+			utils.InputString(&managerName, string(locales.I18n.T(conf.App.Language, "install.manager_name")))
+			utils.InputString(&managerPassword, string(locales.I18n.T(conf.App.Language, "install.manager_password")))
 		}
 
 		// Create manager account if managers table is empty.
@@ -202,7 +203,7 @@ func InitManager() {
 			Name:     managerName,
 			Password: utils.AddSalt(managerPassword),
 		})
-		logger.New(logger.WARNING, "system", string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
-		log.Info(string(locales.I18n.T(conf.Get().SystemLanguage, "install.manager_success")))
+		logger.New(logger.WARNING, "system", string(locales.I18n.T(conf.App.Language, "install.manager_success")))
+		log.Info(string(locales.I18n.T(conf.App.Language, "install.manager_success")))
 	}
 }

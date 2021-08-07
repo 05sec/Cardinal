@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	log "unknwon.dev/clog/v2"
 
-	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
 	"github.com/vidar-team/Cardinal/internal/bootstrap"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
@@ -49,7 +49,10 @@ func prepare() {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	conf.Init()
+	err := conf.TestInit()
+	if err != nil {
+		panic(err)
+	}
 
 	// Init MySQL database.
 	dbold.InitMySQL()

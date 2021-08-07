@@ -3,8 +3,8 @@ package bootstrap
 import (
 	log "unknwon.dev/clog/v2"
 
-	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/game"
@@ -28,7 +28,9 @@ func LinkStart() {
 	install.Init()
 
 	// Config
-	conf.Init()
+	if err := conf.Init("./conf/Cardinal.toml"); err != nil {
+		log.Fatal("Failed to load configuration file: %v", err)
+	}
 
 	// Check version
 	misc.CheckVersion()
@@ -65,5 +67,5 @@ func LinkStart() {
 	// Web router.
 	router := route.Init()
 
-	log.Fatal("Failed to start web server: %v", router.Run(conf.Get().Port))
+	log.Fatal("Failed to start web server: %v", router.Run(conf.App.HTTPAddr))
 }

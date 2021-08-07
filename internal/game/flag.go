@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
-	"github.com/vidar-team/Cardinal/conf"
 	"github.com/vidar-team/Cardinal/internal/asteroid"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/dynamic_config"
 	"github.com/vidar-team/Cardinal/internal/livelog"
@@ -227,7 +227,7 @@ func GenerateFlag(c *gin.Context) (int, interface{}) {
 	flagPrefix := dynamic_config.Get(utils.FLAG_PREFIX_CONF)
 	flagSuffix := dynamic_config.Get(utils.FLAG_SUFFIX_CONF)
 
-	salt := utils.Sha1Encode(conf.Get().Salt)
+	salt := utils.Sha1Encode(conf.App.SecuritySalt)
 	for round := 1; round <= timer.Get().TotalRound; round++ {
 		// Flag = FlagPrefix + hmacSha1(TeamID + | + GameBoxID + | + Round, sha1(salt)) + FlagSuffix
 		for _, gameBox := range gameBoxes {

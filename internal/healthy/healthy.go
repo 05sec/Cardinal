@@ -5,7 +5,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/vidar-team/Cardinal/conf"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/dbold"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/logger"
@@ -20,10 +20,10 @@ func HealthyCheck() {
 	previousRoundScore := PreviousRoundScore()
 	if math.Abs(previousRoundScore) != 0 {
 		// If the previous round total score is not equal zero, maybe all the teams were checked down.
-		if previousRoundScore != float64(-conf.Get().CheckDownScore*teamCount) {
+		if previousRoundScore != float64(-int(conf.Game.CheckDownScore)*teamCount) {
 			// Maybe there are some mistakes in previous round score.
 			logger.New(logger.IMPORTANT, "healthy_check",
-				string(locales.I18n.T(conf.Get().SystemLanguage, "healthy.previous_round_non_zero_error")),
+				string(locales.I18n.T(conf.App.Language, "healthy.previous_round_non_zero_error")),
 			)
 		}
 	}
@@ -31,10 +31,10 @@ func HealthyCheck() {
 	totalScore := TotalScore()
 	if math.Abs(totalScore) != 0 {
 		// If sum all the scores but it is not equal zero, maybe all the teams were checked down in some rounds.
-		if int(totalScore)%(conf.Get().CheckDownScore*teamCount) != 0 {
+		if int(totalScore)%(int(conf.Game.CheckDownScore)*teamCount) != 0 {
 			// Maybes there are some mistakes.
 			logger.New(logger.IMPORTANT, "healthy_check",
-				string(locales.I18n.T(conf.Get().SystemLanguage, "healthy.total_score_non_zero_error")),
+				string(locales.I18n.T(conf.App.Language, "healthy.total_score_non_zero_error")),
 			)
 		}
 	}

@@ -7,7 +7,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	log "unknwon.dev/clog/v2"
 
-	"github.com/vidar-team/Cardinal/conf"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/locales"
 )
 
@@ -15,18 +15,18 @@ var MySQL *gorm.DB
 
 func InitMySQL() {
 	db, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&loc=Local&charset=utf8mb4,utf8",
-		conf.Get().DBUsername,
-		conf.Get().DBPassword,
-		conf.Get().DBHost,
-		conf.Get().DBName,
+		conf.Database.User,
+		conf.Database.Password,
+		conf.Database.Host,
+		conf.Database.Name,
 	))
 
 	if err != nil {
 		log.Fatal("Failed to connect to mysql database: %v", err)
 	}
 
-	db.DB().SetMaxIdleConns(128)
-	db.DB().SetMaxOpenConns(256)
+	db.DB().SetMaxIdleConns(conf.Database.MaxIdleConns)
+	db.DB().SetMaxOpenConns(conf.Database.MaxOpenConns)
 
 	// Create tables.
 	db.AutoMigrate(
@@ -53,6 +53,6 @@ func InitMySQL() {
 
 	// Test the database charset.
 	if MySQL.Exec("SELECT * FROM `logs` WHERE `Content` = '中文测试';").Error != nil {
-		log.Fatal(string(locales.I18n.T(conf.Get().SystemLanguage, "general.database_charset_error")))
+		log.Fatal(string(locales.I18n.T(conf.App.Language, "general.database_charset_error")))
 	}
 }
