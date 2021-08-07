@@ -1,4 +1,6 @@
 pull_request_title: "i18n: sync from Crowdin"
+commit_message: "i18n: sync from Crowdin"
+append_commit_message: false
 
 files:
   - source: /locales/zh-CN.yml
