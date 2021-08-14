@@ -28,9 +28,9 @@ func TestBulletin(t *testing.T) {
 		test func(t *testing.T, router *flamego.Flame, managerToken string)
 	}{
 		{"List", testListBulletins},
-		{"New", testNewBulletins},
-		{"Update", testUpdateBulletins},
-		{"Delete", testDeleteBulletins},
+		{"New", testNewBulletin},
+		{"Update", testUpdateBulletin},
+		{"Delete", testDeleteBulletin},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Cleanup(func() {
@@ -94,7 +94,7 @@ func testListBulletins(t *testing.T, router *flamego.Flame, managerToken string)
 	assert.JSONEq(t, want, w.Body.String())
 }
 
-func testNewBulletins(t *testing.T, router *flamego.Flame, managerToken string) {
+func testNewBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
 	// Invalid JSON.
 	req, err := http.NewRequest(http.MethodPost, "/api/manager/bulletin", strings.NewReader(`{"Title": "No body"`))
 	assert.Nil(t, err)
@@ -125,7 +125,7 @@ func testNewBulletins(t *testing.T, router *flamego.Flame, managerToken string) 
 	assert.JSONEq(t, `{"error": 0, "data": ""}`, w.Body.String())
 }
 
-func testUpdateBulletins(t *testing.T, router *flamego.Flame, managerToken string) {
+func testUpdateBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
 	// Create two bulletins.
 	createBulletin(t, managerToken, router, "Welcome", "Welcome to D^3CTF!")
 	createBulletin(t, managerToken, router, "Hint for Web1", "/web.zip")
@@ -193,7 +193,7 @@ func testUpdateBulletins(t *testing.T, router *flamego.Flame, managerToken strin
 	assert.JSONEq(t, want, w.Body.String())
 }
 
-func testDeleteBulletins(t *testing.T, router *flamego.Flame, managerToken string) {
+func testDeleteBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
 	// Create two bulletins.
 	createBulletin(t, managerToken, router, "Welcome", "Welcome to D^3CTF!")
 	createBulletin(t, managerToken, router, "Hint for Web1", "/web.zip")
