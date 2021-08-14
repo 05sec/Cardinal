@@ -26,7 +26,6 @@ func (c *Context) Success(data interface{}) error {
 	err := jsoniter.NewEncoder(c.ResponseWriter()).Encode(
 		map[string]interface{}{
 			"error": 0,
-			"msg":   "success",
 			"data":  data,
 		},
 	)
