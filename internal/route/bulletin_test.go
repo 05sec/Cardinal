@@ -72,18 +72,18 @@ func testListBulletins(t *testing.T, router *flamego.Flame, managerToken string)
 	want = `{
     "data": [
         {
-            "UpdatedAt": "2020-01-09T18:06:40+08:00",
+            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Welcome",
             "Body": "Welcome to D^3CTF!",
             "ID": 1,
-            "CreatedAt": "2020-01-09T18:06:40+08:00"
+            "CreatedAt": "2020-01-09T10:06:40Z"
         },
         {
             "Body": "/web.zip",
             "ID": 2,
-            "CreatedAt": "2020-01-09T18:06:40+08:00",
-            "UpdatedAt": "2020-01-09T18:06:40+08:00",
+            "CreatedAt": "2020-01-09T10:06:40Z",
+            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Hint for Web1"
         }
@@ -161,18 +161,18 @@ func testUpdateBulletins(t *testing.T, router *flamego.Flame, managerToken strin
 	want := `{
     "data": [
         {
-            "UpdatedAt": "2020-01-09T18:06:40+08:00",
+            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Welcome!!",
             "Body": "Welcome to HCTF!",
             "ID": 1,
-            "CreatedAt": "2020-01-09T18:06:40+08:00"
+            "CreatedAt": "2020-01-09T10:06:40Z"
         },
         {
             "Body": "/web.zip",
             "ID": 2,
-            "CreatedAt": "2020-01-09T18:06:40+08:00",
-            "UpdatedAt": "2020-01-09T18:06:40+08:00",
+            "CreatedAt": "2020-01-09T10:06:40Z",
+            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Hint for Web1"
         }
@@ -221,8 +221,8 @@ func testDeleteBulletins(t *testing.T, router *flamego.Flame, managerToken strin
         {
             "Body": "/web.zip",
             "ID": 2,
-            "CreatedAt": "2020-01-09T18:06:40+08:00",
-            "UpdatedAt": "2020-01-09T18:06:40+08:00",
+            "CreatedAt": "2020-01-09T10:06:40Z",
+            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Hint for Web1"
         }

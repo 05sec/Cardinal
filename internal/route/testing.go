@@ -64,7 +64,8 @@ func NewTestRoute(t *testing.T) (*flamego.Flame, string, func(tables ...string) 
 	managerToken := respBody.Data
 
 	// Mock the global time.
-	mockTime := time.Date(2020, 1, 9, 18, 6, 40, 0, time.Local)
+	time.Local = time.UTC
+	mockTime := time.Date(2020, 1, 9, 10, 6, 40, 0, time.UTC)
 	timePatch := monkey.Patch(time.Now, func() time.Time { return mockTime })
 	t.Cleanup(func() {
 		timePatch.Unpatch()
