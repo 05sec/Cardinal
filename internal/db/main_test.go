@@ -12,6 +12,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
+// newTestDB returns a test database instance with the cleanup function.
 func newTestDB(t *testing.T) (*gorm.DB, func(...string) error) {
-	return dbutil.NewTestDB(t, allTables...)
+	return dbutil.NewTestDB(t, AllTables...)
 }

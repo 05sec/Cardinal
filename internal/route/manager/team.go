@@ -14,7 +14,7 @@ import (
 )
 
 // GetTeams returns all the teams.
-func (*Handler) GetTeams(ctx context.Context) error {
+func (*route.Handler) GetTeams(ctx context.Context) error {
 	teams, err := db.Teams.Get(ctx.Request().Context(), db.GetTeamsOptions{})
 	if err != nil {
 		log.Error("Failed to get teams: %v", err)
@@ -45,7 +45,7 @@ func (*Handler) GetTeams(ctx context.Context) error {
 }
 
 // NewTeams creates a new team with the given options.
-func (*Handler) NewTeams(ctx context.Context, f form.NewTeam) error {
+func (*route.Handler) NewTeams(ctx context.Context, f form.NewTeam) error {
 	type teamInfo struct {
 		Name     string `json:"Name"`
 		Password string `json:"Password"`
@@ -80,7 +80,7 @@ func (*Handler) NewTeams(ctx context.Context, f form.NewTeam) error {
 }
 
 // UpdateTeam updates the team with the given options.
-func (*Handler) UpdateTeam(ctx context.Context, f form.UpdateTeam) error {
+func (*route.Handler) UpdateTeam(ctx context.Context, f form.UpdateTeam) error {
 	// Check the team exist or not.
 	team, err := db.Teams.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
@@ -111,7 +111,7 @@ func (*Handler) UpdateTeam(ctx context.Context, f form.UpdateTeam) error {
 }
 
 // DeleteTeam deletes the team with the given ID.
-func (*Handler) DeleteTeam(ctx context.Context) error {
+func (*route.Handler) DeleteTeam(ctx context.Context) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the team exist or not.
@@ -131,7 +131,7 @@ func (*Handler) DeleteTeam(ctx context.Context) error {
 }
 
 // ResetTeamPassword resets team password with the given id.
-func (*Handler) ResetTeamPassword(ctx context.Context) error {
+func (*route.Handler) ResetTeamPassword(ctx context.Context) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the team exist or not.

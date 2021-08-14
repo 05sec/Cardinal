@@ -15,7 +15,7 @@ import (
 )
 
 // GetChallenges returns all the challenges.
-func (*Handler) GetChallenges(ctx context.Context) error {
+func (*route.Handler) GetChallenges(ctx context.Context) error {
 	type challenge struct {
 		ID               uint      `json:"ID"`
 		CreatedAt        time.Time `json:"CreatedAt"`
@@ -63,7 +63,7 @@ func (*Handler) GetChallenges(ctx context.Context) error {
 }
 
 // NewChallenge creates a new challenge.
-func (*Handler) NewChallenge(ctx context.Context, f form.NewChallenge) error {
+func (*route.Handler) NewChallenge(ctx context.Context, f form.NewChallenge) error {
 	_, err := db.Challenges.Create(ctx.Request().Context(), db.CreateChallengeOptions{
 		Title:            f.Title,
 		BaseScore:        f.BaseScore,
@@ -82,7 +82,7 @@ func (*Handler) NewChallenge(ctx context.Context, f form.NewChallenge) error {
 }
 
 // UpdateChallenge updates the challenge with the given ID.
-func (*Handler) UpdateChallenge(ctx context.Context, f form.UpdateChallenge) error {
+func (*route.Handler) UpdateChallenge(ctx context.Context, f form.UpdateChallenge) error {
 	// Check if the challenge exists.
 	_, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
@@ -109,7 +109,7 @@ func (*Handler) UpdateChallenge(ctx context.Context, f form.UpdateChallenge) err
 }
 
 // DeleteChallenge deletes the challenge with the given ID.
-func (*Handler) DeleteChallenge(ctx context.Context) error {
+func (*route.Handler) DeleteChallenge(ctx context.Context) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check if the challenge exists.
@@ -134,7 +134,7 @@ func (*Handler) DeleteChallenge(ctx context.Context) error {
 }
 
 // SetChallengeVisible sets the challenge's visible.
-func (*Handler) SetChallengeVisible(ctx context.Context, f form.SetChallengeVisible) error {
+func (*route.Handler) SetChallengeVisible(ctx context.Context, f form.SetChallengeVisible) error {
 	// Check if the challenge exists.
 	challenge, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
