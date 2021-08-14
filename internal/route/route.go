@@ -40,18 +40,17 @@ func NewRouter() *flamego.Flame {
 		f.Get("/uploads")
 		f.Get("/asteroid")
 
-		team := NewTeamHandler()
 		f.Group("/team", func() {
-			f.Post("/login", binding.JSON(form.TeamLogin{}), team.Login)
+			f.Post("/login", binding.JSON(form.TeamLogin{}))
 
 			f.Group("", func() {
-				f.Post("/logout", team.Logout)
-				f.Post("/submitFlag", team.SubmitFlag)
-				f.Get("/info", team.Info)
-				f.Get("/gameBoxes", team.GameBoxes)
-				f.Get("/bulletins", team.Bulletins)
+				f.Post("/logout")
+				f.Post("/submitFlag")
+				f.Get("/info")
+				f.Get("/gameBoxes")
+				f.Get("/bulletins")
 				f.Get("/liveLog")
-			}, team.Authenticator)
+			})
 		})
 
 		manager := NewManagerHandler()

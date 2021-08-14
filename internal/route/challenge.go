@@ -2,7 +2,7 @@
 // Use of this source code is governed by an AGPL-style
 // license that can be found in the LICENSE file.
 
-package manager
+package route
 
 import (
 	"time"
@@ -14,8 +14,14 @@ import (
 	"github.com/vidar-team/Cardinal/internal/form"
 )
 
-// GetChallenges returns all the challenges.
-func (*route.Handler) GetChallenges(ctx context.Context) error {
+type ChallengeHandler struct{}
+
+func NewChallengeHandler() *ChallengeHandler {
+	return &ChallengeHandler{}
+}
+
+// List returns all the challenges.
+func (*ChallengeHandler) List(ctx context.Context) error {
 	type challenge struct {
 		ID               uint      `json:"ID"`
 		CreatedAt        time.Time `json:"CreatedAt"`
@@ -62,8 +68,8 @@ func (*route.Handler) GetChallenges(ctx context.Context) error {
 	return ctx.Success(challengeList)
 }
 
-// NewChallenge creates a new challenge.
-func (*route.Handler) NewChallenge(ctx context.Context, f form.NewChallenge) error {
+// New creates a new challenge.
+func (*ChallengeHandler) New(ctx context.Context, f form.NewChallenge) error {
 	_, err := db.Challenges.Create(ctx.Request().Context(), db.CreateChallengeOptions{
 		Title:            f.Title,
 		BaseScore:        f.BaseScore,
@@ -81,8 +87,8 @@ func (*route.Handler) NewChallenge(ctx context.Context, f form.NewChallenge) err
 	return ctx.Success("Success")
 }
 
-// UpdateChallenge updates the challenge with the given ID.
-func (*route.Handler) UpdateChallenge(ctx context.Context, f form.UpdateChallenge) error {
+// Update updates the challenge with the given ID.
+func (*ChallengeHandler) Update(ctx context.Context, f form.UpdateChallenge) error {
 	// Check if the challenge exists.
 	_, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
@@ -108,8 +114,8 @@ func (*route.Handler) UpdateChallenge(ctx context.Context, f form.UpdateChalleng
 	return ctx.Success("Success")
 }
 
-// DeleteChallenge deletes the challenge with the given ID.
-func (*route.Handler) DeleteChallenge(ctx context.Context) error {
+// Delete deletes the challenge with the given ID.
+func (*ChallengeHandler) Delete(ctx context.Context) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check if the challenge exists.
@@ -133,8 +139,8 @@ func (*route.Handler) DeleteChallenge(ctx context.Context) error {
 	return ctx.Success("Success")
 }
 
-// SetChallengeVisible sets the challenge's visible.
-func (*route.Handler) SetChallengeVisible(ctx context.Context, f form.SetChallengeVisible) error {
+// SetVisible sets the challenge's visible.
+func (*ChallengeHandler) SetVisible(ctx context.Context, f form.SetChallengeVisible) error {
 	// Check if the challenge exists.
 	challenge, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
