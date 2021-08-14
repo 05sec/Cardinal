@@ -10,6 +10,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/i18n"
 )
 
 // BulletinHandler is the bulletin request handler.
@@ -42,16 +43,16 @@ func (*BulletinHandler) New(ctx context.Context, f form.NewBulletin) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }
 
 // Update updates the bulletin with the given options.
-func (*BulletinHandler) Update(ctx context.Context, f form.UpdateBulletin) error {
+func (*BulletinHandler) Update(ctx context.Context, f form.UpdateBulletin, l *i18n.Locale) error {
 	// Check the bulletin exists or not.
 	bulletin, err := db.Bulletins.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
 		if err == db.ErrBulletinNotExists {
-			return ctx.Error(40000, "Bulletin dose not exist.")
+			return ctx.Error(40400, l.T("bulletin.not_found"))
 		}
 		log.Error("Failed to get bulletin: %v", err)
 		return ctx.ServerError()
@@ -66,18 +67,18 @@ func (*BulletinHandler) Update(ctx context.Context, f form.UpdateBulletin) error
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }
 
 // Delete deletes the bulletin with the given id.
-func (*BulletinHandler) Delete(ctx context.Context) error {
+func (*BulletinHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the bulletin exists or not.
 	bulletin, err := db.Bulletins.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		if err == db.ErrBulletinNotExists {
-			return ctx.Error(40000, "Bulletin dose not exist.")
+			return ctx.Error(40400, l.T("bulletin.not_found"))
 		}
 		log.Error("Failed to get bulletin: %v", err)
 		return ctx.ServerError()
@@ -89,5 +90,5 @@ func (*BulletinHandler) Delete(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }

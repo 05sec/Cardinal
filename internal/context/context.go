@@ -19,14 +19,21 @@ type Context struct {
 	flamego.Context
 }
 
-func (c *Context) Success(data interface{}) error {
+func (c *Context) Success(data ...interface{}) error {
 	c.ResponseWriter().Header().Set("Content-Type", "application/json")
 	c.ResponseWriter().WriteHeader(http.StatusOK)
+
+	var d interface{}
+	if len(data) == 1 {
+		d = data[0]
+	} else {
+		d = ""
+	}
 
 	err := jsoniter.NewEncoder(c.ResponseWriter()).Encode(
 		map[string]interface{}{
 			"error": 0,
-			"data":  data,
+			"data":  d,
 		},
 	)
 	if err != nil {
