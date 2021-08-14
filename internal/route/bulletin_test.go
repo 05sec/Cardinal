@@ -18,7 +18,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/form"
 )
 
-func TestBulletins(t *testing.T) {
+func TestBulletin(t *testing.T) {
 	t.Parallel()
 
 	router, managerToken, cleanup := NewTestRoute(t)
