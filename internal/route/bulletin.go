@@ -2,7 +2,7 @@
 // Use of this source code is governed by an AGPL-style
 // license that can be found in the LICENSE file.
 
-package manager
+package route
 
 import (
 	log "unknwon.dev/clog/v2"
@@ -10,10 +10,19 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/i18n"
 )
 
-// GetBulletins returns all the bulletins.
-func (*Handler) GetBulletins(ctx context.Context) error {
+// BulletinHandler is the bulletin request handler.
+type BulletinHandler struct{}
+
+// NewBulletinHandler creates and returns a new bulletin Handler.
+func NewBulletinHandler() *BulletinHandler {
+	return &BulletinHandler{}
+}
+
+// List returns all the bulletins.
+func (*BulletinHandler) List(ctx context.Context) error {
 	bulletins, err := db.Bulletins.Get(ctx.Request().Context())
 	if err != nil {
 		log.Error("Failed to get bulletins list: %v", err)
@@ -23,8 +32,8 @@ func (*Handler) GetBulletins(ctx context.Context) error {
 	return ctx.Success(bulletins)
 }
 
-// NewBulletin creates a new bulletin with the given options.
-func (*Handler) NewBulletin(ctx context.Context, f form.NewBulletin) error {
+// New creates a new bulletin with the given options.
+func (*BulletinHandler) New(ctx context.Context, f form.NewBulletin) error {
 	_, err := db.Bulletins.Create(ctx.Request().Context(), db.CreateBulletinOptions{
 		Title: f.Title,
 		Body:  f.Body,
@@ -34,16 +43,16 @@ func (*Handler) NewBulletin(ctx context.Context, f form.NewBulletin) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }
 
-// UpdateBulletin updates the bulletin with the given options.
-func (*Handler) UpdateBulletin(ctx context.Context, f form.UpdateBulletin) error {
+// Update updates the bulletin with the given options.
+func (*BulletinHandler) Update(ctx context.Context, f form.UpdateBulletin, l *i18n.Locale) error {
 	// Check the bulletin exists or not.
 	bulletin, err := db.Bulletins.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
 		if err == db.ErrBulletinNotExists {
-			return ctx.Error(40000, "Bulletin dose not exist.")
+			return ctx.Error(40400, l.T("bulletin.not_found"))
 		}
 		log.Error("Failed to get bulletin: %v", err)
 		return ctx.ServerError()
@@ -58,18 +67,18 @@ func (*Handler) UpdateBulletin(ctx context.Context, f form.UpdateBulletin) error
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }
 
-// DeleteBulletin deletes the bulletin with the given id.
-func (*Handler) DeleteBulletin(ctx context.Context) error {
+// Delete deletes the bulletin with the given id.
+func (*BulletinHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the bulletin exists or not.
 	bulletin, err := db.Bulletins.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		if err == db.ErrBulletinNotExists {
-			return ctx.Error(40000, "Bulletin dose not exist.")
+			return ctx.Error(40400, l.T("bulletin.not_found"))
 		}
 		log.Error("Failed to get bulletin: %v", err)
 		return ctx.ServerError()
@@ -81,5 +90,5 @@ func (*Handler) DeleteBulletin(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }

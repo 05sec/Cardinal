@@ -5,21 +5,13 @@
 package cmd
 
 import (
-	"net/http"
-
-	"github.com/Cardinal-Platform/binding"
-	"github.com/flamego/flamego"
-	"github.com/flamego/session"
 	"github.com/urfave/cli/v2"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/vidar-team/Cardinal/internal/conf"
-	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
-	"github.com/vidar-team/Cardinal/internal/form"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/route"
-	"github.com/vidar-team/Cardinal/internal/route/manager"
 )
 
 var Web = &cli.Command{
@@ -45,96 +37,7 @@ func runWeb(c *cli.Context) error {
 		log.Fatal("Failed to init database: %v", err)
 	}
 
-	f := flamego.Classic()
-
-	f.Use(session.Sessioner(session.Options{
-		ReadIDFunc:  func(r *http.Request) string { return r.Header.Get("Authorization") },
-		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {},
-	}))
-
-	general := route.NewGeneralHandler()
-	f.NotFound(general.NotFound)
-
-	f.Group("/api", func() {
-		f.Any("/", general.Hello)
-		f.Get("/init", general.Init)
-		f.Get("/time")
-		f.Get("/uploads")
-		f.Get("/asteroid")
-
-		team := route.NewTeamHandler()
-		f.Group("/team", func() {
-			f.Post("/login", binding.Bind(form.TeamLogin{}), team.Login)
-			f.Post("/logout", team.Logout)
-
-			f.Group("", func() {
-				f.Post("/submitFlag", team.SubmitFlag)
-				f.Get("/info", team.Info)
-				f.Get("/gameBoxes", team.GameBoxes)
-				f.Get("/bulletins", team.Bulletins)
-				f.Get("/liveLog")
-			}, team.Authenticator)
-		})
-
-		manager := manager.NewHandler()
-		f.Group("/manager", func() {
-			// Panel
-			f.Get("/panel")
-			f.Get("/logs")
-			f.Get("/rank")
-
-			// Challenge
-			f.Get("/challenges", manager.GetChallenges)
-			f.Post("/challenge", binding.Bind(form.NewChallenge{}), manager.NewChallenge)
-			f.Put("/challenge", binding.Bind(form.UpdateChallenge{}), manager.UpdateChallenge)
-			f.Delete("/challenge", manager.DeleteChallenge)
-			f.Post("/challenge/visible", binding.Bind(form.SetChallengeVisible{}), manager.SetChallengeVisible)
-
-			// Team
-			f.Get("/teams", manager.GetTeams)
-			f.Post("/teams", binding.Bind(form.NewTeam{}), manager.NewTeams)
-			f.Put("/team", binding.Bind(form.UpdateTeam{}), manager.UpdateTeam)
-			f.Delete("/team", manager.DeleteTeam)
-			f.Post("/team/resetPassword", manager.ResetTeamPassword)
-
-			// Game Box
-			f.Get("/gameBoxes")
-			f.Post("/gameBoxes")
-			f.Post("/gameBoxes/reset")
-			f.Put("/gameBox")
-			f.Post("/gameBox/sshTest")
-			f.Post("/gameBox/refreshFlag")
-
-			// Flag
-			f.Get("/flags")
-			f.Post("/flags")
-			f.Get("/flags/export")
-
-			// Bulletins
-			f.Get("/bulletins", manager.GetBulletins)
-			f.Post("/bulletin", binding.Bind(form.NewBulletin{}), manager.NewBulletin)
-			f.Put("/bulletin", binding.Bind(form.UpdateBulletin{}), manager.UpdateBulletin)
-			f.Delete("/bulletin", manager.DeleteBulletin)
-
-			// Asteroid
-			f.Group("/asteroid", func() {
-				f.Get("/status")
-				f.Post("/attack")
-				f.Post("/rank")
-				f.Post("/status")
-				f.Post("/round")
-				f.Post("/easterEgg")
-				f.Post("/time")
-				f.Post("/clear")
-			})
-
-			// Check
-			f.Get("/checkDown")
-		})
-	})
-
-	f.Use(context.Contexter())
-
+	f := route.NewRouter()
 	log.Info("Listen on http://0.0.0.0:%d", c.Int("port"))
 
 	f.Run("0.0.0.0", c.Int("port"))

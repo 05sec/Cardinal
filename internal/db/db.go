@@ -16,7 +16,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/dbutil"
 )
 
-var allTables = []interface{}{
+var AllTables = []interface{}{
 	&Action{},
 	&Bulletin{},
 	&Challenge{},
@@ -46,10 +46,17 @@ func Init() error {
 	}
 
 	// Migrate databases.
-	if db.AutoMigrate(allTables...) != nil {
+	if db.AutoMigrate(AllTables...) != nil {
 		return errors.Wrap(err, "auto migrate")
 	}
 
+	SetDatabaseStore(db)
+
+	return nil
+}
+
+// SetDatabaseStore sets the database table store.
+func SetDatabaseStore(db *gorm.DB) {
 	Actions = NewActionsStore(db)
 	Bulletins = NewBulletinsStore(db)
 	Challenges = NewChallengesStore(db)
@@ -58,6 +65,4 @@ func Init() error {
 	Logs = NewLogsStore(db)
 	Managers = NewManagersStore(db)
 	Teams = NewTeamsStore(db)
-
-	return nil
 }

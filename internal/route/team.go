@@ -5,9 +5,7 @@
 package route
 
 import (
-	"time"
-
-	"github.com/flamego/session"
+	"github.com/thanhpk/randstr"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/vidar-team/Cardinal/internal/context"
@@ -15,122 +13,146 @@ import (
 	"github.com/vidar-team/Cardinal/internal/form"
 )
 
-// TeamHandler is the team request handler.
 type TeamHandler struct{}
 
-// NewTeamHandler creates and returns a new TeamHandler.
 func NewTeamHandler() *TeamHandler {
 	return &TeamHandler{}
 }
 
-const teamIDSessionKey = "TeamID"
-
-func (*TeamHandler) Authenticator(ctx context.Context, session session.Session) error {
-	teamID, ok := session.Get(teamIDSessionKey).(uint)
-	if !ok {
-		return ctx.Error(40300, "")
-	}
-
-	team, err := db.Teams.GetByID(ctx.Request().Context(), teamID)
+// List returns all the teams.
+func (*TeamHandler) List(ctx context.Context) error {
+	teams, err := db.Teams.Get(ctx.Request().Context(), db.GetTeamsOptions{})
 	if err != nil {
-		if err == db.ErrTeamNotExists {
-			return ctx.Error(40300, "")
-		}
-
-		log.Error("Failed to get team: %v", err)
+		log.Error("Failed to get teams: %v", err)
 		return ctx.ServerError()
 	}
 
-	ctx.Map(team)
-	return nil
-}
-
-func (*TeamHandler) Login(ctx context.Context, session session.Session, f form.TeamLogin) error {
-	team, err := db.Teams.Authenticate(ctx.Request().Context(), f.Name, f.Password)
-	if err == db.ErrBadCredentials {
-		return ctx.Error(40300, "bad credentials")
-	} else if err != nil {
-		log.Error("Failed to authenticate team: %v", err)
-		return ctx.Error(50000, "")
+	type team struct {
+		ID    uint    `json:"ID"`
+		Logo  string  `json:"Logo"`
+		Score float64 `json:"Score"`
+		Rank  uint    `json:"rank"`
+		Token string  `json:"token"`
 	}
 
-	session.Set(teamIDSessionKey, team.ID)
-	return ctx.Success(session.ID())
+	teamList := make([]*team, 0, len(teams))
+
+	for _, t := range teams {
+		teamList = append(teamList, &team{
+			ID:    t.ID,
+			Logo:  t.Logo,
+			Score: t.Score,
+			Rank:  t.Rank,
+			Token: t.Token,
+		})
+	}
+
+	return ctx.Success(teamList)
 }
 
-func (*TeamHandler) Logout(ctx context.Context, session session.Session) error {
-	session.Flush()
+// New creates a new team with the given options.
+func (*TeamHandler) New(ctx context.Context, f form.NewTeam) error {
+	type teamInfo struct {
+		Name     string `json:"Name"`
+		Password string `json:"Password"`
+	}
+
+	teamInfos := make([]*teamInfo, 0, len(f))
+
+	for _, team := range f {
+		password := randstr.String(16)
+
+		// TODO add transaction
+		_, err := db.Teams.Create(ctx.Request().Context(), db.CreateTeamOptions{
+			Name:     team.Name,
+			Password: password,
+			Logo:     team.Logo,
+		})
+		if err != nil {
+			if err == db.ErrTeamAlreadyExists {
+				return ctx.Error(40000, "Team %q already existed.")
+			}
+			log.Error("Failed to create new team: %v", err)
+			return ctx.ServerError()
+		}
+
+		teamInfos = append(teamInfos, &teamInfo{
+			Name:     team.Name,
+			Password: password,
+		})
+	}
+
+	return ctx.Success(teamInfos)
+}
+
+// Update updates the team with the given options.
+func (*TeamHandler) Update(ctx context.Context, f form.UpdateTeam) error {
+	// Check the team exist or not.
+	team, err := db.Teams.GetByID(ctx.Request().Context(), f.ID)
+	if err != nil {
+		log.Error("Failed to get team by ID: %v", err)
+		return ctx.ServerError()
+	}
+
+	newTeam, err := db.Teams.GetByName(ctx.Request().Context(), f.Name)
+	if err != nil {
+		log.Error("Failed to get team by name: %v", err)
+		return ctx.ServerError()
+	}
+
+	if team.ID != newTeam.ID {
+		// TODO i18n
+		return ctx.Error(40000, "Team name %q repeat.")
+	}
+
+	err = db.Teams.Update(ctx.Request().Context(), f.ID, db.UpdateTeamOptions{
+		Name: f.Name,
+		Logo: f.Logo,
+	})
+	if err != nil {
+		log.Error("Failed to update team: %v", err)
+		return ctx.ServerError()
+	}
 	return ctx.Success("")
 }
 
-func (*TeamHandler) SubmitFlag(ctx context.Context, team *db.Team) error {
-	panic("implement me")
-}
+// Delete deletes the team with the given ID.
+func (*TeamHandler) Delete(ctx context.Context) error {
+	id := uint(ctx.QueryInt("id"))
 
-// Info returns the current logged in team's information.
-func (*TeamHandler) Info(ctx context.Context, team *db.Team) error {
-	return ctx.Success(map[string]interface{}{
-		"Name":  team.Name,
-		"Logo":  team.Logo,
-		"Score": team.Score,
-		"Rank":  team.Rank,
-		"Token": team.Token,
-	})
-}
-
-func (*TeamHandler) GameBoxes(ctx context.Context, team *db.Team) error {
-	gameBoxes, err := db.GameBoxes.Get(ctx.Request().Context(), db.GetGameBoxesOption{
-		TeamID:  team.ID,
-		Visible: true,
-	})
+	// Check the team exist or not.
+	team, err := db.Teams.GetByID(ctx.Request().Context(), id)
 	if err != nil {
-		log.Error("Failed to get team game boxes: %v", err)
+		log.Error("Failed to get team by ID: %v", err)
 		return ctx.ServerError()
 	}
 
-	type gameBox struct {
-		Title       string           `json:"Title"`
-		Address     string           `json:"Address"`
-		Description string           `json:"Description"`
-		Score       float64          `json:"Score"`
-		Status      db.GameBoxStatus `json:"Status"`
-	}
-
-	gameBoxList := make([]*gameBox, 0, len(gameBoxes))
-	for _, gb := range gameBoxes {
-		gameBoxList = append(gameBoxList, &gameBox{
-			Title:       gb.Challenge.Title,
-			Address:     gb.Address,
-			Description: gb.Description,
-			Score:       gb.Score,
-			Status:      gb.Status,
-		})
-	}
-
-	return ctx.Success(gameBoxList)
-}
-
-func (*TeamHandler) Bulletins(ctx context.Context) error {
-	bulletins, err := db.Bulletins.Get(ctx.Request().Context())
+	err = db.Teams.DeleteByID(ctx.Request().Context(), team.ID)
 	if err != nil {
-		log.Error("Failed to get bulletins: %v", err)
+		log.Error("Failed to delete team: %v", err)
 		return ctx.ServerError()
 	}
 
-	type bulletin struct {
-		Title     string    `json:"Title"`
-		Body      string    `json:"Body"`
-		CreatedAt time.Time `json:"CreatedAt"`
+	return ctx.Success("")
+}
+
+// ResetPassword resets team password with the given id.
+func (*TeamHandler) ResetPassword(ctx context.Context) error {
+	id := uint(ctx.QueryInt("id"))
+
+	// Check the team exist or not.
+	team, err := db.Teams.GetByID(ctx.Request().Context(), id)
+	if err != nil {
+		log.Error("Failed to get team by ID: %v", err)
+		return ctx.ServerError()
 	}
 
-	bulletinList := make([]*bulletin, 0, len(bulletins))
-	for _, b := range bulletins {
-		bulletinList = append(bulletinList, &bulletin{
-			Title:     b.Title,
-			Body:      b.Body,
-			CreatedAt: b.CreatedAt,
-		})
+	newPassword := randstr.String(16)
+	err = db.Teams.ChangePassword(ctx.Request().Context(), team.ID, newPassword)
+	if err != nil {
+		log.Error("Failed to change password: %v", err)
+		return ctx.ServerError()
 	}
 
-	return ctx.Success(bulletinList)
+	return ctx.Success(newPassword)
 }
