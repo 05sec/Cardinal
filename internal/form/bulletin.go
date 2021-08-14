@@ -11,6 +11,6 @@ type NewBulletin struct {
 
 type UpdateBulletin struct {
 	ID    uint   `validate:"required"`
-	Title string `validate:"required,lt(255)"`
-	Body  string `validate:"required,lt(1000)"`
+	Title string `validate:"required,lt=255"`
+	Body  string `validate:"required,lt=1000"`
 }
