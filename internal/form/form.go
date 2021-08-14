@@ -7,25 +7,59 @@ package form
 import (
 	"net/http"
 
-	"github.com/Cardinal-Platform/binding"
+	"github.com/flamego/binding"
 	"github.com/flamego/flamego"
+	"github.com/go-playground/locales"
+	"github.com/go-playground/locales/en"
+	"github.com/go-playground/locales/zh"
+	ut "github.com/go-playground/universal-translator"
+
+	"github.com/go-playground/validator/v10"
 	jsoniter "github.com/json-iterator/go"
 	log "unknwon.dev/clog/v2"
+
+	"github.com/vidar-team/Cardinal/internal/i18n"
 )
 
-func init() {
-	binding.CustomErrorHandler = func(ctx flamego.Context, errors binding.Errors) {
-		ctx.ResponseWriter().Header().Set("Content-Type", "application/json")
-		ctx.ResponseWriter().WriteHeader(http.StatusBadRequest)
+func Bind(model interface{}) flamego.Handler {
+	return binding.JSON(model, binding.Options{
+		ErrorHandler: errorHandler(),
+	})
+}
 
-		err := jsoniter.NewEncoder(ctx.ResponseWriter()).Encode(
-			map[string]interface{}{
-				"error": 40000,
-				"msg":   errors[0].Message, // FIXME error message should be more human-friendly.
-			},
-		)
+func errorHandler() flamego.Handler {
+	// TODO add more languages
+	uni := ut.New(en.New(), []locales.Translator{
+		en.New(),
+		zh.New(),
+	}...)
+
+	return func(c flamego.Context, errors binding.Errors, l *i18n.Locale) {
+		c.ResponseWriter().WriteHeader(http.StatusBadRequest)
+		c.ResponseWriter().Header().Set("Content-Type", "application/json")
+
+		// TODO i18n support
+		var errorCode int
+		var msg string
+		if errors[0].Category == binding.ErrorCategoryDeserialization {
+			errorCode = 40000
+			msg = l.T("general.error_payload")
+		} else {
+			errorCode = 40001
+			errs := errors[0].Err.(validator.ValidationErrors)
+
+			lang, _ := l.Tag.Base()
+			translator, _ := uni.GetTranslator(lang.String())
+			msg = errs[0].Translate(translator)
+		}
+
+		body := map[string]interface{}{
+			"error": errorCode,
+			"msg":   msg,
+		}
+		err := jsoniter.NewEncoder(c.ResponseWriter()).Encode(body)
 		if err != nil {
-			log.Error("Failed to encode: %v", err)
+			log.Error("Failed to encode response body: %v", err)
 		}
 	}
 }

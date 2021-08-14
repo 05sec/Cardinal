@@ -5,8 +5,8 @@
 package form
 
 type NewBulletin struct {
-	Title string `binding:"Required;MaxSize(255)"`
-	Body  string `binding:"Required;MaxSize(1000)"`
+	Title string `validate:"required,lt=255"`
+	Body  string `validate:"required,lt=1000"`
 }
 
 type UpdateBulletin struct {
