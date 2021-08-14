@@ -32,6 +32,7 @@ func NewRouter() *flamego.Flame {
 	f.NotFound(general.NotFound)
 
 	bulletin := NewBulletinHandler()
+	gameBox := NewGameBoxHandler()
 
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
@@ -80,12 +81,12 @@ func NewRouter() *flamego.Flame {
 				f.Post("/team/resetPassword")
 
 				// Game Box
-				f.Get("/gameBoxes")
-				f.Post("/gameBoxes")
-				f.Post("/gameBoxes/reset")
-				f.Put("/gameBox")
-				f.Post("/gameBox/sshTest")
-				f.Post("/gameBox/refreshFlag")
+				f.Get("/gameBoxes", gameBox.List)
+				f.Post("/gameBox", form.Bind(form.NewGameBox{}), gameBox.New)
+				f.Put("/gameBox", form.Bind(form.UpdateGameBox{}), gameBox.Update)
+				f.Post("/gameBox/sshTest", gameBox.SSHTest)
+				f.Post("/gameBox/refreshFlag", gameBox.RefreshFlag)
+				f.Post("/gameBoxes/reset", gameBox.ResetAll)
 
 				// Flag
 				f.Get("/flags")
