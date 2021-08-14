@@ -126,8 +126,8 @@ github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGE
 github.com/fatih/color v1.12.0 h1:mRhaKNwANqRgUBGKmnI5ZxEk7QXmjQeCcuYFMX2bfcc=
 github.com/fatih/color v1.12.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
-github.com/flamego/binding v0.0.0-20210814045513-4364d0d256a0 h1:uXgAgh/YDwkAe23A2+xW4RDcblLg6RkdTvmr89VO2Eo=
-github.com/flamego/binding v0.0.0-20210814045513-4364d0d256a0/go.mod h1:NI4UzIVEoQ+C1hg5+KWfd/litWwNFM9EAonNAy5C4Gg=
+github.com/flamego/binding v0.0.0-20210814090747-b9df77794ad6 h1:q+kMIb3TgysRQKbRk0w+F84DpOGL7LbukrCFNQMFZtE=
+github.com/flamego/binding v0.0.0-20210814090747-b9df77794ad6/go.mod h1:NI4UzIVEoQ+C1hg5+KWfd/litWwNFM9EAonNAy5C4Gg=
 github.com/flamego/flamego v0.0.0-20210516144321-6b13a8d6f9bf/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
 github.com/flamego/flamego v0.0.0-20210525090435-cdb552aa0e32/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
 github.com/flamego/flamego v0.0.0-20210812030558-9bb216aa46c8 h1:I6+D+mkMWyNejmLnSCuU1/0Z8iJneMMclIRxBdIaR5w=

@@ -9,11 +9,6 @@ import (
 
 	"github.com/flamego/binding"
 	"github.com/flamego/flamego"
-	"github.com/go-playground/locales"
-	"github.com/go-playground/locales/en"
-	"github.com/go-playground/locales/zh"
-	ut "github.com/go-playground/universal-translator"
-
 	"github.com/go-playground/validator/v10"
 	jsoniter "github.com/json-iterator/go"
 	log "unknwon.dev/clog/v2"
@@ -22,23 +17,19 @@ import (
 )
 
 func Bind(model interface{}) flamego.Handler {
+	validate := validator.New()
+
 	return binding.JSON(model, binding.Options{
 		ErrorHandler: errorHandler(),
+		Validator:    validate,
 	})
 }
 
 func errorHandler() flamego.Handler {
-	// TODO add more languages
-	uni := ut.New(en.New(), []locales.Translator{
-		en.New(),
-		zh.New(),
-	}...)
-
 	return func(c flamego.Context, errors binding.Errors, l *i18n.Locale) {
 		c.ResponseWriter().WriteHeader(http.StatusBadRequest)
 		c.ResponseWriter().Header().Set("Content-Type", "application/json")
 
-		// TODO i18n support
 		var errorCode int
 		var msg string
 		if errors[0].Category == binding.ErrorCategoryDeserialization {
@@ -47,10 +38,18 @@ func errorHandler() flamego.Handler {
 		} else {
 			errorCode = 40001
 			errs := errors[0].Err.(validator.ValidationErrors)
+			err := errs[0]
 
-			lang, _ := l.Tag.Base()
-			translator, _ := uni.GetTranslator(lang.String())
-			msg = errs[0].Translate(translator)
+			fieldName := l.T("form." + err.Namespace())
+
+			switch err.Tag() {
+			case "required":
+				msg = l.T("form.required_error", fieldName)
+			case "len":
+				msg = l.T("form.len_error", fieldName)
+			default:
+				msg = err.Error()
+			}
 		}
 
 		body := map[string]interface{}{

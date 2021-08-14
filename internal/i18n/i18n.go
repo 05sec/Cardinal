@@ -5,12 +5,15 @@
 package i18n
 
 import (
+	"net/http"
+
 	"github.com/flamego/flamego"
 	"github.com/qor/i18n"
 	"github.com/qor/i18n/backends/yaml"
 	"golang.org/x/text/language"
 
 	"github.com/vidar-team/Cardinal/internal/context"
+	"github.com/vidar-team/Cardinal/locales"
 )
 
 type Locale struct {
@@ -23,8 +26,7 @@ func (l *Locale) T(key string, args ...interface{}) string {
 }
 
 func I18n() flamego.Handler {
-	// TODO go embed
-	yamlBackend := yaml.New("./locales")
+	yamlBackend := yaml.NewWithFilesystem(http.FS(locales.FS))
 	translations := yamlBackend.LoadTranslations()
 	i18n := i18n.New(yamlBackend)
 

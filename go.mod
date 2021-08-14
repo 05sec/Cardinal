@@ -17,7 +17,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.12.0 // indirect
-	github.com/flamego/binding v0.0.0-20210814045513-4364d0d256a0
+	github.com/flamego/binding v0.0.0-20210814090747-b9df77794ad6
 	github.com/flamego/flamego v0.0.0-20210812030558-9bb216aa46c8
 	github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2
 	github.com/getsentry/sentry-go v0.7.0

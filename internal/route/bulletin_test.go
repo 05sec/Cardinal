@@ -103,7 +103,17 @@ func testNewBulletins(t *testing.T, router *flamego.Flame, managerToken string) 
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"error":40000, "msg":"general.error_payload"}`, w.Body.String())
+	assert.JSONEq(t, `{"error":40000, "msg":"Wrong Request Format!"}`, w.Body.String())
+
+	// Missing bulletin body.
+	req, err = http.NewRequest(http.MethodPost, "/api/manager/bulletin", strings.NewReader(`{"Title": "No body"}`))
+	assert.Nil(t, err)
+	req.Header.Set("Authorization", managerToken)
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.JSONEq(t, `{"error":40001, "msg":"Bulletin Body is a required field"}`, w.Body.String())
 
 	// Normal JSON.
 	req, err = http.NewRequest(http.MethodPost, "/api/manager/bulletin", strings.NewReader(`{"Title": "Welcome", "Body": "Welcome to D^3CTF!"}`))
@@ -128,7 +138,7 @@ func testUpdateBulletins(t *testing.T, router *flamego.Flame, managerToken strin
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"error":40000, "msg":"general.error_payload"}`, w.Body.String())
+	assert.JSONEq(t, `{"error":40000, "msg":"Wrong Request Format!"}`, w.Body.String())
 
 	// Update not exist bulletin.
 	req, err = http.NewRequest(http.MethodPut, "/api/manager/bulletin", strings.NewReader(`{"ID": 5, "Title": "Welcome", "Body": "Welcome to D^3CTF!"}`))
@@ -138,7 +148,7 @@ func testUpdateBulletins(t *testing.T, router *flamego.Flame, managerToken strin
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.JSONEq(t, `{"error": 40400, "msg":"bulletin.not_found"}`, w.Body.String())
+	assert.JSONEq(t, `{"error": 40400, "msg":"Bulletin Not Found!"}`, w.Body.String())
 
 	// Update bulletin.
 	req, err = http.NewRequest(http.MethodPut, "/api/manager/bulletin", strings.NewReader(`{"ID": 1, "Title": "Welcome!!", "Body": "Welcome to HCTF!"}`))
@@ -196,7 +206,7 @@ func testDeleteBulletins(t *testing.T, router *flamego.Flame, managerToken strin
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusNotFound, w.Code)
-	assert.JSONEq(t, `{"error":40400, "msg":"bulletin.not_found"}`, w.Body.String())
+	assert.JSONEq(t, `{"error":40400, "msg":"Bulletin Not Found!"}`, w.Body.String())
 
 	// Delete the first bulletin.
 	req, err = http.NewRequest(http.MethodDelete, "/api/manager/bulletin?id=1", nil)
