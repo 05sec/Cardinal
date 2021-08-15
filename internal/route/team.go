@@ -11,6 +11,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/i18n"
 )
 
 type TeamHandler struct{}
@@ -51,7 +52,7 @@ func (*TeamHandler) List(ctx context.Context) error {
 }
 
 // New creates a new team with the given options.
-func (*TeamHandler) New(ctx context.Context, f form.NewTeam) error {
+func (*TeamHandler) New(ctx context.Context, f form.NewTeam, l *i18n.Locale) error {
 	type teamInfo struct {
 		Name     string `json:"Name"`
 		Password string `json:"Password"`
@@ -70,7 +71,7 @@ func (*TeamHandler) New(ctx context.Context, f form.NewTeam) error {
 		})
 		if err != nil {
 			if err == db.ErrTeamAlreadyExists {
-				return ctx.Error(40000, "Team %q already existed.")
+				return ctx.Error(40000, l.T("team.exist", team.Name))
 			}
 			log.Error("Failed to create new team: %v", err)
 			return ctx.ServerError()

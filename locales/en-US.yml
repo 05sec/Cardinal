@@ -57,6 +57,7 @@ en-US:
     auto_refresh_flag_error: "Missing Game box SSH!"
     reset_success: "Reset game boxes successfully!"
   team:
+    exist: "Team {{.}} already exist"
     post_error: "Add Team Failed!"
     put_error: "Edit Team Information Failed!"
     put_success: "Edit Team Information Succeeded"
