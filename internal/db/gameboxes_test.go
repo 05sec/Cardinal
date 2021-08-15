@@ -433,6 +433,17 @@ func testGameBoxesUpdate(t *testing.T, ctx context.Context, db *gameboxes) {
 	assert.Equal(t, uint(1), id)
 	assert.Nil(t, err)
 
+	err = db.Update(ctx, 2, UpdateGameBoxOptions{
+		Address:     "192.168.1.11",
+		Description: "This is the Web1, have fun!",
+		InternalSSH: SSHConfig{
+			Port:     2222,
+			User:     "r00t",
+			Password: "s3cret",
+		},
+	})
+	assert.Equal(t, ErrGameBoxNotExists, err)
+
 	err = db.Update(ctx, 1, UpdateGameBoxOptions{
 		Address:     "192.168.1.11",
 		Description: "This is the Web1, have fun!",

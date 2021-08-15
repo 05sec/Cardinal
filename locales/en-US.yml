@@ -44,6 +44,7 @@ en-US:
     repeat: "Please DON'T Submit Flag Repeatedly."
     generate_success: "Generate Flag Succeeded!"
   gamebox:
+    already_exist: "Game box already exist"
     post_error: "Add Game box Failed!"
     post_success: "Add Game box Succeeded!"
     put_error: "Edit Game box Information Failed!"

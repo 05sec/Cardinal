@@ -19,8 +19,6 @@ import (
 )
 
 func TestBulletins(t *testing.T) {
-	t.Parallel()
-
 	router, managerToken, cleanup := NewTestRoute(t)
 
 	for _, tc := range []struct {

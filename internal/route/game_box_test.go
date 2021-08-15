@@ -1,0 +1,94 @@
+// Copyright 2021 E99p1ant. All rights reserved.
+// Use of this source code is governed by an AGPL-style
+// license that can be found in the LICENSE file.
+
+package route
+
+import (
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/flamego/flamego"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestGameBox(t *testing.T) {
+	router, managerToken, cleanup := NewTestRoute(t)
+
+	for _, tc := range []struct {
+		name string
+		test func(t *testing.T, router *flamego.Flame, managerToken string)
+	}{
+		{"List", testListGameBoxes},
+		{"New", testNewGameBox},
+		{"Update", testUpdateGameBox},
+		{"ResetAll", testResetAllGameBox},
+		{"SSHTest", testSSHTestGameBox},
+		{"RefreshFlag", testRefreshFlagGameBox},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				err := cleanup("game_boxes", "challenges")
+				if err != nil {
+					t.Fatal(err)
+				}
+			})
+
+			tc.test(t, router, managerToken)
+		})
+	}
+}
+
+func testListGameBoxes(t *testing.T, router *flamego.Flame, managerToken string) {
+	// Empty game box list.
+	req, err := http.NewRequest(http.MethodGet, "/api/manager/gameBoxes", nil)
+	assert.Nil(t, err)
+
+	req.Header.Set("Authorization", managerToken)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	want := `{"error":0,"data":[]}`
+	assert.JSONEq(t, want, w.Body.String())
+
+	// TODO Create the base challenge.
+
+	// TODO Create two game boxes.
+
+	// TODO Get the two game boxes.
+}
+
+func testNewGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
+
+}
+
+func testUpdateGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
+
+}
+
+func testResetAllGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
+
+}
+
+func testSSHTestGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
+
+}
+
+func testRefreshFlagGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
+
+}
+
+//func createGameBox(t *testing.T, managerToken string, router *flamego.Flame, f form.NewGameBox) {
+//	bodyBytes, err := jsoniter.Marshal(f)
+//	assert.Nil(t, err)
+//
+//	req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBox", bytes.NewBuffer(bodyBytes))
+//	assert.Nil(t, err)
+//	req.Header.Set("Authorization", managerToken)
+//	w := httptest.NewRecorder()
+//	router.ServeHTTP(w, req)
+//
+//	assert.Equal(t, http.StatusOK, w.Code)
+//	assert.JSONEq(t, `{"error": 0, "data": ""}`, w.Body.String())
+//}
