@@ -34,6 +34,14 @@ func NewTestRoute(t *testing.T) (*flamego.Flame, string, func(tables ...string) 
 	// Set the global database store to test database.
 	db.SetDatabaseStore(testDB)
 
+	// Mock the global time.
+	time.Local = time.UTC
+	mockTime := time.Date(2020, 1, 9, 10, 6, 40, 0, time.UTC)
+	timePatch := monkey.Patch(time.Now, func() time.Time { return mockTime })
+	t.Cleanup(func() {
+		timePatch.Unpatch()
+	})
+
 	// Create manager account for testing.
 	ctx := context.Background()
 	_, err := db.Managers.Create(ctx, db.CreateManagerOptions{
@@ -62,14 +70,6 @@ func NewTestRoute(t *testing.T) (*flamego.Flame, string, func(tables ...string) 
 	err = jsoniter.NewDecoder(w.Body).Decode(&respBody)
 	assert.Nil(t, err)
 	managerToken := respBody.Data
-
-	// Mock the global time.
-	time.Local = time.UTC
-	mockTime := time.Date(2020, 1, 9, 10, 6, 40, 0, time.UTC)
-	timePatch := monkey.Patch(time.Now, func() time.Time { return mockTime })
-	t.Cleanup(func() {
-		timePatch.Unpatch()
-	})
 
 	return f, managerToken, func(tables ...string) error {
 		if t.Failed() {
