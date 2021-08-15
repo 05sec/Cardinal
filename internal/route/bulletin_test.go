@@ -18,9 +18,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/form"
 )
 
-func TestBulletin(t *testing.T) {
-	t.Parallel()
-
+func TestBulletins(t *testing.T) {
 	router, managerToken, cleanup := NewTestRoute(t)
 
 	for _, tc := range []struct {
@@ -28,9 +26,9 @@ func TestBulletin(t *testing.T) {
 		test func(t *testing.T, router *flamego.Flame, managerToken string)
 	}{
 		{"List", testListBulletins},
-		{"New", testNewBulletin},
-		{"Update", testUpdateBulletin},
-		{"Delete", testDeleteBulletin},
+		{"New", testNewBulletins},
+		{"Update", testUpdateBulletins},
+		{"Delete", testDeleteBulletins},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Cleanup(func() {
@@ -94,7 +92,7 @@ func testListBulletins(t *testing.T, router *flamego.Flame, managerToken string)
 	assert.JSONEq(t, want, w.Body.String())
 }
 
-func testNewBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
+func testNewBulletins(t *testing.T, router *flamego.Flame, managerToken string) {
 	// Invalid JSON.
 	req, err := http.NewRequest(http.MethodPost, "/api/manager/bulletin", strings.NewReader(`{"Title": "No body"`))
 	assert.Nil(t, err)
@@ -125,7 +123,7 @@ func testNewBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
 	assert.JSONEq(t, `{"error": 0, "data": ""}`, w.Body.String())
 }
 
-func testUpdateBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
+func testUpdateBulletins(t *testing.T, router *flamego.Flame, managerToken string) {
 	// Create two bulletins.
 	createBulletin(t, managerToken, router, "Welcome", "Welcome to D^3CTF!")
 	createBulletin(t, managerToken, router, "Hint for Web1", "/web.zip")
@@ -193,7 +191,7 @@ func testUpdateBulletin(t *testing.T, router *flamego.Flame, managerToken string
 	assert.JSONEq(t, want, w.Body.String())
 }
 
-func testDeleteBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
+func testDeleteBulletins(t *testing.T, router *flamego.Flame, managerToken string) {
 	// Create two bulletins.
 	createBulletin(t, managerToken, router, "Welcome", "Welcome to D^3CTF!")
 	createBulletin(t, managerToken, router, "Hint for Web1", "/web.zip")

@@ -32,7 +32,7 @@ func NewRouter() *flamego.Flame {
 	f.NotFound(general.NotFound)
 
 	bulletin := NewBulletinHandler()
-	challenge := NewChallengeHandler()
+	gameBox := NewGameBoxHandler()
 
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
@@ -67,11 +67,11 @@ func NewRouter() *flamego.Flame {
 				f.Get("/rank")
 
 				// Challenge
-				f.Get("/challenges", challenge.List)
-				f.Post("/challenge", form.Bind(form.NewChallenge{}), challenge.New)
-				f.Put("/challenge", form.Bind(form.UpdateChallenge{}), challenge.Update)
-				f.Delete("/challenge", challenge.Delete)
-				f.Post("/challenge/visible", form.Bind(form.SetChallengeVisible{}), challenge.SetVisible)
+				f.Get("/challenges")
+				f.Post("/challenge", binding.JSON(form.NewChallenge{}))
+				f.Put("/challenge", binding.JSON(form.UpdateChallenge{}))
+				f.Delete("/challenge")
+				f.Post("/challenge/visible", binding.JSON(form.SetChallengeVisible{}))
 
 				// Team
 				f.Get("/teams")
@@ -81,12 +81,12 @@ func NewRouter() *flamego.Flame {
 				f.Post("/team/resetPassword")
 
 				// Game Box
-				f.Get("/gameBoxes")
-				f.Post("/gameBoxes")
-				f.Post("/gameBoxes/reset")
-				f.Put("/gameBox")
-				f.Post("/gameBox/sshTest")
-				f.Post("/gameBox/refreshFlag")
+				f.Get("/gameBoxes", gameBox.List)
+				f.Post("/gameBox", form.Bind(form.NewGameBox{}), gameBox.New)
+				f.Put("/gameBox", form.Bind(form.UpdateGameBox{}), gameBox.Update)
+				f.Post("/gameBox/sshTest", gameBox.SSHTest)
+				f.Post("/gameBox/refreshFlag", gameBox.RefreshFlag)
+				f.Post("/gameBoxes/reset", gameBox.ResetAll)
 
 				// Flag
 				f.Get("/flags")

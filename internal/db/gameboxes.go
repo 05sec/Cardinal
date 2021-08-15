@@ -240,6 +240,15 @@ type UpdateGameBoxOptions struct {
 }
 
 func (db *gameboxes) Update(ctx context.Context, id uint, opts UpdateGameBoxOptions) error {
+	var gameBox GameBox
+	err := db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).First(&gameBox).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return ErrGameBoxNotExists
+		}
+		return errors.Wrap(err, "get")
+	}
+
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).
 		Updates(&GameBox{
 			Address:             opts.Address,
