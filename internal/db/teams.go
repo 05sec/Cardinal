@@ -29,6 +29,9 @@ type TeamsStore interface {
 	// Create creates a new team and persists to database.
 	// It returns the team when it created.
 	Create(ctx context.Context, opts CreateTeamOptions) (*Team, error)
+	// BatchCreate creates teams in batch.
+	// It returns the teams when they created.
+	BatchCreate(ctx context.Context, opts []CreateTeamOptions) ([]*Team, error)
 	// Get returns the team list.
 	Get(ctx context.Context, opts GetTeamsOptions) ([]*Team, error)
 	// GetByID returns the team with given id.
@@ -129,6 +132,39 @@ func (db *teams) Create(ctx context.Context, opts CreateTeamOptions) (*Team, err
 	t.EncodePassword()
 
 	return t, db.WithContext(ctx).Create(t).Error
+}
+
+func (db *teams) BatchCreate(ctx context.Context, opts []CreateTeamOptions) ([]*Team, error) {
+	tx := db.Begin()
+
+	teams := make([]*Team, 0, len(opts))
+	for _, option := range opts {
+		var team Team
+		if err := tx.WithContext(ctx).Model(&Team{}).Where("name = ?", option.Name).First(&team).Error; err == nil {
+			tx.Rollback()
+			return nil, ErrTeamAlreadyExists
+		} else if err != gorm.ErrRecordNotFound {
+			tx.Rollback()
+			return nil, errors.Wrap(err, "get")
+		}
+
+		t := &Team{
+			Name:     option.Name,
+			Password: option.Password,
+			Salt:     getTeamSalt(),
+			Logo:     option.Logo,
+			Token:    randstr.Hex(16), // Random token.
+		}
+		t.EncodePassword()
+		if err := tx.WithContext(ctx).Create(t).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		teams = append(teams, t)
+	}
+
+	return teams, tx.Commit().Error
 }
 
 type GetTeamsOptions struct {

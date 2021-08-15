@@ -53,37 +53,23 @@ func (*TeamHandler) List(ctx context.Context) error {
 
 // New creates a new team with the given options.
 func (*TeamHandler) New(ctx context.Context, f form.NewTeam, l *i18n.Locale) error {
-	type teamInfo struct {
-		Name     string `json:"Name"`
-		Password string `json:"Password"`
-	}
-
-	teamInfos := make([]*teamInfo, 0, len(f))
-
+	teamOptions := make([]db.CreateTeamOptions, 0, len(f))
 	for _, team := range f {
 		password := randstr.String(16)
-
-		// TODO add transaction
-		_, err := db.Teams.Create(ctx.Request().Context(), db.CreateTeamOptions{
+		teamOptions = append(teamOptions, db.CreateTeamOptions{
 			Name:     team.Name,
 			Password: password,
 			Logo:     team.Logo,
 		})
-		if err != nil {
-			if err == db.ErrTeamAlreadyExists {
-				return ctx.Error(40000, l.T("team.exist", team.Name))
-			}
-			log.Error("Failed to create new team: %v", err)
-			return ctx.ServerError()
-		}
-
-		teamInfos = append(teamInfos, &teamInfo{
-			Name:     team.Name,
-			Password: password,
-		})
 	}
 
-	return ctx.Success(teamInfos)
+	_, err := db.Teams.BatchCreate(ctx.Request().Context(), teamOptions)
+	if err != nil {
+		log.Error("Failed to create teams in batch: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success(teamOptions)
 }
 
 // Update updates the team with the given options.
