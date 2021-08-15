@@ -385,7 +385,3 @@ func createChallenge(t *testing.T, managerToken string, router *flamego.Flame, f
 
 	assert.Equal(t, http.StatusOK, w.Code)
 }
-
-func createGameBox(t *testing.T, managerToken string, router *flamego.Flame) {
-
-}
