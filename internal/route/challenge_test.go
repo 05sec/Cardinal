@@ -306,7 +306,16 @@ func testSetChallengeVisible(t *testing.T, router *flamego.Flame, managerToken s
 		RenewFlagCommand: "",
 	})
 
-	// TODO create game box
+	// TODO Create the game boxes of the challenges.
+	createGameBox(t, managerToken, router, form.NewGameBox{
+		ChallengeID: 0,
+		TeamID:      0,
+		Address:     "",
+		Description: "",
+		SSHPort:     0,
+		SSHUser:     "",
+		SSHPassword: "",
+	})
 
 	// Invalid JSON.
 	req, err := http.NewRequest(http.MethodPost, "/api/manager/challenge/visible", strings.NewReader(`{"ID": 1, "Visible": tr`))
@@ -338,7 +347,7 @@ func testSetChallengeVisible(t *testing.T, router *flamego.Flame, managerToken s
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.JSONEq(t, `{"data":"", "error":0}`, w.Body.String())
 
-	// Check the bulletins.
+	// Check the challenges.
 	req, err = http.NewRequest(http.MethodGet, "/api/manager/challenges", nil)
 	assert.Nil(t, err)
 

@@ -5,12 +5,16 @@
 package route
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/flamego/flamego"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/vidar-team/Cardinal/internal/form"
 )
 
 func TestGameBox(t *testing.T) {
@@ -79,16 +83,16 @@ func testRefreshFlagGameBox(t *testing.T, router *flamego.Flame, managerToken st
 
 }
 
-//func createGameBox(t *testing.T, managerToken string, router *flamego.Flame, f form.NewGameBox) {
-//	bodyBytes, err := jsoniter.Marshal(f)
-//	assert.Nil(t, err)
-//
-//	req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBox", bytes.NewBuffer(bodyBytes))
-//	assert.Nil(t, err)
-//	req.Header.Set("Authorization", managerToken)
-//	w := httptest.NewRecorder()
-//	router.ServeHTTP(w, req)
-//
-//	assert.Equal(t, http.StatusOK, w.Code)
-//	assert.JSONEq(t, `{"error": 0, "data": ""}`, w.Body.String())
-//}
+func createGameBox(t *testing.T, managerToken string, router *flamego.Flame, f form.NewGameBox) {
+	bodyBytes, err := jsoniter.Marshal(f)
+	assert.Nil(t, err)
+
+	req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBox", bytes.NewBuffer(bodyBytes))
+	assert.Nil(t, err)
+	req.Header.Set("Authorization", managerToken)
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `{"error": 0, "data": ""}`, w.Body.String())
+}
