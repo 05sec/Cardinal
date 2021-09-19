@@ -11,9 +11,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Cardinal-Platform/testify/assert"
 	"github.com/flamego/flamego"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/vidar-team/Cardinal/internal/form"
 )
@@ -70,18 +70,14 @@ func testListBulletins(t *testing.T, router *flamego.Flame, managerToken string)
 	want = `{
     "data": [
         {
-            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Welcome",
             "Body": "Welcome to D^3CTF!",
-            "ID": 1,
-            "CreatedAt": "2020-01-09T10:06:40Z"
+            "ID": 1
         },
         {
             "Body": "/web.zip",
             "ID": 2,
-            "CreatedAt": "2020-01-09T10:06:40Z",
-            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Hint for Web1"
         }
@@ -89,7 +85,7 @@ func testListBulletins(t *testing.T, router *flamego.Flame, managerToken string)
     "error": 0
 }
 `
-	assert.JSONEq(t, want, w.Body.String())
+	assert.JSONPartialEq(t, want, w.Body.String())
 }
 
 func testNewBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
@@ -169,18 +165,14 @@ func testUpdateBulletin(t *testing.T, router *flamego.Flame, managerToken string
 	want := `{
     "data": [
         {
-            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Welcome!!",
             "Body": "Welcome to HCTF!",
-            "ID": 1,
-            "CreatedAt": "2020-01-09T10:06:40Z"
+            "ID": 1
         },
         {
             "Body": "/web.zip",
             "ID": 2,
-            "CreatedAt": "2020-01-09T10:06:40Z",
-            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Hint for Web1"
         }
@@ -188,7 +180,7 @@ func testUpdateBulletin(t *testing.T, router *flamego.Flame, managerToken string
     "error": 0
 }
 `
-	assert.JSONEq(t, want, w.Body.String())
+	assert.JSONPartialEq(t, want, w.Body.String())
 }
 
 func testDeleteBulletin(t *testing.T, router *flamego.Flame, managerToken string) {
@@ -229,8 +221,6 @@ func testDeleteBulletin(t *testing.T, router *flamego.Flame, managerToken string
         {
             "Body": "/web.zip",
             "ID": 2,
-            "CreatedAt": "2020-01-09T10:06:40Z",
-            "UpdatedAt": "2020-01-09T10:06:40Z",
             "DeletedAt": null,
             "Title": "Hint for Web1"
         }
@@ -238,7 +228,7 @@ func testDeleteBulletin(t *testing.T, router *flamego.Flame, managerToken string
     "error": 0
 }
 `
-	assert.JSONEq(t, want, w.Body.String())
+	assert.JSONPartialEq(t, want, w.Body.String())
 }
 
 func createBulletin(t *testing.T, managerToken string, router *flamego.Flame, title, body string) {

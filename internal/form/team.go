@@ -10,12 +10,12 @@ type TeamLogin struct {
 }
 
 type NewTeam []struct {
-	Name string `binding:"Required;MaxSize(255)"`
-	Logo string `binding:"Required;MaxSize(255)"`
+	Name string `validate:"required,lt=255"`
+	Logo string `validate:"required,lt=255"`
 }
 
 type UpdateTeam struct {
-	ID   uint   `binding:"Required;MaxSize(255)"`
-	Name string `binding:"Required;MaxSize(255)"`
-	Logo string // Logo is not necessary.
+	ID   uint   `validate:"required,lt=255"`
+	Name string `validate:"required,lt=255"`
+	Logo string
 }
