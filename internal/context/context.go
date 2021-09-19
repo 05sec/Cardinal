@@ -43,7 +43,7 @@ func (c *Context) Success(data ...interface{}) error {
 }
 
 func (c *Context) ServerError() error {
-	return c.Error(http.StatusInternalServerError, "Internal server error")
+	return c.Error(http.StatusInternalServerError*100, "Internal server error")
 }
 
 func (c *Context) Error(errorCode uint, message string) error {

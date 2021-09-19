@@ -29,6 +29,7 @@ func TestTeams(t *testing.T) {
 	}{
 		{"Authenticate", testTeamsAuthenticate},
 		{"Create", testTeamsCreate},
+		{"BatchCreate", testTeamsBatchCreate},
 		{"Get", testTeamsGet},
 		{"GetByID", testTeamsGetByID},
 		{"GetByName", testTeamsGetByName},
@@ -110,6 +111,109 @@ func testTeamsCreate(t *testing.T, ctx context.Context, db *teams) {
 	assert.Equal(t, ErrTeamAlreadyExists, err)
 }
 
+func testTeamsBatchCreate(t *testing.T, ctx context.Context, db *teams) {
+	got, err := db.BatchCreate(ctx, []CreateTeamOptions{
+		{
+			Name:     "Vidar",
+			Password: "123456",
+			Logo:     "https://vidar.club/logo.png",
+		},
+		{
+			Name:     "E99p1ant",
+			Password: "abcdef",
+			Logo:     "https://github.red/",
+		},
+	})
+	assert.Nil(t, err)
+
+	for _, t := range got {
+		t.Token = ""
+		t.CreatedAt = time.Time{}
+		t.UpdatedAt = time.Time{}
+	}
+
+	want := []*Team{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Name:     "Vidar",
+			Password: "123456",
+			Salt:     got[0].Salt,
+			Logo:     "https://vidar.club/logo.png",
+			Score:    0,
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Name:     "E99p1ant",
+			Password: "abcdef",
+			Salt:     got[1].Salt,
+			Logo:     "https://github.red/",
+			Score:    0,
+		},
+	}
+	want[0].EncodePassword()
+	want[1].EncodePassword()
+
+	assert.Equal(t, want, got)
+
+	// Batch create repeat team.
+	_, err = db.BatchCreate(ctx, []CreateTeamOptions{
+		{
+			Name:     "Cosmos",
+			Password: "zxcvbn",
+		},
+		{
+			Name:     "E99p1ant",
+			Password: "qwerty",
+			Logo:     "https://github.red/logo.png",
+		},
+	})
+	assert.Equal(t, ErrTeamAlreadyExists, err)
+
+	// Check the team list.
+	got, err = db.Get(ctx, GetTeamsOptions{
+		Page:     1,
+		PageSize: 10,
+	})
+	assert.Nil(t, err)
+	for _, t := range got {
+		t.Token = ""
+		t.CreatedAt = time.Time{}
+		t.UpdatedAt = time.Time{}
+	}
+
+	want = []*Team{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Name:     "Vidar",
+			Password: "123456",
+			Salt:     got[0].Salt,
+			Logo:     "https://vidar.club/logo.png",
+			Score:    0,
+			Rank:     1,
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Name:     "E99p1ant",
+			Password: "abcdef",
+			Salt:     got[1].Salt,
+			Logo:     "https://github.red/",
+			Score:    0,
+			Rank:     1,
+		},
+	}
+	want[0].EncodePassword()
+	want[1].EncodePassword()
+	assert.Equal(t, want, got)
+}
+
 func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 	team1, err := db.Create(ctx, CreateTeamOptions{
 		Name:     "Vidar",
@@ -136,13 +240,12 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 		Page:     1,
 		PageSize: 5,
 	})
+	assert.Nil(t, err)
 
 	for k := range got {
 		got[k].CreatedAt = time.Time{}
 		got[k].UpdatedAt = time.Time{}
 	}
-
-	assert.Nil(t, err)
 
 	want := []*Team{
 		{

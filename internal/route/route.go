@@ -33,6 +33,7 @@ func NewRouter() *flamego.Flame {
 
 	bulletin := NewBulletinHandler()
 	gameBox := NewGameBoxHandler()
+	team := NewTeamHandler()
 
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
@@ -74,11 +75,11 @@ func NewRouter() *flamego.Flame {
 				f.Post("/challenge/visible", binding.JSON(form.SetChallengeVisible{}))
 
 				// Team
-				f.Get("/teams")
-				f.Post("/teams", binding.JSON(form.NewTeam{}))
-				f.Put("/team", binding.JSON(form.UpdateTeam{}))
-				f.Delete("/team")
-				f.Post("/team/resetPassword")
+				f.Get("/teams", team.List)
+				f.Post("/teams", form.Bind(form.NewTeam{}), team.New)
+				f.Put("/team", form.Bind(form.UpdateTeam{}), team.Update)
+				f.Delete("/team", team.Delete)
+				f.Post("/team/resetPassword", team.ResetPassword)
 
 				// Game Box
 				f.Get("/gameBoxes", gameBox.List)

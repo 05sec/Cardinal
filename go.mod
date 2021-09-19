@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	bou.ke/monkey v1.0.2
+	github.com/Cardinal-Platform/testify v0.0.0-20210919113340-9072c9681cc6 // indirect
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
@@ -17,16 +18,15 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.12.0 // indirect
-	github.com/flamego/binding v0.0.0-20210814090747-b9df77794ad6
+	github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3
 	github.com/flamego/flamego v0.0.0-20210812030558-9bb216aa46c8
 	github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2
+	github.com/flamego/validator v0.0.0-20210821065223-7cb80dd2ce7a
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
 	github.com/gin-gonic/gin v1.7.0
-	github.com/go-playground/locales v0.14.0
-	github.com/go-playground/universal-translator v0.18.0
-	github.com/go-playground/validator/v10 v10.9.0
+	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect

@@ -5,12 +5,15 @@
 package route
 
 import (
+	"fmt"
+
 	"github.com/thanhpk/randstr"
 	log "unknwon.dev/clog/v2"
 
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/i18n"
 )
 
 type TeamHandler struct{}
@@ -31,8 +34,8 @@ func (*TeamHandler) List(ctx context.Context) error {
 		ID    uint    `json:"ID"`
 		Logo  string  `json:"Logo"`
 		Score float64 `json:"Score"`
-		Rank  uint    `json:"rank"`
-		Token string  `json:"token"`
+		Rank  uint    `json:"Rank"`
+		Token string  `json:"Token"`
 	}
 
 	teamList := make([]*team, 0, len(teams))
@@ -51,58 +54,51 @@ func (*TeamHandler) List(ctx context.Context) error {
 }
 
 // New creates a new team with the given options.
-func (*TeamHandler) New(ctx context.Context, f form.NewTeam) error {
-	type teamInfo struct {
-		Name     string `json:"Name"`
-		Password string `json:"Password"`
-	}
-
-	teamInfos := make([]*teamInfo, 0, len(f))
-
+func (*TeamHandler) New(ctx context.Context, f form.NewTeam, l *i18n.Locale) error {
+	teamOptions := make([]db.CreateTeamOptions, 0, len(f))
 	for _, team := range f {
 		password := randstr.String(16)
-
-		// TODO add transaction
-		_, err := db.Teams.Create(ctx.Request().Context(), db.CreateTeamOptions{
+		teamOptions = append(teamOptions, db.CreateTeamOptions{
 			Name:     team.Name,
 			Password: password,
 			Logo:     team.Logo,
 		})
-		if err != nil {
-			if err == db.ErrTeamAlreadyExists {
-				return ctx.Error(40000, "Team %q already existed.")
-			}
-			log.Error("Failed to create new team: %v", err)
-			return ctx.ServerError()
-		}
-
-		teamInfos = append(teamInfos, &teamInfo{
-			Name:     team.Name,
-			Password: password,
-		})
 	}
 
-	return ctx.Success(teamInfos)
+	_, err := db.Teams.BatchCreate(ctx.Request().Context(), teamOptions)
+	if err != nil {
+		if err == db.ErrTeamAlreadyExists {
+			// TODO show which team has existed.
+			return ctx.Error(40000, l.T("team.repeat"))
+		}
+		log.Error("Failed to create teams in batch: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success(teamOptions)
 }
 
 // Update updates the team with the given options.
-func (*TeamHandler) Update(ctx context.Context, f form.UpdateTeam) error {
+func (*TeamHandler) Update(ctx context.Context, f form.UpdateTeam, l *i18n.Locale) error {
 	// Check the team exist or not.
 	team, err := db.Teams.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
+		if err == db.ErrTeamNotExists {
+			return ctx.Error(40400, l.T("team.not_found"))
+		}
 		log.Error("Failed to get team by ID: %v", err)
 		return ctx.ServerError()
 	}
 
 	newTeam, err := db.Teams.GetByName(ctx.Request().Context(), f.Name)
-	if err != nil {
+	if err == nil {
+		if team.ID != newTeam.ID {
+			// TODO i18n
+			return ctx.Error(40000, fmt.Sprintf("Team name %q repeat.", team.Name))
+		}
+	} else if err != db.ErrTeamNotExists {
 		log.Error("Failed to get team by name: %v", err)
 		return ctx.ServerError()
-	}
-
-	if team.ID != newTeam.ID {
-		// TODO i18n
-		return ctx.Error(40000, "Team name %q repeat.")
 	}
 
 	err = db.Teams.Update(ctx.Request().Context(), f.ID, db.UpdateTeamOptions{
@@ -113,16 +109,19 @@ func (*TeamHandler) Update(ctx context.Context, f form.UpdateTeam) error {
 		log.Error("Failed to update team: %v", err)
 		return ctx.ServerError()
 	}
-	return ctx.Success("")
+	return ctx.Success()
 }
 
 // Delete deletes the team with the given ID.
-func (*TeamHandler) Delete(ctx context.Context) error {
+func (*TeamHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the team exist or not.
 	team, err := db.Teams.GetByID(ctx.Request().Context(), id)
 	if err != nil {
+		if err == db.ErrTeamNotExists {
+			return ctx.Error(40400, l.T("team.not_found"))
+		}
 		log.Error("Failed to get team by ID: %v", err)
 		return ctx.ServerError()
 	}
@@ -133,16 +132,19 @@ func (*TeamHandler) Delete(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success("")
+	return ctx.Success()
 }
 
 // ResetPassword resets team password with the given id.
-func (*TeamHandler) ResetPassword(ctx context.Context) error {
+func (*TeamHandler) ResetPassword(ctx context.Context, l *i18n.Locale) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check the team exist or not.
 	team, err := db.Teams.GetByID(ctx.Request().Context(), id)
 	if err != nil {
+		if err == db.ErrTeamNotExists {
+			return ctx.Error(40400, l.T("team.not_found"))
+		}
 		log.Error("Failed to get team by ID: %v", err)
 		return ctx.ServerError()
 	}

@@ -9,7 +9,7 @@ import (
 
 	"github.com/flamego/binding"
 	"github.com/flamego/flamego"
-	"github.com/go-playground/validator/v10"
+	"github.com/flamego/validator"
 	jsoniter "github.com/json-iterator/go"
 	log "unknwon.dev/clog/v2"
 
@@ -20,12 +20,12 @@ func Bind(model interface{}) flamego.Handler {
 	validate := validator.New()
 
 	return binding.JSON(model, binding.Options{
-		ErrorHandler: errorHandler(),
+		ErrorHandler: errorHandler(validate),
 		Validator:    validate,
 	})
 }
 
-func errorHandler() flamego.Handler {
+func errorHandler(validate *validator.Validate) flamego.Handler {
 	return func(c flamego.Context, errors binding.Errors, l *i18n.Locale) {
 		c.ResponseWriter().WriteHeader(http.StatusBadRequest)
 		c.ResponseWriter().Header().Set("Content-Type", "application/json")
@@ -37,19 +37,26 @@ func errorHandler() flamego.Handler {
 			msg = l.T("general.error_payload")
 		} else {
 			errorCode = 40001
-			errs := errors[0].Err.(validator.ValidationErrors)
-			err := errs[0]
+			switch v := errors[0].Err.(type) {
+			case *validator.InvalidValidationError:
+				// TODO
+				log.Error(v.Error())
+			case validator.ValidationErrors:
+				errs := errors[0].Err.(validator.ValidationErrors)
+				err := errs[0]
 
-			fieldName := l.T("form." + err.Namespace())
+				fieldName := l.T("form." + err.Namespace())
 
-			switch err.Tag() {
-			case "required":
-				msg = l.T("form.required_error", fieldName)
-			case "len":
-				msg = l.T("form.len_error", fieldName)
-			default:
-				msg = err.Error()
+				switch err.Tag() {
+				case "required":
+					msg = l.T("form.required_error", fieldName)
+				case "len":
+					msg = l.T("form.len_error", fieldName)
+				default:
+					msg = err.Error()
+				}
 			}
+
 		}
 
 		body := map[string]interface{}{
