@@ -33,7 +33,7 @@ func TestGameBoxes(t *testing.T) {
 	assert.Nil(t, err)
 	_, err = challengesStore.Create(ctx, CreateChallengeOptions{
 		Title:            "Pwn1",
-		BaseScore:        1000,
+		BaseScore:        1500,
 		AutoRenewFlag:    true,
 		RenewFlagCommand: "echo {{FLAG}} > /flag",
 	})
@@ -60,6 +60,7 @@ func TestGameBoxes(t *testing.T) {
 		test func(t *testing.T, ctx context.Context, db *gameboxes)
 	}{
 		{"Create", testGameBoxesCreate},
+		{"BatchCreate", testGameBoxesBatchCreate},
 		{"Get", testGameBoxesGet},
 		{"GetByID", testGameBoxesGetByID},
 		{"Update", testGameBoxesUpdate},
@@ -105,6 +106,95 @@ func testGameBoxesCreate(t *testing.T, ctx context.Context, db *gameboxes) {
 			Port:     22,
 			User:     "root",
 			Password: "passw0rd",
+		},
+	})
+	assert.Equal(t, ErrGameBoxAlreadyExists, err)
+}
+
+func testGameBoxesBatchCreate(t *testing.T, ctx context.Context, db *gameboxes) {
+	got, err := db.BatchCreate(ctx, []CreateGameBoxOptions{
+		{
+			TeamID:      1,
+			ChallengeID: 1,
+			Address:     "192.168.1.1",
+			Description: "Web1 For Vidar",
+			InternalSSH: SSHConfig{
+				Port:     22,
+				User:     "root",
+				Password: "passw0rd",
+			},
+		},
+		{
+			TeamID:      1,
+			ChallengeID: 2,
+			Address:     "192.168.2.1",
+			Description: "Web2 For Vidar",
+			InternalSSH: SSHConfig{
+				Port:     22,
+				User:     "root",
+				Password: "s3cret",
+			},
+		},
+	})
+	assert.Nil(t, err)
+
+	for _, challenge := range got {
+		challenge.CreatedAt = time.Time{}
+		challenge.UpdatedAt = time.Time{}
+		challenge.DeletedAt = gorm.DeletedAt{}
+	}
+
+	want := []*GameBox{
+		{
+			Model:               gorm.Model{ID: 1},
+			TeamID:              1,
+			ChallengeID:         1,
+			Address:             "192.168.1.1",
+			Description:         "Web1 For Vidar",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
+			Score:               1000,
+			Status:              GameBoxStatusUp,
+		},
+		{
+			Model:               gorm.Model{ID: 2},
+			TeamID:              1,
+			ChallengeID:         2,
+			Address:             "192.168.2.1",
+			Description:         "Web2 For Vidar",
+			InternalSSHPort:     "22",
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3cret",
+			Score:               1500,
+			Status:              GameBoxStatusUp,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	// Create game box repeatedly.
+	_, err = db.BatchCreate(ctx, []CreateGameBoxOptions{
+		{
+			TeamID:      1,
+			ChallengeID: 1,
+			Address:     "192.168.1.1",
+			Description: "Web1 For Vidar",
+			InternalSSH: SSHConfig{
+				Port:     22,
+				User:     "root",
+				Password: "passw0rd",
+			},
+		},
+		{
+			TeamID:      2,
+			ChallengeID: 1,
+			Address:     "192.168.1.2",
+			Description: "Web1 For E99p1ant",
+			InternalSSH: SSHConfig{
+				Port:     22,
+				User:     "root",
+				Password: "s3cret",
+			},
 		},
 	})
 	assert.Equal(t, ErrGameBoxAlreadyExists, err)
