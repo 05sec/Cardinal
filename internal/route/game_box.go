@@ -32,31 +32,34 @@ func (*GameBoxHandler) List(ctx context.Context) error {
 	return ctx.Success(gameBoxes)
 }
 
-// New creates a new game box.
+// New creates game boxes with the given options.
 func (*GameBoxHandler) New(ctx context.Context, f form.NewGameBox, l *i18n.Locale) error {
-	_, err := db.GameBoxes.Create(ctx.Request().Context(), db.CreateGameBoxOptions{
-		TeamID:      f.TeamID,
-		ChallengeID: f.ChallengeID,
-		Address:     f.Address,
-		Description: f.Description,
-		InternalSSH: db.SSHConfig{
-			Port:     f.SSHPort,
-			User:     f.SSHUser,
-			Password: f.SSHPassword,
-		},
-	})
-	if err != nil {
-		if err == db.ErrChallengeNotExists {
-			return ctx.Error(40000, l.T("challenge.not_found"))
-		} else if err == db.ErrGameBoxAlreadyExists {
-			return ctx.Error(40001, l.T("gamebox.already_exist"))
-		} else {
-			log.Error("Failed to create new game box: %v", err)
-			return ctx.ServerError()
-		}
+	gameBoxOptions := make([]db.CreateGameBoxOptions, 0, len(f))
+	for _, option := range f {
+		gameBoxOptions = append(gameBoxOptions, db.CreateGameBoxOptions{
+			TeamID:      option.TeamID,
+			ChallengeID: option.ChallengeID,
+			Address:     option.Address,
+			Description: option.Description,
+			InternalSSH: db.SSHConfig{
+				Port:     option.SSHPort,
+				User:     option.SSHUser,
+				Password: option.SSHPassword,
+			},
+		})
 	}
 
-	return ctx.Success()
+	_, err := db.GameBoxes.BatchCreate(ctx.Request().Context(), gameBoxOptions)
+	if err != nil {
+		if err == db.ErrGameBoxAlreadyExists {
+			// TODO show which game box has existed.
+			return ctx.Error(40000, l.T("gamebox.repeat"))
+		}
+		log.Error("Failed to create game boxes in batch: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success(gameBoxOptions)
 }
 
 // Update updates the game box.
