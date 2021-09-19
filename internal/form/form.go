@@ -5,7 +5,6 @@
 package form
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/flamego/binding"
@@ -40,8 +39,8 @@ func errorHandler(validate *validator.Validate) flamego.Handler {
 			errorCode = 40001
 			switch v := errors[0].Err.(type) {
 			case *validator.InvalidValidationError:
-				fmt.Println(v.Error())
-				//validate.Var()
+				// TODO
+				log.Error(v.Error())
 			case validator.ValidationErrors:
 				errs := errors[0].Err.(validator.ValidationErrors)
 				err := errs[0]

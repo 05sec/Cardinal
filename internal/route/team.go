@@ -90,8 +90,6 @@ func (*TeamHandler) Update(ctx context.Context, f form.UpdateTeam, l *i18n.Local
 		return ctx.ServerError()
 	}
 
-	log.Trace("ID %d Name %q", f.ID, team.Name)
-
 	newTeam, err := db.Teams.GetByName(ctx.Request().Context(), f.Name)
 	if err == nil {
 		if team.ID != newTeam.ID {
