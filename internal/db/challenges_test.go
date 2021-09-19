@@ -262,10 +262,10 @@ func testChallengesGetByIDs(t *testing.T, ctx context.Context, db *challenges) {
 
 	got, err := db.GetByIDs(ctx, 1, 2)
 	assert.Nil(t, err)
-	for _, g := range got {
-		g.CreatedAt = time.Time{}
-		g.UpdatedAt = time.Time{}
-		g.DeletedAt = gorm.DeletedAt{}
+	for _, challenge := range got {
+		challenge.CreatedAt = time.Time{}
+		challenge.UpdatedAt = time.Time{}
+		challenge.DeletedAt = gorm.DeletedAt{}
 	}
 
 	want := []*Challenge{
@@ -291,10 +291,10 @@ func testChallengesGetByIDs(t *testing.T, ctx context.Context, db *challenges) {
 	// Get not exist challenge.
 	got, err = db.GetByIDs(ctx, 2, 3)
 	assert.Nil(t, err)
-	for _, g := range got {
-		g.CreatedAt = time.Time{}
-		g.UpdatedAt = time.Time{}
-		g.DeletedAt = gorm.DeletedAt{}
+	for _, challenge := range got {
+		challenge.CreatedAt = time.Time{}
+		challenge.UpdatedAt = time.Time{}
+		challenge.DeletedAt = gorm.DeletedAt{}
 	}
 
 	want = []*Challenge{
@@ -311,10 +311,10 @@ func testChallengesGetByIDs(t *testing.T, ctx context.Context, db *challenges) {
 	// Get no challenge.
 	got, err = db.GetByIDs(ctx)
 	assert.Nil(t, err)
-	for _, g := range got {
-		g.CreatedAt = time.Time{}
-		g.UpdatedAt = time.Time{}
-		g.DeletedAt = gorm.DeletedAt{}
+	for _, challenge := range got {
+		challenge.CreatedAt = time.Time{}
+		challenge.UpdatedAt = time.Time{}
+		challenge.DeletedAt = gorm.DeletedAt{}
 	}
 
 	want = []*Challenge(nil)
@@ -323,10 +323,10 @@ func testChallengesGetByIDs(t *testing.T, ctx context.Context, db *challenges) {
 	// All challenges not exist.
 	got, err = db.GetByIDs(ctx, 3, 4, 5)
 	assert.Nil(t, err)
-	for _, g := range got {
-		g.CreatedAt = time.Time{}
-		g.UpdatedAt = time.Time{}
-		g.DeletedAt = gorm.DeletedAt{}
+	for _, challenge := range got {
+		challenge.CreatedAt = time.Time{}
+		challenge.UpdatedAt = time.Time{}
+		challenge.DeletedAt = gorm.DeletedAt{}
 	}
 
 	want = []*Challenge(nil)
