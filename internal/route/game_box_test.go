@@ -65,15 +65,15 @@ func testListGameBoxes(t *testing.T, router *flamego.Flame, managerToken string)
 	})
 
 	// Create two game boxes.
-	createGameBox(t, managerToken, router, form.NewGameBox{{
-		ChallengeID: 0,
-		TeamID:      0,
-		Address:     "",
-		Description: "",
-		SSHPort:     0,
-		SSHUser:     "",
-		SSHPassword: "",
-	}})
+	//createGameBox(t, managerToken, router, form.NewGameBox{{
+	//	ChallengeID: 0,
+	//	TeamID:      0,
+	//	Address:     "",
+	//	Description: "",
+	//	SSHPort:     0,
+	//	SSHUser:     "",
+	//	SSHPassword: "",
+	//}})
 
 	// TODO Get the two game boxes.
 }
