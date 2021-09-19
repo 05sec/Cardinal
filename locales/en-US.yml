@@ -21,7 +21,6 @@ en-US:
     delete_success: "Delete Bulletin Succeeded!"
     not_found: "Bulletin Not Found!"
   challenge:
-    success: "Create new challenge {{.}} succeed"
     post_error: "Add Challenge Failed!"
     post_success: "Add Challenge Succeeded!"
     put_error: "Edit Challenge Information Failed!"
@@ -30,7 +29,7 @@ en-US:
     delete_success: "Delete Challenge Succeeded!"
     not_found: "Challenge Not Found!"
     empty_command: "Command should NOT be Empty!"
-    repeat: "Duplicated Challenge Found!"
+    repeat: "题目重复！"
   check:
     repeat: "Duplicated Check Ignored."
     not_visible: "Challenge is now Invisible."
@@ -46,7 +45,6 @@ en-US:
     repeat: "Please DON'T Submit Flag Repeatedly."
     generate_success: "Generate Flag Succeeded!"
   gamebox:
-    already_exist: "Game box already exist"
     post_error: "Add Game box Failed!"
     post_success: "Add Game box Succeeded!"
     put_error: "Edit Game box Information Failed!"
@@ -59,7 +57,6 @@ en-US:
     auto_refresh_flag_error: "Missing Game box SSH!"
     reset_success: "Reset game boxes successfully!"
   team:
-    exist: "Team {{.}} already exist"
     post_error: "Add Team Failed!"
     put_error: "Edit Team Information Failed!"
     put_success: "Edit Team Information Succeeded"
@@ -134,18 +131,3 @@ en-US:
   misc:
     version_out_of_date: "The Current Version of Cardinal is Out of Date. Now Version: {{.currentVersion}} / Latest Version: {{.latestVersion}}"
     database_version_out_of_date: "The Database Structure Has Been Upgraded. Please delete the current Database and regenerate it."
-
-  form:
-    required_error: "{{.}} is a required field"
-
-    NewBulletin:
-      Title: "Bulletin Title"
-      Body: "Bulletin Body"
-    UpdateBulletin:
-      ID: "Bulletin ID"
-      Title: "Bulletin Title"
-      Body: "Bulletin Body"
-    NewChallenge:
-      Title: "Challenge title"
-      BaseScore: "Challenge base score"
-
