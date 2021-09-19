@@ -10,16 +10,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"bou.ke/monkey"
 	"github.com/flamego/flamego"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
+	"github.com/thanhpk/randstr"
 
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/dbutil"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/utils"
 )
 
 const (
@@ -34,12 +35,16 @@ func NewTestRoute(t *testing.T) (*flamego.Flame, string, func(tables ...string) 
 	// Set the global database store to test database.
 	db.SetDatabaseStore(testDB)
 
-	// Mock the global time.
-	time.Local = time.UTC
-	mockTime := time.Date(2020, 1, 9, 10, 6, 40, 0, time.UTC)
-	timePatch := monkey.Patch(time.Now, func() time.Time { return mockTime })
+	// Mock utils.GenerateToken()
+	tokenPatch := monkey.Patch(utils.GenerateToken, func() string { return "mocked_token" })
 	t.Cleanup(func() {
-		timePatch.Unpatch()
+		tokenPatch.Unpatch()
+	})
+
+	// Mock github.com/thanhpk/randstr package.
+	randstrPatch := monkey.Patch(randstr.Hex, func(int) string { return "mocked_randstr_hex" })
+	t.Cleanup(func() {
+		randstrPatch.Unpatch()
 	})
 
 	// Create manager account for testing.

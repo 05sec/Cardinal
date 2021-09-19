@@ -6,6 +6,8 @@ github.com/AndreasBriese/bbloom v0.0.0-20190306092124-e2d15f34fcf9/go.mod h1:bOv
 github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 h1:w+iIsaOQNcT7OZ575w+acHgRric5iCyQh+xv+KJ4HB8=
 github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78/go.mod h1:LmzpDX56iTiv29bbRTIsUNlaFfuhWRQBWjQdVyAevI8=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/Cardinal-Platform/testify v0.0.0-20210919113340-9072c9681cc6 h1:DeEbVqoHcWDIfi24xGwMshhe1S/yMxrxmcK70o3gkdc=
+github.com/Cardinal-Platform/testify v0.0.0-20210919113340-9072c9681cc6/go.mod h1:BoI8ntk8p/KK/76w6tlMpaeH2jTm15wNtGQTUEVt0pE=
 github.com/CloudyKit/fastprinter v0.0.0-20170127035650-74b38d55f37a/go.mod h1:EFZQ978U7x8IRnstaskI3IysnWY5Ao3QgZUKOXlsAdw=
 github.com/CloudyKit/jet v2.1.3-0.20180809161101-62edd43e4f88+incompatible/go.mod h1:HPYO+50pSWkPoj9Q/eq0aRGByCL6ScRlUmiEX5Zgm+w=
 github.com/Joker/hpp v1.0.0/go.mod h1:8x5n+M1Hp5hC0g8okX3sR3vFQwynaX/UgSOM9MeBKzY=
@@ -126,14 +128,16 @@ github.com/fatih/color v1.10.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGE
 github.com/fatih/color v1.12.0 h1:mRhaKNwANqRgUBGKmnI5ZxEk7QXmjQeCcuYFMX2bfcc=
 github.com/fatih/color v1.12.0/go.mod h1:ELkj/draVOlAH/xkhN6mQ50Qd0MPOk5AAr3maGEBuJM=
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
-github.com/flamego/binding v0.0.0-20210814090747-b9df77794ad6 h1:q+kMIb3TgysRQKbRk0w+F84DpOGL7LbukrCFNQMFZtE=
-github.com/flamego/binding v0.0.0-20210814090747-b9df77794ad6/go.mod h1:NI4UzIVEoQ+C1hg5+KWfd/litWwNFM9EAonNAy5C4Gg=
+github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3 h1:EUQBkgIm+c6iJj7J/LxZ2xTu92LuJZvhXVk8bj6VsuQ=
+github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3/go.mod h1:CRIYtnbf5gDUsffghi0n2W6FTBVhJlH1VXhIKR+pVms=
 github.com/flamego/flamego v0.0.0-20210516144321-6b13a8d6f9bf/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
 github.com/flamego/flamego v0.0.0-20210525090435-cdb552aa0e32/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
 github.com/flamego/flamego v0.0.0-20210812030558-9bb216aa46c8 h1:I6+D+mkMWyNejmLnSCuU1/0Z8iJneMMclIRxBdIaR5w=
 github.com/flamego/flamego v0.0.0-20210812030558-9bb216aa46c8/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
 github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2 h1:ajz9HXHgGkbv2eXA833AMGo7ODRXrNjhdhJTdFZVpi0=
 github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2/go.mod h1:cBFYt6d3oHXm10wllmcKE5FHLTuFof3dtmvEnNYFf50=
+github.com/flamego/validator v0.0.0-20210821065223-7cb80dd2ce7a h1:MOvEkMRto/w2URXG/Sw6eX+IeARhWJ8N8Jcmh5f+YY4=
+github.com/flamego/validator v0.0.0-20210821065223-7cb80dd2ce7a/go.mod h1:QE7faxrXOOh4lwbUCWf/H0MwRGF7F2lda2J83IzpmHI=
 github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4/go.mod h1:T9YF2M40nIgbVgp3rreNmTged+9HrbNTIQf1PsaIiTA=
 github.com/franela/goblin v0.0.0-20200105215937-c9ffbefa60db/go.mod h1:7dvUGVsVBjqR7JHJk0brhHOZYGmfBYOrK0ZhYMEtBr4=
 github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8/go.mod h1:ZhphrRTfi2rbfLwlschooIH4+wKKDR4Pdxhh+TRoA20=
@@ -174,7 +178,6 @@ github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+
 github.com/go-playground/universal-translator v0.18.0 h1:82dyy6p4OuJq4/CByFNOn/jYrnRPArHwAcmLoJZxyho=
 github.com/go-playground/universal-translator v0.18.0/go.mod h1:UvRDBj+xPUEGrFYl+lu/H90nyDXpg0fqeB/AQUGNTVA=
 github.com/go-playground/validator/v10 v10.4.1/go.mod h1:nlOn6nFhuKACm19sB/8EGNn9GlaMV7XkbRSipzJ0Ii4=
-github.com/go-playground/validator/v10 v10.6.1/go.mod h1:xm76BBt941f7yWdGnI2DVPFFg1UK3YY04qifoXU3lOk=
 github.com/go-playground/validator/v10 v10.9.0 h1:NgTtmN58D0m8+UuxtYmGztBJB7VnPgjj221I1QHci2A=
 github.com/go-playground/validator/v10 v10.9.0/go.mod h1:74x4gJWsvQexRdW8Pn3dXSGrTK4nAUsbPlLADvpJkos=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
@@ -597,6 +600,7 @@ github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271/go.mod h1:AZpEONHx3
 github.com/streadway/handy v0.0.0-20190108123426-d5acb3125c2a/go.mod h1:qNTQ5P5JnDBl6z3cMAg/SywNDC5ABu5ApDIw6lUbRmI=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/objx v0.2.0 h1:Hbg2NidpLE8veEBkEZTL3CvlkUIVzuU9jDplZO54c48=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
