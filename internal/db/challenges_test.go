@@ -31,6 +31,7 @@ func TestChallenges(t *testing.T) {
 		{"BatchCreate", testChallengesBatchCreate},
 		{"Get", testChallengesGet},
 		{"GetByID", testChallengesGetByID},
+		{"GetByIDs", testChallengesGetByIDs},
 		{"Update", testChallengesUpdate},
 		{"DeleteByID", testChallengesDeleteByID},
 		{"DeleteAll", testChallengesDeleteAll},
@@ -239,6 +240,96 @@ func testChallengesGetByID(t *testing.T, ctx context.Context, db *challenges) {
 	got, err = db.GetByID(ctx, 2)
 	assert.Equal(t, ErrChallengeNotExists, err)
 	want = (*Challenge)(nil)
+	assert.Equal(t, want, got)
+}
+
+func testChallengesGetByIDs(t *testing.T, ctx context.Context, db *challenges) {
+	id1, err := db.Create(ctx, CreateChallengeOptions{
+		Title:            "Web1",
+		BaseScore:        1000,
+		AutoRenewFlag:    true,
+		RenewFlagCommand: "echo {{flag}} > /flag",
+	})
+	assert.Equal(t, uint(1), id1)
+	assert.Nil(t, err)
+
+	id2, err := db.Create(ctx, CreateChallengeOptions{
+		Title:     "Pwn1",
+		BaseScore: 1000,
+	})
+	assert.Equal(t, uint(2), id2)
+	assert.Nil(t, err)
+
+	got, err := db.GetByIDs(ctx, 1, 2)
+	assert.Nil(t, err)
+	for _, g := range got {
+		g.CreatedAt = time.Time{}
+		g.UpdatedAt = time.Time{}
+		g.DeletedAt = gorm.DeletedAt{}
+	}
+
+	want := []*Challenge{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Title:            "Web1",
+			BaseScore:        1000,
+			AutoRenewFlag:    true,
+			RenewFlagCommand: "echo {{flag}} > /flag",
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Title:     "Pwn1",
+			BaseScore: 1000,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	// Get not exist challenge.
+	got, err = db.GetByIDs(ctx, 2, 3)
+	assert.Nil(t, err)
+	for _, g := range got {
+		g.CreatedAt = time.Time{}
+		g.UpdatedAt = time.Time{}
+		g.DeletedAt = gorm.DeletedAt{}
+	}
+
+	want = []*Challenge{
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Title:     "Pwn1",
+			BaseScore: 1000,
+		},
+	}
+	assert.Equal(t, want, got)
+
+	// Get no challenge.
+	got, err = db.GetByIDs(ctx)
+	assert.Nil(t, err)
+	for _, g := range got {
+		g.CreatedAt = time.Time{}
+		g.UpdatedAt = time.Time{}
+		g.DeletedAt = gorm.DeletedAt{}
+	}
+
+	want = []*Challenge(nil)
+	assert.Equal(t, want, got)
+
+	// All challenges not exist.
+	got, err = db.GetByIDs(ctx, 3, 4, 5)
+	assert.Nil(t, err)
+	for _, g := range got {
+		g.CreatedAt = time.Time{}
+		g.UpdatedAt = time.Time{}
+		g.DeletedAt = gorm.DeletedAt{}
+	}
+
+	want = []*Challenge(nil)
 	assert.Equal(t, want, got)
 }
 

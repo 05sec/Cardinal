@@ -29,6 +29,9 @@ type ChallengesStore interface {
 	// GetByID returns the challenge with given id.
 	// It returns ErrChallengeNotExists when not found.
 	GetByID(ctx context.Context, id uint) (*Challenge, error)
+	// GetByIDs returns the challenges with given ids.
+	// It ignores the not exists challenge.
+	GetByIDs(ctx context.Context, ids ...uint) ([]*Challenge, error)
 	// Update updates the challenge with given id.
 	Update(ctx context.Context, id uint, opts UpdateChallengeOptions) error
 	// DeleteByID deletes the challenge with given id.
@@ -133,6 +136,23 @@ func (db *challenges) GetByID(ctx context.Context, id uint) (*Challenge, error) 
 		return nil, errors.Wrap(err, "get")
 	}
 	return &challenge, nil
+}
+
+func (db *challenges) GetByIDs(ctx context.Context, ids ...uint) ([]*Challenge, error) {
+	var challenges []*Challenge
+	for _, id := range ids {
+		var challenge Challenge
+		if err := db.WithContext(ctx).Model(&Challenge{}).Where("id = ?", id).First(&challenge).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				continue
+			}
+			return nil, errors.Wrap(err, "get")
+		}
+
+		challenges = append(challenges, &challenge)
+	}
+
+	return challenges, nil
 }
 
 type UpdateChallengeOptions struct {
