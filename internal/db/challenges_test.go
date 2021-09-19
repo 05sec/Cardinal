@@ -28,6 +28,7 @@ func TestChallenges(t *testing.T) {
 		test func(t *testing.T, ctx context.Context, db *challenges)
 	}{
 		{"Create", testChallengesCreate},
+		{"BatchCreate", testChallengesBatchCreate},
 		{"Get", testChallengesGet},
 		{"GetByID", testChallengesGetByID},
 		{"Update", testChallengesUpdate},
@@ -63,6 +64,91 @@ func testChallengesCreate(t *testing.T, ctx context.Context, db *challenges) {
 		RenewFlagCommand: "echo {{flag}} > /flag",
 	})
 	assert.Equal(t, ErrChallengeAlreadyExists, err)
+}
+
+func testChallengesBatchCreate(t *testing.T, ctx context.Context, db *challenges) {
+	got, err := db.BatchCreate(ctx, []CreateChallengeOptions{
+		{
+			Title:            "Web1",
+			BaseScore:        1000,
+			AutoRenewFlag:    true,
+			RenewFlagCommand: "echo {{FLAG}} > /flag",
+		},
+		{
+			Title:     "Web2",
+			BaseScore: 1000,
+		},
+	})
+	assert.Nil(t, err)
+
+	for _, t := range got {
+		t.CreatedAt = time.Time{}
+		t.UpdatedAt = time.Time{}
+	}
+
+	want := []*Challenge{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Title:            "Web1",
+			BaseScore:        1000,
+			AutoRenewFlag:    true,
+			RenewFlagCommand: "echo {{FLAG}} > /flag",
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Title:     "Web2",
+			BaseScore: 1000,
+		},
+	}
+
+	assert.Equal(t, want, got)
+
+	// Batch create repeat challenge.
+	_, err = db.BatchCreate(ctx, []CreateChallengeOptions{
+		{
+			Title:            "Web3",
+			BaseScore:        1000,
+			AutoRenewFlag:    true,
+			RenewFlagCommand: "echo {{FLAG}} > /flag",
+		},
+		{
+			Title:     "Web1",
+			BaseScore: 1500,
+		},
+	})
+	assert.Equal(t, ErrChallengeAlreadyExists, err)
+
+	// Check the challenge list.
+	got, err = db.Get(ctx)
+	assert.Nil(t, err)
+	for _, t := range got {
+		t.CreatedAt = time.Time{}
+		t.UpdatedAt = time.Time{}
+	}
+
+	want = []*Challenge{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Title:            "Web1",
+			BaseScore:        1000,
+			AutoRenewFlag:    true,
+			RenewFlagCommand: "echo {{FLAG}} > /flag",
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Title:     "Web2",
+			BaseScore: 1000,
+		},
+	}
+	assert.Equal(t, want, got)
 }
 
 func testChallengesGet(t *testing.T, ctx context.Context, db *challenges) {
