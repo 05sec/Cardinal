@@ -4,7 +4,7 @@
 
 package form
 
-type NewGameBox struct {
+type NewGameBox []struct {
 	ChallengeID uint   `validate:"required"`
 	TeamID      uint   `validate:"required"`
 	Address     string `validate:"required"`

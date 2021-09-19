@@ -12,6 +12,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
+	"github.com/vidar-team/Cardinal/internal/i18n"
 )
 
 type ChallengeHandler struct{}
@@ -69,7 +70,7 @@ func (*ChallengeHandler) List(ctx context.Context) error {
 }
 
 // New creates a new challenge.
-func (*ChallengeHandler) New(ctx context.Context, f form.NewChallenge) error {
+func (*ChallengeHandler) New(ctx context.Context, f form.NewChallenge, l *i18n.Locale) error {
 	_, err := db.Challenges.Create(ctx.Request().Context(), db.CreateChallengeOptions{
 		Title:            f.Title,
 		BaseScore:        f.BaseScore,
@@ -77,24 +78,25 @@ func (*ChallengeHandler) New(ctx context.Context, f form.NewChallenge) error {
 		RenewFlagCommand: f.RenewFlagCommand,
 	})
 	if err != nil {
+		if err == db.ErrChallengeAlreadyExists {
+			return ctx.Error(40000, l.T("challenge.repeat"))
+		}
 		log.Error("Failed to create new challenge: %v", err)
 		return ctx.ServerError()
 	}
 
 	// TODO send log to panel
 
-	// TODO i18n
-	return ctx.Success("Success")
+	return ctx.Success(l.T("challenge.success", f.Title))
 }
 
 // Update updates the challenge with the given ID.
-func (*ChallengeHandler) Update(ctx context.Context, f form.UpdateChallenge) error {
+func (*ChallengeHandler) Update(ctx context.Context, f form.UpdateChallenge, l *i18n.Locale) error {
 	// Check if the challenge exists.
 	_, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
 		if err == db.ErrChallengeNotExists {
-			// TODO i18n
-			return ctx.Error(40000, "Challenge does not exist.")
+			return ctx.Error(40400, l.T("challenge.not_found"))
 		}
 		log.Error("Failed to get challenge: %v", err)
 		return ctx.ServerError()
@@ -110,20 +112,18 @@ func (*ChallengeHandler) Update(ctx context.Context, f form.UpdateChallenge) err
 		log.Error("Failed to update challenge: %v", err)
 		return ctx.ServerError()
 	}
-	// TODO i18n
-	return ctx.Success("Success")
+	return ctx.Success()
 }
 
 // Delete deletes the challenge with the given ID.
-func (*ChallengeHandler) Delete(ctx context.Context) error {
+func (*ChallengeHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 	id := uint(ctx.QueryInt("id"))
 
 	// Check if the challenge exists.
 	_, err := db.Challenges.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		if err == db.ErrChallengeNotExists {
-			// TODO i18n
-			return ctx.Error(40000, "Challenge does not exist.")
+			return ctx.Error(40400, l.T("challenge.not_found"))
 		}
 		log.Error("Failed to get challenge: %v", err)
 		return ctx.ServerError()
@@ -135,18 +135,16 @@ func (*ChallengeHandler) Delete(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	// TODO i18n
-	return ctx.Success("Success")
+	return ctx.Success()
 }
 
 // SetVisible sets the challenge's visible.
-func (*ChallengeHandler) SetVisible(ctx context.Context, f form.SetChallengeVisible) error {
+func (*ChallengeHandler) SetVisible(ctx context.Context, f form.SetChallengeVisible, l *i18n.Locale) error {
 	// Check if the challenge exists.
 	challenge, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
 		if err == db.ErrChallengeNotExists {
-			// TODO i18n
-			return ctx.Error(40000, "Challenge does not exist.")
+			return ctx.Error(40400, l.T("challenge.not_found"))
 		}
 		log.Error("Failed to get challenge: %v", err)
 		return ctx.ServerError()
@@ -170,5 +168,5 @@ func (*ChallengeHandler) SetVisible(ctx context.Context, f form.SetChallengeVisi
 	}
 
 	// TODO i18n
-	return ctx.Success("Success")
+	return ctx.Success("challenge.set_visible", challenge.Title)
 }

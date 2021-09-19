@@ -5,16 +5,16 @@
 package form
 
 type NewChallenge struct {
-	Title            string  `binding:"Required;MaxSize(255)"`
-	BaseScore        float64 `binding:"Required;Range(0,10000)"`
+	Title            string  `validate:"required,lt=255"`
+	BaseScore        float64 `validate:"required,gte=0,lte=10000"`
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }
 
 type UpdateChallenge struct {
-	ID               uint    `binding:"Required"`
-	Title            string  `binding:"Required;MaxSize(255)"`
-	BaseScore        float64 `binding:"Required;Range(0,10000)"`
+	ID               uint    `validate:"required"`
+	Title            string  `validate:"required,lt=255"`
+	BaseScore        float64 `validate:"required,gte=0,lte=10000"`
 	AutoRenewFlag    bool
 	RenewFlagCommand string
 }

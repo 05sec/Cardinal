@@ -21,6 +21,7 @@ en-US:
     delete_success: "Delete Bulletin Succeeded!"
     not_found: "Bulletin Not Found!"
   challenge:
+    success: "Create new challenge {{.}} succeed"
     post_error: "Add Challenge Failed!"
     post_success: "Add Challenge Succeeded!"
     put_error: "Edit Challenge Information Failed!"
@@ -29,6 +30,7 @@ en-US:
     delete_success: "Delete Challenge Succeeded!"
     not_found: "Challenge Not Found!"
     empty_command: "Command should NOT be Empty!"
+    repeat: "Duplicated Challenge Found!"
   check:
     repeat: "Duplicated Check Ignored."
     not_visible: "Challenge is now Invisible."
@@ -139,3 +141,11 @@ en-US:
     NewBulletin:
       Title: "Bulletin Title"
       Body: "Bulletin Body"
+    UpdateBulletin:
+      ID: "Bulletin ID"
+      Title: "Bulletin Title"
+      Body: "Bulletin Body"
+    NewChallenge:
+      Title: "Challenge title"
+      BaseScore: "Challenge base score"
+

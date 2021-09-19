@@ -22,6 +22,9 @@ type GameBoxesStore interface {
 	// Create creates a new game box and persists to database.
 	// It returns the game box ID when game box created.
 	Create(ctx context.Context, opts CreateGameBoxOptions) (uint, error)
+	// BatchCreate creates game boxes in batch.
+	// It returns the game boxes after they are created.
+	BatchCreate(ctx context.Context, opts []CreateGameBoxOptions) ([]*GameBox, error)
 	// Get returns the game boxes with the given options.
 	Get(ctx context.Context, opts GetGameBoxesOption) ([]*GameBox, error)
 	// GetByID returns the game box with given id.
@@ -139,6 +142,63 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 	}
 
 	return g.ID, nil
+}
+
+func (db *gameboxes) BatchCreate(ctx context.Context, opts []CreateGameBoxOptions) ([]*GameBox, error) {
+	tx := db.Begin()
+
+	challengeIDSets := make(map[uint]struct{})
+	for _, option := range opts {
+		challengeIDSets[option.ChallengeID] = struct{}{}
+	}
+	challengeIDs := make([]uint, 0, len(challengeIDSets))
+	for id := range challengeIDSets {
+		challengeIDs = append(challengeIDs, id)
+	}
+
+	challengesStore := NewChallengesStore(db.DB)
+	challenges, err := challengesStore.GetByIDs(ctx, challengeIDs...)
+	if err != nil {
+		return nil, errors.Wrap(err, "get challenges")
+	}
+	challengeSets := make(map[uint]*Challenge)
+	for _, challenge := range challenges {
+		challenge := challenge
+		challengeSets[challenge.ID] = challenge
+	}
+
+	gameboxes := make([]*GameBox, 0, len(opts))
+	for _, option := range opts {
+		var gameBox GameBox
+		if err := tx.WithContext(ctx).Model(&GameBox{}).Where("team_id = ? AND challenge_id = ?", option.TeamID, option.ChallengeID).First(&gameBox).Error; err == nil {
+			tx.Rollback()
+			return nil, ErrGameBoxAlreadyExists
+		} else if err != gorm.ErrRecordNotFound {
+			tx.Rollback()
+			return nil, errors.Wrap(err, "get")
+		}
+
+		g := &GameBox{
+			TeamID:              option.TeamID,
+			ChallengeID:         option.ChallengeID,
+			Address:             option.Address,
+			Description:         option.Description,
+			InternalSSHPort:     strconv.Itoa(int(option.InternalSSH.Port)),
+			InternalSSHUser:     option.InternalSSH.User,
+			InternalSSHPassword: option.InternalSSH.Password,
+			Visible:             false,
+			Score:               challengeSets[option.ChallengeID].BaseScore,
+			Status:              GameBoxStatusUp,
+		}
+		if err := tx.WithContext(ctx).Create(g).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		gameboxes = append(gameboxes, g)
+	}
+
+	return gameboxes, tx.Commit().Error
 }
 
 func (db *gameboxes) loadAttributes(ctx context.Context, gameBoxes []*GameBox) ([]*GameBox, error) {
