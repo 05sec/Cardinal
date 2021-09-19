@@ -30,6 +30,7 @@ en-US:
     delete_success: "Delete Challenge Succeeded!"
     not_found: "Challenge Not Found!"
     empty_command: "Command should NOT be Empty!"
+    repeat: "Duplicated Challenge Found!"
   check:
     repeat: "Duplicated Check Ignored."
     not_visible: "Challenge is now Invisible."

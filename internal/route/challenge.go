@@ -78,6 +78,9 @@ func (*ChallengeHandler) New(ctx context.Context, f form.NewChallenge, l *i18n.L
 		RenewFlagCommand: f.RenewFlagCommand,
 	})
 	if err != nil {
+		if err == db.ErrChallengeAlreadyExists {
+			return ctx.Error(40000, l.T("challenge.repeat"))
+		}
 		log.Error("Failed to create new challenge: %v", err)
 		return ctx.ServerError()
 	}
@@ -136,13 +139,12 @@ func (*ChallengeHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 }
 
 // SetVisible sets the challenge's visible.
-func (*ChallengeHandler) SetVisible(ctx context.Context, f form.SetChallengeVisible) error {
+func (*ChallengeHandler) SetVisible(ctx context.Context, f form.SetChallengeVisible, l *i18n.Locale) error {
 	// Check if the challenge exists.
 	challenge, err := db.Challenges.GetByID(ctx.Request().Context(), f.ID)
 	if err != nil {
 		if err == db.ErrChallengeNotExists {
-			// TODO i18n
-			return ctx.Error(40000, "Challenge does not exist.")
+			return ctx.Error(40400, l.T("challenge.not_found"))
 		}
 		log.Error("Failed to get challenge: %v", err)
 		return ctx.ServerError()

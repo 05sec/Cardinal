@@ -30,7 +30,7 @@ type TeamsStore interface {
 	// It returns the team when it created.
 	Create(ctx context.Context, opts CreateTeamOptions) (*Team, error)
 	// BatchCreate creates teams in batch.
-	// It returns the teams when they created.
+	// It returns the teams after they are created.
 	BatchCreate(ctx context.Context, opts []CreateTeamOptions) ([]*Team, error)
 	// Get returns the team list.
 	Get(ctx context.Context, opts GetTeamsOptions) ([]*Team, error)

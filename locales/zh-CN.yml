@@ -31,6 +31,7 @@ zh-CN:
     delete_success: "删除题目成功！"
     not_found: "题目不存在！"
     empty_command: "命令不能为空！"
+    repeat: "题目重复！"
 
   check:
     repeat: "重复 Check，已忽略"
