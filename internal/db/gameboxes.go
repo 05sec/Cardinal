@@ -147,7 +147,7 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 func (db *gameboxes) BatchCreate(ctx context.Context, opts []CreateGameBoxOptions) ([]*GameBox, error) {
 	tx := db.Begin()
 
-	challengeIDSets := make(map[uint]struct{}, 0)
+	challengeIDSets := make(map[uint]struct{})
 	for _, option := range opts {
 		challengeIDSets[option.ChallengeID] = struct{}{}
 	}
@@ -161,7 +161,7 @@ func (db *gameboxes) BatchCreate(ctx context.Context, opts []CreateGameBoxOption
 	if err != nil {
 		return nil, errors.Wrap(err, "get challenges")
 	}
-	challengeSets := make(map[uint]*Challenge, 0)
+	challengeSets := make(map[uint]*Challenge)
 	for _, challenge := range challenges {
 		challenge := challenge
 		challengeSets[challenge.ID] = challenge
