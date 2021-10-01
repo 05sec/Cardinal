@@ -16,8 +16,6 @@ type NewGameBox []struct {
 
 type UpdateGameBox struct {
 	ID          uint   `validate:"required"`
-	ChallengeID uint   `validate:"required"`
-	TeamID      uint   `validate:"required"`
 	Address     string `validate:"required"`
 	Description string
 	SSHPort     uint
