@@ -658,6 +658,5 @@ func getGameBoxes(t *testing.T, managerToken string, router *flamego.Flame) stri
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	fmt.Println(w.Body.String())
 	return w.Body.String()
 }
