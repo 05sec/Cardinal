@@ -62,8 +62,8 @@ type Team struct {
 	gorm.Model
 
 	Name     string
-	Password string
-	Salt     string
+	Password string `json:"-"`
+	Salt     string `json:"-"`
 	Logo     string
 	Score    float64
 	Rank     uint
