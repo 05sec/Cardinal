@@ -68,7 +68,7 @@ func Init() {
 	t = &timer{
 		BeginTime: conf.Game.StartAt.In(time.Local),
 		EndTime:   conf.Game.EndAt.In(time.Local),
-		Duration:  conf.Game.Duration,
+		Duration:  conf.Game.RoundDuration,
 		RestTime:  restTime,
 		NowRound:  -1,
 	}

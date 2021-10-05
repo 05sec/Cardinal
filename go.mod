@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	bou.ke/monkey v1.0.2
-	github.com/Cardinal-Platform/testify v0.0.0-20210919113340-9072c9681cc6 // indirect
+	github.com/Cardinal-Platform/testify v0.0.0-20210919113340-9072c9681cc6
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5 // indirect
 	github.com/andybalholm/cascadia v1.1.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
@@ -84,8 +84,9 @@ require (
 	google.golang.org/grpc v1.33.1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gorm.io/driver/mysql v1.1.2
 	gorm.io/driver/postgres v1.1.0
-	gorm.io/gorm v1.21.9
+	gorm.io/gorm v1.21.12
 	moul.io/http2curl v1.0.0 // indirect
 	unknwon.dev/clog/v2 v2.1.2
 )

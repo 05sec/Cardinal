@@ -10,10 +10,12 @@ import (
 	"github.com/thanhpk/randstr"
 	log "unknwon.dev/clog/v2"
 
+	"github.com/vidar-team/Cardinal/internal/clock"
 	"github.com/vidar-team/Cardinal/internal/context"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/form"
 	"github.com/vidar-team/Cardinal/internal/i18n"
+	"github.com/vidar-team/Cardinal/internal/rank"
 )
 
 type TeamHandler struct{}
@@ -157,4 +159,64 @@ func (*TeamHandler) ResetPassword(ctx context.Context, l *i18n.Locale) error {
 	}
 
 	return ctx.Success(newPassword)
+}
+
+// SubmitFlag submits a flag.
+func (*TeamHandler) SubmitFlag(ctx context.Context, team *db.Team, f form.SubmitFlag) error {
+	flagStr := f.Flag
+
+	flag, err := db.Flags.Check(ctx.Request().Context(), flagStr)
+	if err != nil {
+		if err == db.ErrFlagNotExists {
+			return ctx.Error(40000, "error flag")
+		}
+		log.Error("Failed to check flag: %v", err)
+		return ctx.ServerError()
+	}
+
+	// The team can only submit the other teams' current round flag.
+	if flag.TeamID == team.ID || flag.Round != clock.T.CurrentRound {
+		return ctx.Error(40000, "error flag")
+	}
+
+	if _, err := db.Actions.Create(ctx.Request().Context(), db.CreateActionOptions{
+		Type:           db.ActionTypeAttack,
+		GameBoxID:      flag.GameBoxID,
+		AttackerTeamID: team.ID,
+		Round:          flag.Round,
+	}); err != nil {
+		log.Error("Failed to create new attack game box actions: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success()
+}
+
+func (*TeamHandler) Info(ctx context.Context, team *db.Team) error {
+	return ctx.Success(team)
+}
+
+func (*TeamHandler) GameBoxes(ctx context.Context, team *db.Team) error {
+	gameBoxes, err := db.GameBoxes.Get(ctx.Request().Context(), db.GetGameBoxesOption{
+		TeamID:  team.ID,
+		Visible: true,
+	})
+	if err != nil {
+		log.Error("Failed to get team game boxes: %v", err)
+		return ctx.ServerError()
+	}
+	return ctx.Success(gameBoxes)
+}
+
+func (*TeamHandler) Bulletins(ctx context.Context) error {
+	bulletins, err := db.Bulletins.Get(ctx.Request().Context())
+	if err != nil {
+		log.Error("Failed to get team bulletins: %v", err)
+		return ctx.ServerError()
+	}
+	return ctx.Success(bulletins)
+}
+
+func (*TeamHandler) Rank(ctx context.Context) error {
+	return ctx.Success(rank.ForTeam())
 }

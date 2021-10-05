@@ -112,7 +112,7 @@ func SetConfigFileGuide(lang string) error {
 	if err != nil {
 		return errors.Wrap(err, "input duration")
 	}
-	conf.Game.Duration = uint(duration)
+	conf.Game.RoundDuration = uint(duration)
 
 	// App HTTP service port.
 	port, err := inputInt(string(locales.I18n.T(lang, "install.port")), 19999, func(port int) error {

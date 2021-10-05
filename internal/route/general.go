@@ -5,6 +5,10 @@
 package route
 
 import (
+	"time"
+
+	"github.com/vidar-team/Cardinal/internal/clock"
+	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/context"
 )
 
@@ -18,17 +22,27 @@ func NewGeneralHandler() *GeneralHandler {
 
 func (*GeneralHandler) Hello(c context.Context) error {
 	return c.Success(map[string]interface{}{
-		// TODO get the info from main.go
-		"Version": "",
-		"Commit":  "",
+		"Version":     conf.Version,
+		"BuildTime":   conf.BuildTime,
+		"BuildCommit": conf.BuildCommit,
 	})
 }
 
 func (*GeneralHandler) Init(c context.Context) error {
-	// TODO: Get value from config file.
 	return c.Success(map[string]interface{}{
-		"Title":    "",
-		"Language": "",
+		"Name": conf.App.Name,
+	})
+}
+
+func (*GeneralHandler) Time(c context.Context) error {
+	return c.Success(map[string]interface{}{
+		"CurrentTime":         time.Now().Unix(),
+		"StartAt":             clock.T.StartAt.Unix(),
+		"EndAt":               clock.T.EndAt.Unix(),
+		"RoundDuration":       clock.T.RoundDuration.Seconds(),
+		"CurrentRound":        clock.T.CurrentRound,
+		"RoundRemainDuration": clock.T.RoundRemainDuration,
+		"Status":              clock.T.Status,
 	})
 }
 

@@ -7,7 +7,6 @@ package route
 import (
 	"net/http"
 
-	"github.com/flamego/binding"
 	"github.com/flamego/flamego"
 	"github.com/flamego/session"
 
@@ -20,53 +19,59 @@ import (
 func NewRouter() *flamego.Flame {
 	f := flamego.Classic()
 
-	f.Use(session.Sessioner(session.Options{
-		ReadIDFunc:  func(r *http.Request) string { return r.Header.Get("Authorization") },
-		WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {},
-	}))
-
-	f.Use(context.Contexter())
-	f.Use(i18n.I18n())
+	f.Use(
+		session.Sessioner(session.Options{
+			ReadIDFunc:  func(r *http.Request) string { return r.Header.Get("Authorization") },
+			WriteIDFunc: func(w http.ResponseWriter, r *http.Request, sid string, created bool) {},
+		}),
+		context.Contexter(),
+		i18n.I18n(),
+		flamego.Static(flamego.StaticOptions{
+			Directory: "uploads",
+			Prefix:    "uploads",
+		}),
+	)
 
 	general := NewGeneralHandler()
-	f.NotFound(general.NotFound)
-
+	auth := NewAuthHandler()
 	bulletin := NewBulletinHandler()
 	challenge := NewChallengeHandler()
 	gameBox := NewGameBoxHandler()
 	team := NewTeamHandler()
+	manager := NewManagerHandler()
 
 	f.Group("/api", func() {
 		f.Any("/", general.Hello)
 		f.Get("/init", general.Init)
-		f.Get("/time")
-		f.Get("/uploads")
+		f.Get("/time", general.Time)
 		f.Get("/asteroid")
 
 		f.Group("/team", func() {
-			f.Post("/login", binding.JSON(form.TeamLogin{}))
+			f.Post("/login", form.Bind(form.TeamLogin{}), auth.TeamLogin)
 
 			f.Group("", func() {
-				f.Post("/logout")
-				f.Post("/submitFlag")
-				f.Get("/info")
-				f.Get("/gameBoxes")
-				f.Get("/bulletins")
+				f.Post("/logout", auth.TeamLogout)
+				f.Post("/submitFlag", form.Bind(form.SubmitFlag{}), team.SubmitFlag)
+				f.Get("/info", team.Info)
+				f.Get("/gameBoxes", func() {
+					f.Get("/", team.GameBoxes)
+					f.Get("/all")
+				})
+				f.Get("/bulletins", team.Bulletins)
+				f.Get("/rank", team.Rank)
 				f.Get("/liveLog")
-			})
+			}, auth.TeamAuthenticator)
 		})
 
-		manager := NewManagerHandler()
 		f.Group("/manager", func() {
-			f.Post("/login", form.Bind(form.ManagerLogin{}), manager.Login)
+			f.Post("/login", form.Bind(form.ManagerLogin{}), auth.ManagerLogin)
 
 			f.Group("", func() {
-				f.Post("/logout", manager.Logout)
+				f.Post("/logout", auth.ManagerLogout)
 
-				// Panel
 				f.Get("/panel")
 				f.Get("/logs")
-				f.Get("/rank")
+				f.Get("/rank", manager.Rank)
 
 				// Challenge
 				f.Get("/challenges", challenge.List)
@@ -84,11 +89,11 @@ func NewRouter() *flamego.Flame {
 
 				// Game Box
 				f.Get("/gameBoxes", gameBox.List)
+				f.Post("/gameBoxes/reset")
 				f.Post("/gameBox", form.Bind(form.NewGameBox{}), gameBox.New)
 				f.Put("/gameBox", form.Bind(form.UpdateGameBox{}), gameBox.Update)
-				f.Post("/gameBox/sshTest", gameBox.SSHTest)
-				f.Post("/gameBox/refreshFlag", gameBox.RefreshFlag)
-				f.Post("/gameBoxes/reset", gameBox.ResetAll)
+				f.Post("/gameBox/sshTest")
+				f.Post("/gameBox/refreshFlag")
 
 				// Flag
 				f.Get("/flags")
@@ -115,9 +120,11 @@ func NewRouter() *flamego.Flame {
 
 				// Check
 				f.Get("/checkDown")
-			}, manager.Authenticator)
+			}, auth.ManagerAuthenticator)
 		})
 	})
+
+	f.NotFound(general.NotFound)
 
 	return f
 }
