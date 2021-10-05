@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 	log "unknwon.dev/clog/v2"
 
+	"github.com/vidar-team/Cardinal/internal/clock"
 	"github.com/vidar-team/Cardinal/internal/conf"
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
@@ -36,6 +37,8 @@ func runWeb(c *cli.Context) error {
 	if err = db.Init(); err != nil {
 		log.Fatal("Failed to init database: %v", err)
 	}
+
+	clock.Start()
 
 	f := route.NewRouter()
 	log.Info("Listen on http://0.0.0.0:%d", c.Int("port"))
