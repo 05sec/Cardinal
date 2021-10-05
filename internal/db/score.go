@@ -140,6 +140,9 @@ func (db *scores) RefreshCheckScore(ctx context.Context, round uint, replaces ..
 		gameBoxes, err := gameBoxesStore.Get(ctx, GetGameBoxesOption{
 			ChallengeID: challenge.ID,
 		})
+		if err != nil {
+			return errors.Wrap(err, "get game boxes")
+		}
 
 		// Skip the invisible challenge.
 		if len(gameBoxes) == 0 || !gameBoxes[0].Visible {
