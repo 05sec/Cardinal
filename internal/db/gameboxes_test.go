@@ -65,8 +65,10 @@ func TestGameBoxes(t *testing.T) {
 		{"GetByID", testGameBoxesGetByID},
 		{"Update", testGameBoxesUpdate},
 		{"SetScore", testGameBoxesSetScore},
+		{"CountScore", testCountScore},
 		{"SetVisible", testGameBoxesSetVisible},
 		{"SetStatus", testGameBoxesSetStatus},
+		{"CleanAllStatus", testGameBoxesCleanAllStatus},
 		{"DeleteByID", testGameBoxesDeleteByID},
 		{"DeleteAll", testGameBoxesDeleteAll},
 	} {
@@ -631,6 +633,38 @@ func testGameBoxesSetScore(t *testing.T, ctx context.Context, db *gameboxes) {
 	assert.Equal(t, want, got)
 }
 
+func testCountScore(t *testing.T, ctx context.Context, db *gameboxes) {
+	id1, err := db.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 1, Address: "192.168.1.1", Description: "Web1 For Vidar"})
+	assert.Nil(t, err)
+	err = db.SetScore(ctx, id1, 1800)
+	assert.Nil(t, err)
+
+	id2, err := db.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 2, Address: "192.168.2.1", Description: "Web2 For Vidar"})
+	assert.Nil(t, err)
+	err = db.SetScore(ctx, id2, -500)
+	assert.Nil(t, err)
+
+	// Get visible game box score, for the game boxes are invisible when created.
+	got, err := db.CountScore(ctx, GameBoxCountScoreOptions{
+		TeamID:  1,
+		Visible: true,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, float64(0), got)
+
+	err = db.SetVisible(ctx, id1, true)
+	assert.Nil(t, err)
+	err = db.SetVisible(ctx, id2, true)
+	assert.Nil(t, err)
+
+	got, err = db.CountScore(ctx, GameBoxCountScoreOptions{
+		TeamID:  1,
+		Visible: true,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, float64(1300), got)
+}
+
 func testGameBoxesSetVisible(t *testing.T, ctx context.Context, db *gameboxes) {
 	id, err := db.Create(ctx, CreateGameBoxOptions{
 		TeamID:      1,
@@ -767,6 +801,68 @@ func testGameBoxesSetStatus(t *testing.T, ctx context.Context, db *gameboxes) {
 	// Set unexpected game box status.
 	err = db.SetStatus(ctx, 1, "unexpected")
 	assert.Equal(t, ErrBadGameBoxsStatus, err)
+}
+
+func testGameBoxesCleanAllStatus(t *testing.T, ctx context.Context, db *gameboxes) {
+	id1, err := db.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 1, Address: "192.168.1.1", Description: "Web1 For Vidar"})
+	assert.Nil(t, err)
+	err = db.SetStatus(ctx, id1, GameBoxStatusDown)
+	assert.Nil(t, err)
+
+	id2, err := db.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 2, Address: "192.168.1.2", Description: "Web2 For Vidar"})
+	assert.Nil(t, err)
+	err = db.SetStatus(ctx, id2, GameBoxStatusCaptured)
+	assert.Nil(t, err)
+
+	_, err = db.Create(ctx, CreateGameBoxOptions{TeamID: 2, ChallengeID: 1, Address: "192.168.2.1", Description: "Web1 For E99p1ant"})
+	assert.Nil(t, err)
+
+	err = db.CleanAllStatus(ctx)
+	assert.Nil(t, err)
+
+	got, err := db.Get(ctx, GetGameBoxesOption{})
+	assert.Nil(t, err)
+
+	for _, gameBox := range got {
+		gameBox.CreatedAt = time.Time{}
+		gameBox.UpdatedAt = time.Time{}
+		gameBox.Challenge = nil
+		gameBox.Team = nil
+	}
+
+	want := []*GameBox{
+		{
+			Model:           gorm.Model{ID: 1},
+			TeamID:          1,
+			ChallengeID:     1,
+			Address:         "192.168.1.1",
+			Description:     "Web1 For Vidar",
+			InternalSSHPort: "0",
+			Score:           1000,
+			Status:          GameBoxStatusUp,
+		},
+		{
+			Model:           gorm.Model{ID: 2},
+			TeamID:          1,
+			ChallengeID:     2,
+			Address:         "192.168.1.2",
+			Description:     "Web2 For Vidar",
+			InternalSSHPort: "0",
+			Score:           1500,
+			Status:          GameBoxStatusUp,
+		},
+		{
+			Model:           gorm.Model{ID: 3},
+			TeamID:          2,
+			ChallengeID:     1,
+			Address:         "192.168.2.1",
+			Description:     "Web1 For E99p1ant",
+			InternalSSHPort: "0",
+			Score:           1000,
+			Status:          GameBoxStatusUp,
+		},
+	}
+	assert.Equal(t, want, got)
 }
 
 func testGameBoxesDeleteByID(t *testing.T, ctx context.Context, db *gameboxes) {

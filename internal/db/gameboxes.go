@@ -34,10 +34,14 @@ type GameBoxesStore interface {
 	Update(ctx context.Context, id uint, opts UpdateGameBoxOptions) error
 	// SetScore updates the game box score with given id.
 	SetScore(ctx context.Context, id uint, score float64) error
+	// CountScore counts the game box total scores with the given options.
+	CountScore(ctx context.Context, opts GameBoxCountScoreOptions) (float64, error)
 	// SetVisible sets the game box visibility with given id.
 	SetVisible(ctx context.Context, id uint, isVisible bool) error
 	// SetStatus sets the game box status with given id.
 	SetStatus(ctx context.Context, id uint, status GameBoxStatus) error
+	// CleanAllStatus sets all the game boxes' status to `GameBoxStatusUp`.
+	CleanAllStatus(ctx context.Context) error
 	// DeleteByID deletes the game box with given id.
 	DeleteByID(ctx context.Context, id uint) error
 	// DeleteAll deletes all the game boxes.
@@ -323,6 +327,26 @@ func (db *gameboxes) SetScore(ctx context.Context, id uint, score float64) error
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("score", score).Error
 }
 
+type GameBoxCountScoreOptions struct {
+	TeamID      uint
+	ChallengeID uint
+	Visible     bool // If Visible is `false`, it returns the visible and invisible game boxes.
+	Status      GameBoxStatus
+}
+
+func (db *gameboxes) CountScore(ctx context.Context, opts GameBoxCountScoreOptions) (float64, error) {
+	var sum struct {
+		Score float64
+	}
+
+	return sum.Score, db.WithContext(ctx).Model(&GameBox{}).Select(`SUM(score) AS score`).Where(&GameBox{
+		TeamID:      opts.TeamID,
+		ChallengeID: opts.ChallengeID,
+		Visible:     opts.Visible,
+		Status:      opts.Status,
+	}).Find(&sum).Error
+}
+
 func (db *gameboxes) SetVisible(ctx context.Context, id uint, isVisible bool) error {
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("visible", isVisible).Error
 }
@@ -337,6 +361,10 @@ func (db *gameboxes) SetStatus(ctx context.Context, id uint, status GameBoxStatu
 	}
 
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("status", status).Error
+}
+
+func (db *gameboxes) CleanAllStatus(ctx context.Context) error {
+	return db.WithContext(ctx).Session(&gorm.Session{AllowGlobalUpdate: true}).Model(&GameBox{}).Update("status", GameBoxStatusUp).Error
 }
 
 func (db *gameboxes) DeleteByID(ctx context.Context, id uint) error {

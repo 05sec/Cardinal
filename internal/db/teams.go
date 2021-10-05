@@ -169,6 +169,7 @@ func (db *teams) BatchCreate(ctx context.Context, opts []CreateTeamOptions) ([]*
 
 type GetTeamsOptions struct {
 	OrderBy  string
+	Order    string
 	Page     int
 	PageSize int
 }
@@ -179,15 +180,22 @@ func (db *teams) Get(ctx context.Context, opts GetTeamsOptions) ([]*Team, error)
 	}
 
 	if opts.OrderBy == "" {
-		opts.OrderBy = "id ASC"
+		opts.OrderBy = "id"
+	}
+
+	if opts.Order != "DESC" {
+		opts.Order = "ASC"
+	}
+
+	q := db.WithContext(ctx).Model(&Team{}).
+		Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"})
+
+	if opts.PageSize != 0 {
+		q = q.Offset((opts.Page - 1) * opts.PageSize).Limit(opts.PageSize)
 	}
 
 	var teams []*Team
-	return teams, db.WithContext(ctx).Model(&Team{}).
-		Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}).
-		Offset((opts.Page - 1) * opts.PageSize).
-		Limit(opts.PageSize).
-		Order(opts.OrderBy).Find(&teams).Error
+	return teams, q.Order(opts.OrderBy + " " + opts.Order).Find(&teams).Error
 }
 
 var ErrTeamNotExists = errors.New("team dose not exist")
