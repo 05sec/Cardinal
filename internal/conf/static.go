@@ -52,6 +52,9 @@ var (
 		PauseTime     []Period
 		RoundDuration uint
 
+		FlagPrefix string
+		FlagSuffix string
+
 		AttackScore    int
 		CheckDownScore int
 	}

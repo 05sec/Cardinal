@@ -42,8 +42,8 @@ type Flag struct {
 	TeamID      uint `gorm:"uniqueIndex:flag_unique_idx"`
 	ChallengeID uint `gorm:"uniqueIndex:flag_unique_idx"`
 	GameBoxID   uint `gorm:"uniqueIndex:flag_unique_idx"`
+	Round       uint `gorm:"uniqueIndex:flag_unique_idx"`
 
-	Round uint
 	Value string
 }
 
@@ -97,7 +97,7 @@ func (db *flags) BatchCreate(ctx context.Context, opts CreateFlagOptions) error 
 	}
 
 	if err := tx.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "team_id"}, {Name: "challenge_id"}, {Name: "game_box_id"}},
+		Columns:   []clause.Column{{Name: "team_id"}, {Name: "challenge_id"}, {Name: "game_box_id"}, {Name: "round"}},
 		DoUpdates: clause.AssignmentColumns([]string{"value"}),
 	}).CreateInBatches(flags, len(flags)).Error; err != nil {
 		tx.Rollback()
@@ -112,6 +112,8 @@ func (db *flags) BatchCreate(ctx context.Context, opts CreateFlagOptions) error 
 }
 
 type GetFlagOptions struct {
+	Page        int
+	PageSize    int
 	TeamID      uint
 	ChallengeID uint
 	GameBoxID   uint
@@ -120,12 +122,23 @@ type GetFlagOptions struct {
 
 func (db *flags) Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, error) {
 	var flags []*Flag
-	return flags, db.WithContext(ctx).Model(&Flag{}).Where(&Flag{
+
+	q := db.WithContext(ctx).Model(&Flag{}).Where(&Flag{
 		TeamID:      opts.TeamID,
 		GameBoxID:   opts.GameBoxID,
 		ChallengeID: opts.ChallengeID,
 		Round:       opts.Round,
-	}).Find(&flags).Error
+	})
+
+	if opts.Page <= 0 {
+		opts.Page = 1
+	}
+
+	if opts.PageSize != 0 {
+		q = q.Offset((opts.Page - 1) * opts.PageSize).Limit(opts.PageSize)
+	}
+
+	return flags, q.Find(&flags).Error
 }
 
 var ErrFlagNotExists = errors.New("flag does not find")

@@ -36,6 +36,7 @@ func NewRouter() *flamego.Flame {
 	auth := NewAuthHandler()
 	bulletin := NewBulletinHandler()
 	challenge := NewChallengeHandler()
+	flag := NewFlagHandler()
 	gameBox := NewGameBoxHandler()
 	team := NewTeamHandler()
 	manager := NewManagerHandler()
@@ -96,9 +97,8 @@ func NewRouter() *flamego.Flame {
 				f.Post("/gameBox/refreshFlag")
 
 				// Flag
-				f.Get("/flags")
-				f.Post("/flags")
-				f.Get("/flags/export")
+				f.Get("/flags", flag.Get)
+				f.Post("/flags", flag.BatchCreate)
 
 				// Bulletins
 				f.Get("/bulletins", bulletin.List)

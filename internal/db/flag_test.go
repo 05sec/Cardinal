@@ -108,7 +108,7 @@ func TestFlags(t *testing.T) {
 		name string
 		test func(t *testing.T, ctx context.Context, db *flags)
 	}{
-		{"Create", testFlagsBatchCreate},
+		{"BatchCreate", testFlagsBatchCreate},
 		{"Get", testFlagsGet},
 		{"Check", testFlagsCheck},
 		{"DeleteAll", testFlagsDeleteAll},
@@ -173,6 +173,33 @@ func testFlagsBatchCreate(t *testing.T, ctx context.Context, db *flags) {
 	got := flags[0].Value
 	want := "d3ctf{upsert_it}"
 	assert.Equal(t, want, got)
+
+	// New round
+	err = db.BatchCreate(ctx, CreateFlagOptions{
+		Flags: []FlagMetadata{
+			{
+				GameBoxID: 1,
+				Round:     2,
+				Value:     "d3ctf{81092a3cf05843109f022d3ff201ec6e}",
+			},
+			{
+				GameBoxID: 2,
+				Round:     2,
+				Value:     "d3ctf{dc891cef907e0615aeb659018f43e186}",
+			},
+			{
+				GameBoxID: 3,
+				Round:     2,
+				Value:     "d3ctf{8fff5617c428b42497a81ebffff4f92a}",
+			},
+			{
+				GameBoxID: 4,
+				Round:     2,
+				Value:     "d3ctf{bf97cc7e6f6088aa2837338cbc61e95c}",
+			},
+		},
+	})
+	assert.Nil(t, err)
 
 	// Game box not found.
 	err = db.BatchCreate(ctx, CreateFlagOptions{
@@ -267,6 +294,51 @@ func testFlagsGet(t *testing.T, ctx context.Context, db *flags) {
 			GameBoxID:   4,
 			Round:       1,
 			Value:       "d3ctf{a87ff679a2f3e71d9181a67b7542122c}",
+		},
+	}
+	assert.Equal(t, want, got)
+
+	got, err = db.Get(ctx, GetFlagOptions{
+		Page:     1,
+		PageSize: 3,
+	})
+	assert.Nil(t, err)
+
+	for _, flag := range got {
+		flag.CreatedAt = time.Time{}
+		flag.UpdatedAt = time.Time{}
+	}
+
+	want = []*Flag{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			TeamID:      1,
+			ChallengeID: 1,
+			GameBoxID:   1,
+			Round:       1,
+			Value:       "d3ctf{c4ca4238a0b923820dcc509a6f75849b}",
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			TeamID:      2,
+			ChallengeID: 1,
+			GameBoxID:   2,
+			Round:       1,
+			Value:       "d3ctf{c81e728d9d4c2f636f067f89cc14862c}",
+		},
+		{
+			Model: gorm.Model{
+				ID: 3,
+			},
+			TeamID:      1,
+			ChallengeID: 2,
+			GameBoxID:   3,
+			Round:       1,
+			Value:       "d3ctf{eccbc87e4b5ce2fe28308fd9f2a7baf3}",
 		},
 	}
 	assert.Equal(t, want, got)
