@@ -3,7 +3,6 @@ package cardinal_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -633,7 +632,6 @@ func Test_SubmitFlag(t *testing.T) {
 		ChallengeID: 1,
 		Round:       1,
 	}).Find(&flag1)
-	fmt.Println(flag1)
 	assert.NotEqual(t, flag1.Flag, "")
 
 	var flag2 dbold.Flag
@@ -642,7 +640,6 @@ func Test_SubmitFlag(t *testing.T) {
 		ChallengeID: 3,
 		Round:       1,
 	}).Find(&flag2)
-	fmt.Println(flag2)
 	assert.NotEqual(t, flag2.Flag, "")
 
 	var flag3 dbold.Flag
@@ -651,7 +648,6 @@ func Test_SubmitFlag(t *testing.T) {
 		ChallengeID: 3,
 		Round:       1,
 	}).Find(&flag3)
-	fmt.Println(flag3)
 	assert.NotEqual(t, flag3.Flag, "")
 
 	// not begin
@@ -716,7 +712,6 @@ func Test_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[0].AccessKey)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
-	fmt.Println("flag1", w.Body.String())
 
 	// success flag2
 	w = httptest.NewRecorder()
@@ -727,7 +722,6 @@ func Test_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[0].AccessKey)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
-	fmt.Println("flag2", w.Body.String())
 
 	// success flag3
 	w = httptest.NewRecorder()
@@ -738,7 +732,6 @@ func Test_SubmitFlag(t *testing.T) {
 	req.Header.Set("Authorization", team[1].AccessKey)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
-	fmt.Println("flag3", w.Body.String())
 
 	// repeat submit
 	w = httptest.NewRecorder()
@@ -794,7 +787,6 @@ func Test_CheckDown(t *testing.T) {
 	req.Header.Set("Authorization", managerToken)
 	router.ServeHTTP(w, req)
 	assert.Equal(t, 200, w.Code)
-	fmt.Println("checkdown", w.Body.String())
 
 	// repeat
 	w = httptest.NewRecorder()

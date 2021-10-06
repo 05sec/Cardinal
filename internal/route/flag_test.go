@@ -5,7 +5,6 @@
 package route
 
 import (
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -97,8 +96,6 @@ func testFlagGet(t *testing.T, router *flamego.Flame, managerToken string) {
 	createFlag(t, router, managerToken)
 	req, err = http.NewRequest(http.MethodGet, "/api/manager/flags", nil)
 	assert.Nil(t, err)
-
-	fmt.Println(conf.Game.FlagPrefix)
 
 	req.Header.Set("Authorization", managerToken)
 	w = httptest.NewRecorder()
