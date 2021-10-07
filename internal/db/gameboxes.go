@@ -30,6 +30,8 @@ type GameBoxesStore interface {
 	// GetByID returns the game box with given id.
 	// It returns ErrGameBoxNotExists when not found.
 	GetByID(ctx context.Context, id uint) (*GameBox, error)
+	// Count returns the total count of game boxes.
+	Count(ctx context.Context) (int64, error)
 	// Update updates the game box with given id.
 	Update(ctx context.Context, id uint, opts UpdateGameBoxOptions) error
 	// SetScore updates the game box score with given id.
@@ -70,7 +72,8 @@ type GameBox struct {
 	ChallengeID uint
 	Challenge   *Challenge `gorm:"-"`
 
-	Address     string
+	IPAddress   string
+	Port        string
 	Description string
 
 	InternalSSHPort     string
@@ -95,7 +98,8 @@ type SSHConfig struct {
 type CreateGameBoxOptions struct {
 	TeamID      uint
 	ChallengeID uint
-	Address     string
+	IPAddress   string
+	Port        uint
 	Description string
 	InternalSSH SSHConfig
 }
@@ -131,7 +135,8 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 	g := &GameBox{
 		TeamID:              opts.TeamID,
 		ChallengeID:         opts.ChallengeID,
-		Address:             opts.Address,
+		IPAddress:           opts.IPAddress,
+		Port:                strconv.Itoa(int(opts.Port)),
 		Description:         opts.Description,
 		InternalSSHPort:     strconv.Itoa(int(opts.InternalSSH.Port)),
 		InternalSSHUser:     opts.InternalSSH.User,
@@ -185,7 +190,8 @@ func (db *gameboxes) BatchCreate(ctx context.Context, opts []CreateGameBoxOption
 		g := &GameBox{
 			TeamID:              option.TeamID,
 			ChallengeID:         option.ChallengeID,
-			Address:             option.Address,
+			IPAddress:           option.IPAddress,
+			Port:                strconv.Itoa(int(option.Port)),
 			Description:         option.Description,
 			InternalSSHPort:     strconv.Itoa(int(option.InternalSSH.Port)),
 			InternalSSHUser:     option.InternalSSH.User,
@@ -297,8 +303,14 @@ func (db *gameboxes) GetByID(ctx context.Context, id uint) (*GameBox, error) {
 	return gameBoxes[0], nil
 }
 
+func (db *gameboxes) Count(ctx context.Context) (int64, error) {
+	var count int64
+	return count, db.WithContext(ctx).Model(&GameBox{}).Count(&count).Error
+}
+
 type UpdateGameBoxOptions struct {
-	Address     string
+	IPAddress   string
+	Port        uint
 	Description string
 	InternalSSH SSHConfig
 }
@@ -315,7 +327,8 @@ func (db *gameboxes) Update(ctx context.Context, id uint, opts UpdateGameBoxOpti
 
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).
 		Updates(&GameBox{
-			Address:             opts.Address,
+			IPAddress:           opts.IPAddress,
+			Port:                strconv.Itoa(int(opts.Port)),
 			Description:         opts.Description,
 			InternalSSHPort:     strconv.Itoa(int(opts.InternalSSH.Port)),
 			InternalSSHUser:     opts.InternalSSH.User,
@@ -351,13 +364,13 @@ func (db *gameboxes) SetVisible(ctx context.Context, id uint, isVisible bool) er
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("visible", isVisible).Error
 }
 
-var ErrBadGameBoxsStatus = errors.New("bad game box status")
+var ErrBadGameBoxesStatus = errors.New("bad game box status")
 
 func (db *gameboxes) SetStatus(ctx context.Context, id uint, status GameBoxStatus) error {
 	switch status {
 	case GameBoxStatusUp, GameBoxStatusDown, GameBoxStatusCaptured:
 	default:
-		return ErrBadGameBoxsStatus
+		return ErrBadGameBoxesStatus
 	}
 
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("status", status).Error

@@ -29,7 +29,16 @@ func (*GameBoxHandler) List(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success(gameBoxes)
+	count, err := db.GameBoxes.Count(ctx.Request().Context())
+	if err != nil {
+		log.Error("Failed to get game box count: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success(map[string]interface{}{
+		"Data":  gameBoxes,
+		"Count": count,
+	})
 }
 
 // New creates game boxes with the given options.
@@ -39,7 +48,8 @@ func (*GameBoxHandler) New(ctx context.Context, f form.NewGameBox, l *i18n.Local
 		gameBoxOptions = append(gameBoxOptions, db.CreateGameBoxOptions{
 			TeamID:      option.TeamID,
 			ChallengeID: option.ChallengeID,
-			Address:     option.Address,
+			IPAddress:   option.IPAddress,
+			Port:        option.Port,
 			Description: option.Description,
 			InternalSSH: db.SSHConfig{
 				Port:     option.SSHPort,
@@ -65,7 +75,8 @@ func (*GameBoxHandler) New(ctx context.Context, f form.NewGameBox, l *i18n.Local
 // Update updates the game box.
 func (*GameBoxHandler) Update(ctx context.Context, f form.UpdateGameBox, l *i18n.Locale) error {
 	err := db.GameBoxes.Update(ctx.Request().Context(), f.ID, db.UpdateGameBoxOptions{
-		Address:     f.Address,
+		IPAddress:   f.IPAddress,
+		Port:        f.Port,
 		Description: f.Description,
 		InternalSSH: db.SSHConfig{
 			Port:     f.SSHPort,

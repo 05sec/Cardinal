@@ -7,6 +7,7 @@ package route
 import (
 	"net/http"
 
+	"github.com/flamego/cors"
 	"github.com/flamego/flamego"
 	"github.com/flamego/session"
 
@@ -32,6 +33,8 @@ func NewRouter() *flamego.Flame {
 		}),
 	)
 
+	f.Use(cors.CORS())
+
 	general := NewGeneralHandler()
 	auth := NewAuthHandler()
 	bulletin := NewBulletinHandler()
@@ -51,7 +54,7 @@ func NewRouter() *flamego.Flame {
 			f.Post("/login", form.Bind(form.TeamLogin{}), auth.TeamLogin)
 
 			f.Group("", func() {
-				f.Post("/logout", auth.TeamLogout)
+				f.Get("/logout", auth.TeamLogout)
 				f.Post("/submitFlag", form.Bind(form.SubmitFlag{}), team.SubmitFlag)
 				f.Get("/info", team.Info)
 				f.Get("/gameBoxes", func() {
@@ -66,10 +69,9 @@ func NewRouter() *flamego.Flame {
 
 		f.Group("/manager", func() {
 			f.Post("/login", form.Bind(form.ManagerLogin{}), auth.ManagerLogin)
+			f.Get("/logout", auth.ManagerLogout)
 
 			f.Group("", func() {
-				f.Post("/logout", auth.ManagerLogout)
-
 				f.Get("/panel")
 				f.Get("/logs")
 				f.Get("/rank", manager.Rank)
@@ -91,7 +93,7 @@ func NewRouter() *flamego.Flame {
 				// Game Box
 				f.Get("/gameBoxes", gameBox.List)
 				f.Post("/gameBoxes/reset")
-				f.Post("/gameBox", form.Bind(form.NewGameBox{}), gameBox.New)
+				f.Post("/gameBoxes", form.Bind(form.NewGameBox{}), gameBox.New)
 				f.Put("/gameBox", form.Bind(form.UpdateGameBox{}), gameBox.Update)
 				f.Post("/gameBox/sshTest")
 				f.Post("/gameBox/refreshFlag")

@@ -5,9 +5,10 @@
 package form
 
 type NewGameBox []struct {
-	ChallengeID uint   `validate:"required"`
-	TeamID      uint   `validate:"required"`
-	Address     string `validate:"required"`
+	ChallengeID uint   `binding:"required"`
+	TeamID      uint   `binding:"required"`
+	IPAddress   string `binding:"required"`
+	Port        uint
 	Description string
 	SSHPort     uint
 	SSHUser     string
@@ -15,8 +16,9 @@ type NewGameBox []struct {
 }
 
 type UpdateGameBox struct {
-	ID          uint   `validate:"required"`
-	Address     string `validate:"required"`
+	ID          uint   `binding:"required"`
+	IPAddress   string `binding:"required"`
+	Port        uint
 	Description string
 	SSHPort     uint
 	SSHUser     string
