@@ -33,6 +33,7 @@ func TestTeams(t *testing.T) {
 		{"Get", testTeamsGet},
 		{"GetByID", testTeamsGetByID},
 		{"GetByName", testTeamsGetByName},
+		{"GetByToken", testTeamsGetByToken},
 		{"ChangePassword", testTeamsChangePassword},
 		{"Update", testTeamsUpdate},
 		{"SetScore", testTeamsSetScore},
@@ -238,7 +239,7 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 
 	got, err := db.Get(ctx, GetTeamsOptions{
 		Page:     1,
-		PageSize: 5,
+		PageSize: 2,
 	})
 	assert.Nil(t, err)
 
@@ -248,6 +249,44 @@ func testTeamsGet(t *testing.T, ctx context.Context, db *teams) {
 	}
 
 	want := []*Team{
+		{
+			Model: gorm.Model{
+				ID: 1,
+			},
+			Name:     "Vidar",
+			Password: "123456",
+			Salt:     team1.Salt,
+			Logo:     "https://vidar.club/logo.png",
+			Score:    0,
+			Rank:     1,
+			Token:    team1.Token,
+		},
+		{
+			Model: gorm.Model{
+				ID: 2,
+			},
+			Name:     "E99p1ant",
+			Password: "abcdef",
+			Salt:     team2.Salt,
+			Logo:     "https://github.red/",
+			Score:    0,
+			Rank:     1,
+			Token:    team2.Token,
+		},
+	}
+	want[0].EncodePassword()
+	want[1].EncodePassword()
+	assert.Equal(t, want, got)
+
+	got, err = db.Get(ctx, GetTeamsOptions{})
+	assert.Nil(t, err)
+
+	for k := range got {
+		got[k].CreatedAt = time.Time{}
+		got[k].UpdatedAt = time.Time{}
+	}
+
+	want = []*Team{
 		{
 			Model: gorm.Model{
 				ID: 1,
@@ -393,6 +432,23 @@ func testTeamsGetByName(t *testing.T, ctx context.Context, db *teams) {
 	got, err = db.GetByName(ctx, "Vidar")
 	assert.Nil(t, err)
 	assert.Equal(t, uint(2), got.Rank)
+}
+
+func testTeamsGetByToken(t *testing.T, ctx context.Context, db *teams) {
+	want, err := db.Create(ctx, CreateTeamOptions{
+		Name:     "Vidar",
+		Password: "123456",
+		Logo:     "https://vidar.club/logo.png",
+	})
+	assert.Nil(t, err)
+	want.Rank = 1
+
+	got, err := db.GetByToken(ctx, want.Token)
+	assert.Nil(t, err)
+	assert.Equal(t, want, got)
+
+	_, err = db.GetByToken(ctx, "")
+	assert.Equal(t, ErrTeamNotExists, err)
 }
 
 func testTeamsChangePassword(t *testing.T, ctx context.Context, db *teams) {

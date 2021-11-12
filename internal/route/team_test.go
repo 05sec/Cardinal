@@ -30,6 +30,11 @@ func TestTeam(t *testing.T) {
 		{"Update", testUpdateTeam},
 		{"Delete", testDeleteTeam},
 		{"ResetPassword", testResetPasswordTeam},
+		//{"SubmitFlag"},
+		//{"Info"},
+		//{"GameBoxes"},
+		//{"Bulletins"},
+		//{"Rank"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Cleanup(func() {
@@ -77,21 +82,25 @@ func testListTeams(t *testing.T, router *flamego.Flame, managerToken string) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	want = `{
-    "error": 0,
     "data": [
         {
             "ID": 1,
             "Logo": "https://vidar.club/logo.png",
+            "Name": "Vidar",
+            "Rank": 1,
             "Score": 0,
-            "Rank": 1
+            "Token": "mocked_randstr_hex"
         },
         {
             "ID": 2,
             "Logo": "https://github.red/",
+            "Name": "E99p1ant",
+            "Rank": 1,
             "Score": 0,
-            "Rank": 1
+            "Token": "mocked_randstr_hex"
         }
-    ]
+    ],
+    "error": 0
 }`
 	assert.JSONPartialEq(t, want, w.Body.String())
 }
@@ -187,7 +196,7 @@ func testUpdateTeam(t *testing.T, router *flamego.Flame, managerToken string) {
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"error":40000, "msg":"Team name \"Vidar\" repeat."}`, w.Body.String())
+	assert.JSONEq(t, `{"error":40000, "msg":"Team name \"John\" repeat."}`, w.Body.String())
 }
 
 func testDeleteTeam(t *testing.T, router *flamego.Flame, managerToken string) {
@@ -214,18 +223,20 @@ func testDeleteTeam(t *testing.T, router *flamego.Flame, managerToken string) {
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
 	want := `{
-    "error": 0,
     "data": [
         {
-            "Score": 0,
-            "Token": "mocked_randstr_hex",
             "ID": 1,
             "Logo": "https://vidar.club/logo.png",
-            "Rank": 1
+            "Name": "Vidar",
+            "Rank": 1,
+            "Score": 0,
+            "Token": "mocked_randstr_hex"
         }
-    ]
-}`
-	assert.JSONEq(t, want, w.Body.String())
+    ],
+    "error": 0
+}
+`
+	assert.JSONPartialEq(t, want, w.Body.String())
 
 	// Delete not exists team.
 	req, err = http.NewRequest(http.MethodDelete, "/api/manager/team?id=3", nil)

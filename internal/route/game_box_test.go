@@ -6,6 +6,7 @@ package route
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -78,46 +79,50 @@ func testListGameBoxes(t *testing.T, router *flamego.Flame, managerToken string)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	want := `{"error":0,"data":[]}`
+	want := `{"error":0,"data": {"Data": [], "Count": 0}}`
 	assert.JSONEq(t, want, w.Body.String())
 
 	// Create four game boxes of two challenges for two teams.
 	createGameBox(t, managerToken, router, form.NewGameBox{
 		{
-			ChallengeID: 1,
-			TeamID:      1,
-			Address:     "192.168.1.1",
-			Description: "Web1 for Vidar",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "passw0rd",
+			ChallengeID:         1,
+			TeamID:              1,
+			IPAddress:           "192.168.1.1",
+			Port:                80,
+			Description:         "Web1 for Vidar",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
 		},
 		{
-			ChallengeID: 2,
-			TeamID:      1,
-			Address:     "192.168.2.1",
-			Description: "Web2 for Vidar",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "s3cret",
+			ChallengeID:         2,
+			TeamID:              1,
+			IPAddress:           "192.168.2.1",
+			Port:                8080,
+			Description:         "Web2 for Vidar",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3cret",
 		},
 		{
-			ChallengeID: 1,
-			TeamID:      2,
-			Address:     "192.168.1.2",
-			Description: "Web1 for E99p1ant",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "passw0rd",
+			ChallengeID:         1,
+			TeamID:              2,
+			IPAddress:           "192.168.1.2",
+			Port:                80,
+			Description:         "Web1 for E99p1ant",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
 		},
 		{
-			ChallengeID: 2,
-			TeamID:      2,
-			Address:     "192.168.2.2",
-			Description: "Web2 for E99p1ant",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "s3cret",
+			ChallengeID:         2,
+			TeamID:              2,
+			IPAddress:           "192.168.2.2",
+			Port:                8080,
+			Description:         "Web2 for E99p1ant",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3cret",
 		},
 	})
 
@@ -128,133 +133,134 @@ func testListGameBoxes(t *testing.T, router *flamego.Flame, managerToken string)
 	req.Header.Set("Authorization", managerToken)
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
+	fmt.Println(w.Body.String())
 	assert.Equal(t, http.StatusOK, w.Code)
 	want = `{
-    "data": [
-        {
-            "Address": "192.168.1.1",
-            "Score": 1000,
-            "DeletedAt": null,
-            "InternalSSHPort": "22",
-            "ChallengeID": 1,
-            "TeamID": 1,
-            "Challenge": {
+    "data": {
+        "Count": 4,
+        "Data": [
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for Vidar",
                 "ID": 1,
-                "DeletedAt": null,
-                "Title": "Web1",
-                "BaseScore": 1000,
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag"
+                "IPAddress": "192.168.1.1",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
             },
-            "InternalSSHUser": "root",
-            "InternalSSHPassword": "passw0rd",
-            "Status": "up",
-            "ID": 1,
-            "Team": {
-                "Token": "mocked_randstr_hex",
-                "Logo": "https://vidar.club/logo.png",
-                "Rank": 1,
-                "ID": 1,
-                "DeletedAt": null,
-                "Name": "Vidar",
-                "Score": 0
-            },
-            "Description": "Web1 for Vidar",
-            "Visible": false
-        },
-        {
-            "DeletedAt": null,
-            "Description": "Web2 for Vidar",
-            "InternalSSHPort": "22",
-            "InternalSSHPassword": "s3cret",
-            "Visible": false,
-            "Score": 1500,
-            "ID": 2,
-            "ChallengeID": 2,
-            "Challenge": {
-                "Title": "Web2",
-                "BaseScore": 1500,
-                "AutoRenewFlag": false,
-                "RenewFlagCommand": "",
-                "ID": 2
-            },
-            "InternalSSHUser": "root",
-            "TeamID": 1,
-            "Team": {
-                "ID": 1,
-                "Name": "Vidar",
-                "Score": 0,
-                "Rank": 1,
-                "Token": "mocked_randstr_hex",
-                "DeletedAt": null,
-                "Logo": "https://vidar.club/logo.png"
-            },
-            "Address": "192.168.2.1",
-            "Status": "up"
-        },
-        {
-            "Address": "192.168.1.2",
-            "InternalSSHPassword": "passw0rd",
-            "Visible": false,
-            "Team": {
+            {
+                "Challenge": {
+                    "AutoRenewFlag": false,
+                    "BaseScore": 1500,
+                    "ID": 2,
+                    "RenewFlagCommand": "",
+                    "Title": "Web2"
+                },
+                "ChallengeID": 2,
+                "Description": "Web2 for Vidar",
                 "ID": 2,
-                "Logo": "https://github.red/logo.png",
-                "Score": 0,
-                "Token": "mocked_randstr_hex",
-                "DeletedAt": null,
-                "Name": "E99p1ant",
-                "Rank": 1
+                "IPAddress": "192.168.2.1",
+                "InternalSSHPassword": "s3cret",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 8080,
+                "Score": 1500,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
             },
-            "Challenge": {
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
-                "ID": 1,
-                "DeletedAt": null,
-                "Title": "Web1",
-                "BaseScore": 1000
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for E99p1ant",
+                "ID": 3,
+                "IPAddress": "192.168.1.2",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 2,
+                    "Logo": "https://github.red/logo.png",
+                    "Name": "E99p1ant",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 2,
+                "Visible": false
             },
-            "ChallengeID": 1,
-            "InternalSSHUser": "root",
-            "Score": 1000,
-            "Status": "up",
-            "TeamID": 2,
-            "Description": "Web1 for E99p1ant",
-            "InternalSSHPort": "22",
-            "ID": 3,
-            "DeletedAt": null
-        },
-        {
-            "DeletedAt": null,
-            "Team": {
-                "Logo": "https://github.red/logo.png",
-                "Score": 0,
-                "ID": 2,
-                "DeletedAt": null,
-                "Token": "mocked_randstr_hex",
-                "Name": "E99p1ant",
-                "Rank": 1
-            },
-            "TeamID": 2,
-            "Challenge": {
-                "ID": 2,
-                "DeletedAt": null,
-                "Title": "Web2",
-                "BaseScore": 1500,
-                "AutoRenewFlag": false,
-                "RenewFlagCommand": ""
-            },
-            "Description": "Web2 for E99p1ant",
-            "InternalSSHPassword": "s3cret",
-            "Visible": false,
-            "Score": 1500,
-            "InternalSSHPort": "22",
-            "ID": 4,
-            "ChallengeID": 2,
-            "Address": "192.168.2.2",
-            "InternalSSHUser": "root",
-            "Status": "up"
-        }
-    ],
+            {
+                "Challenge": {
+                    "AutoRenewFlag": false,
+                    "BaseScore": 1500,
+                    "ID": 2,
+                    "RenewFlagCommand": "",
+                    "Title": "Web2"
+                },
+                "ChallengeID": 2,
+                "Description": "Web2 for E99p1ant",
+                "ID": 4,
+                "IPAddress": "192.168.2.2",
+                "InternalSSHPassword": "s3cret",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 8080,
+                "Score": 1500,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 2,
+                    "Logo": "https://github.red/logo.png",
+                    "Name": "E99p1ant",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 2,
+                "Visible": false
+            }
+        ]
+    },
     "error": 0
 }`
 	assert.JSONPartialEq(t, want, w.Body.String())
@@ -269,220 +275,255 @@ func testNewGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
 	}{
 		{
 			name: "normal",
-			body: `[{
-				"ChallengeID": 1,
-				"TeamID": 1,
-				"Description": "Web1 for Vidar",
-				"SSHUser": "root",
-				"Address": "192.168.1.1",
-				"SSHPort": 22,
-				"SSHPassword": "passw0rd",
-				"Score": 1000,
-				"DeletedAt": null,
-				"InternalSSHPort": "22"
-			}]`,
+			body: `
+[
+    {
+        "ChallengeID": 1,
+        "Description": "Web1 for Vidar",
+        "IPAddress": "192.168.1.1",
+        "Port": 80,
+        "InternalSSHPassword": "passw0rd",
+        "InternalSSHPort": 22,
+        "InternalSSHUser": "root",
+        "Score": 1000,
+        "TeamID": 1
+    }
+]
+`,
 			wantStatusCode: http.StatusOK,
-			wantGameBoxList: `{
-    "error": 0,
-    "data": [
-        {
-            "Team": {
-                "Name": "Vidar",
-                "Score": 0,
-                "Rank": 1,
-                "Token": "mocked_randstr_hex",
+			wantGameBoxList: `
+{
+    "data": {
+        "Count": 1,
+        "Data": [
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for Vidar",
                 "ID": 1,
-                "Logo": "https://vidar.club/logo.png"
-            },
-            "Challenge": {
-                "Title": "Web1",
-                "BaseScore": 1000,
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
-                "ID": 1
-            },
-            "InternalSSHPort": "22",
-            "InternalSSHPassword": "passw0rd",
-            "Status": "up",
-            "ID": 1,
-            "ChallengeID": 1,
-            "Address": "192.168.1.1",
-            "TeamID": 1,
-            "Description": "Web1 for Vidar",
-            "InternalSSHUser": "root",
-            "Visible": false,
-            "Score": 1000
-        }
-    ]
-}`,
+                "IPAddress": "192.168.1.1",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
+            }
+        ]
+    },
+    "error": 0
+}
+`,
 		},
 		{
 			name: "duplicate game box",
-			body: `[{
-				"ChallengeID": 1,
-				"TeamID": 1,
-				"Description": "Web1 for Vidar",
-				"SSHUser": "admin",
-				"Address": "192.168.1.2",
-				"SSHPort": 22,
-				"SSHPassword": "s3cret",
-				"Score": 1000,
-				"DeletedAt": null,
-				"InternalSSHPort": "22"
-			}]`,
+			body: `
+[
+    {
+        "ChallengeID": 1,
+        "Description": "Web1 for Vidar",
+        "IPAddress": "192.168.1.2",
+        "Port": 8080,
+        "InternalSSHPassword": "s3cret",
+        "InternalSSHPort": 22,
+        "InternalSSHUser": "admin",
+        "Score": 1000,
+        "TeamID": 1
+    }
+]
+`,
 			wantStatusCode: http.StatusBadRequest,
-			wantGameBoxList: `{
-    "error": 0,
-    "data": [
-        {
-            "Team": {
-                "Name": "Vidar",
-                "Score": 0,
-                "Rank": 1,
-                "Token": "mocked_randstr_hex",
+			wantGameBoxList: `
+{
+    "data": {
+        "Count": 1,
+        "Data": [
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for Vidar",
                 "ID": 1,
-                "Logo": "https://vidar.club/logo.png"
-            },
-            "Challenge": {
-                "Title": "Web1",
-                "BaseScore": 1000,
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
-                "ID": 1
-            },
-            "InternalSSHPort": "22",
-            "InternalSSHPassword": "passw0rd",
-            "Status": "up",
-            "ID": 1,
-            "ChallengeID": 1,
-            "Address": "192.168.1.1",
-            "TeamID": 1,
-            "Description": "Web1 for Vidar",
-            "InternalSSHUser": "root",
-            "Visible": false,
-            "Score": 1000
-        }
-    ]
-}`,
+                "IPAddress": "192.168.1.1",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
+            }
+        ]
+    },
+    "error": 0
+}
+`,
 		},
 		{
 			name: "create multiple game box",
-			body: `[{
-				"ChallengeID": 2,
-				"TeamID": 1,
-				"Description": "Web2 for Vidar",
-				"SSHUser": "root",
-				"Address": "192.168.2.1",
-				"SSHPort": 22,
-				"SSHPassword": "passw0rd",
-				"Score": 1000,
-				"InternalSSHPort": "22"
-			},
-			{
-				"ChallengeID": 2,
-				"TeamID": 2,
-				"Description": "Web2 for E99p1ant",
-				"SSHUser": "root",
-				"Address": "192.168.2.2",
-				"SSHPort": 22,
-				"SSHPassword": "passw0rd",
-				"Score": 1000,
-				"InternalSSHPort": "22"
-			}]`,
+			body: `
+[
+    {
+        "ChallengeID": 2,
+        "Description": "Web2 for Vidar",
+        "IPAddress": "192.168.2.1",
+        "Port": 8080,
+        "InternalSSHPassword": "passw0rd",
+        "InternalSSHPort": 22,
+        "InternalSSHUser": "root",
+        "Score": 1000,
+        "TeamID": 1
+    },
+    {
+        "ChallengeID": 2,
+        "Description": "Web2 for E99p1ant",
+        "IPAddress": "192.168.2.2",
+        "Port": 8080,
+        "InternalSSHPassword": "passw0rd",
+        "InternalSSHPort": 22,
+        "InternalSSHUser": "root",
+        "Score": 1000,
+        "TeamID": 2
+    }
+]
+`,
 			wantStatusCode: http.StatusOK,
-			wantGameBoxList: `{
-    "error": 0,
-    "data": [
-        {
-            "TeamID": 1,
-            "Status": "up",
-            "Team": {
+			wantGameBoxList: `
+{
+    "data": {
+        "Count": 3,
+        "Data": [
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for Vidar",
                 "ID": 1,
-                "Name": "Vidar",
-                "Logo": "https://vidar.club/logo.png",
-                "Score": 0,
-                "Rank": 1,
-                "Token": "mocked_randstr_hex"
+                "IPAddress": "192.168.1.1",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
             },
-            "ChallengeID": 1,
-            "Challenge": {
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
-                "ID": 1,
-                "Title": "Web1",
-                "BaseScore": 1000
-            },
-            "InternalSSHPort": "22",
-            "Score": 1000,
-            "ID": 1,
-            "Description": "Web1 for Vidar",
-            "Visible": false,
-            "Address": "192.168.1.1",
-            "InternalSSHUser": "root",
-            "InternalSSHPassword": "passw0rd"
-        },
-        {
-            "ID": 2,
-            "TeamID": 1,
-            "Description": "Web2 for Vidar",
-            "Visible": false,
-            "ChallengeID": 2,
-            "Address": "192.168.2.1",
-            "InternalSSHPassword": "passw0rd",
-            "Status": "up",
-            "Team": {
-                "Name": "Vidar",
-                "Logo": "https://vidar.club/logo.png",
-                "Rank": 1,
-                "Score": 0,
-                "Token": "mocked_randstr_hex",
-                "ID": 1
-            },
-            "Score": 1500,
-            "Challenge": {
-                "Title": "Web2",
-                "BaseScore": 1500,
-                "AutoRenewFlag": false,
-                "RenewFlagCommand": "",
-                "ID": 2
-            },
-            "InternalSSHPort": "22",
-            "InternalSSHUser": "root"
-        },
-        {
-            "Description": "Web2 for E99p1ant",
-            "InternalSSHUser": "root",
-            "TeamID": 2,
-            "Team": {
-                "Name": "E99p1ant",
-                "Score": 0,
+            {
+                "Challenge": {
+                    "AutoRenewFlag": false,
+                    "BaseScore": 1500,
+                    "ID": 2,
+                    "RenewFlagCommand": "",
+                    "Title": "Web2"
+                },
+                "ChallengeID": 2,
+                "Description": "Web2 for Vidar",
                 "ID": 2,
-                "Logo": "https://github.red/logo.png",
-                "Rank": 1,
-                "Token": "mocked_randstr_hex"
+                "IPAddress": "192.168.2.1",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 8080,
+                "Score": 1500,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
             },
-            "ChallengeID": 2,
-            "Challenge": {
-                "ID": 2,
-                "Title": "Web2",
-                "BaseScore": 1500,
-                "AutoRenewFlag": false,
-                "RenewFlagCommand": ""
-            },
-            "Visible": false,
-            "Score": 1500,
-            "ID": 3,
-            "InternalSSHPassword": "passw0rd",
-            "Address": "192.168.2.2",
-            "InternalSSHPort": "22",
-            "Status": "up"
-        }
-    ]
-}`,
+            {
+                "Challenge": {
+                    "AutoRenewFlag": false,
+                    "BaseScore": 1500,
+                    "ID": 2,
+                    "RenewFlagCommand": "",
+                    "Title": "Web2"
+                },
+                "ChallengeID": 2,
+                "Description": "Web2 for E99p1ant",
+                "ID": 3,
+                "IPAddress": "192.168.2.2",
+                "InternalSSHPassword": "passw0rd",
+                "InternalSSHPort": 22,
+                "InternalSSHUser": "root",
+                "Port": 8080,
+                "Score": 1500,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 2,
+                    "Logo": "https://github.red/logo.png",
+                    "Name": "E99p1ant",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 2,
+                "Visible": false
+            }
+        ]
+    },
+    "error": 0
+}
+`,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBox", strings.NewReader(tc.body))
+			req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBoxes", strings.NewReader(tc.body))
 			assert.Nil(t, err)
 			req.Header.Set("Authorization", managerToken)
 			w := httptest.NewRecorder()
@@ -500,13 +541,14 @@ func testNewGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
 func testUpdateGameBox(t *testing.T, router *flamego.Flame, managerToken string) {
 	createGameBox(t, managerToken, router, form.NewGameBox{
 		{
-			ChallengeID: 1,
-			TeamID:      1,
-			Address:     "192.168.1.1",
-			Description: "Web1 for Vidar",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "passw0rd",
+			ChallengeID:         1,
+			TeamID:              1,
+			IPAddress:           "192.168.1.1",
+			Port:                80,
+			Description:         "Web1 for Vidar",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
 		},
 	})
 
@@ -518,93 +560,113 @@ func testUpdateGameBox(t *testing.T, router *flamego.Flame, managerToken string)
 	}{
 		{
 			name: "normal",
-			body: `{
-				"ID": 1,
-				"Address": "192.168.11.1",
-				"Description": "Web1 for Vidar-Team",
-				"SSHPort": 2222,
-				"SSHUser": "root",
-				"SSHPassword": "s3cret"
-			}`,
+			body: `
+{
+    "Description": "Web1 for Vidar-Team",
+    "ID": 1,
+    "IPAddress": "192.168.11.1",
+	"Port": 80,
+    "InternalSSHPassword": "s3cret",
+    "InternalSSHPort": 2222,
+    "InternalSSHUser": "root"
+}
+`,
 			wantStatusCode: http.StatusOK,
-			wantGameBoxList: `{
-    "error": 0,
-    "data": [
-        {
-            "TeamID": 1,
-            "InternalSSHPort": "2222",
-            "Address": "192.168.11.1",
-            "Visible": false,
-            "Score": 1000,
-            "ID": 1,
-            "Team": {
-                "Logo": "https://vidar.club/logo.png",
-                "Score": 0,
-                "Rank": 1,
-                "Token": "mocked_randstr_hex",
+			wantGameBoxList: `
+{
+    "data": {
+        "Count": 1,
+        "Data": [
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for Vidar-Team",
                 "ID": 1,
-                "Name": "Vidar"
-            },
-            "Challenge": {
-                "Title": "Web1",
-                "BaseScore": 1000,
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
-                "ID": 1
-            },
-            "InternalSSHPassword": "s3cret",
-            "ChallengeID": 1,
-            "Description": "Web1 for Vidar-Team",
-            "InternalSSHUser": "root",
-            "Status": "up"
-        }
-    ]
-}`,
+                "IPAddress": "192.168.11.1",
+                "InternalSSHPassword": "s3cret",
+                "InternalSSHPort": 2222,
+                "InternalSSHUser": "root",
+               	"Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
+            }
+        ]
+    },
+    "error": 0
+}
+`,
 		},
 		{
 			name: "game box not found",
-			body: `{
-				"ID": 2,
-				"Address": "192.168.11.1",
-				"Description": "Web1 for Vidar-Team",
-				"SSHPort": 2222,
-				"SSHUser": "root",
-				"SSHPassword": "s3cret"
-			}`,
+			body: `
+{
+    "Description": "Web1 for Vidar-Team",
+    "ID": 2,
+    "IPAddress": "192.168.11.1",
+	"Port": 80,
+    "InternalSSHPassword": "s3cret",
+    "InternalSSHPort": 2222,
+    "InternalSSHUser": "root"
+}
+`,
 			wantStatusCode: http.StatusNotFound,
-			wantGameBoxList: `{
-    "error": 0,
-    "data": [
-        {
-            "TeamID": 1,
-            "InternalSSHPort": "2222",
-            "Address": "192.168.11.1",
-            "Visible": false,
-            "Score": 1000,
-            "ID": 1,
-            "Team": {
-                "Logo": "https://vidar.club/logo.png",
-                "Score": 0,
-                "Rank": 1,
-                "Token": "mocked_randstr_hex",
+			wantGameBoxList: `
+{
+    "data": {
+        "Count": 1,
+        "Data": [
+            {
+                "Challenge": {
+                    "AutoRenewFlag": true,
+                    "BaseScore": 1000,
+                    "ID": 1,
+                    "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
+                    "Title": "Web1"
+                },
+                "ChallengeID": 1,
+                "Description": "Web1 for Vidar-Team",
                 "ID": 1,
-                "Name": "Vidar"
-            },
-            "Challenge": {
-                "Title": "Web1",
-                "BaseScore": 1000,
-                "AutoRenewFlag": true,
-                "RenewFlagCommand": "echo {{FLAG}} \u003e /flag",
-                "ID": 1
-            },
-            "InternalSSHPassword": "s3cret",
-            "ChallengeID": 1,
-            "Description": "Web1 for Vidar-Team",
-            "InternalSSHUser": "root",
-            "Status": "up"
-        }
-    ]
-}`,
+                "IPAddress": "192.168.11.1",
+                "InternalSSHPassword": "s3cret",
+                "InternalSSHPort": 2222,
+                "InternalSSHUser": "root",
+               	"Port": 80,
+                "Score": 1000,
+                "IsDown": false,
+				"IsCaptured": false,
+                "Team": {
+                    "ID": 1,
+                    "Logo": "https://vidar.club/logo.png",
+                    "Name": "Vidar",
+                    "Rank": 1,
+                    "Score": 0,
+                    "Token": "mocked_randstr_hex"
+                },
+                "TeamID": 1,
+                "Visible": false
+            }
+        ]
+    },
+    "error": 0
+}
+`,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -639,7 +701,7 @@ func createGameBox(t *testing.T, managerToken string, router *flamego.Flame, f f
 	bodyBytes, err := jsoniter.Marshal(f)
 	assert.Nil(t, err)
 
-	req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBox", bytes.NewBuffer(bodyBytes))
+	req, err := http.NewRequest(http.MethodPost, "/api/manager/gameBoxes", bytes.NewBuffer(bodyBytes))
 	assert.Nil(t, err)
 	req.Header.Set("Authorization", managerToken)
 	w := httptest.NewRecorder()

@@ -29,22 +29,36 @@ func (*GameBoxHandler) List(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success(gameBoxes)
+	count, err := db.GameBoxes.Count(ctx.Request().Context())
+	if err != nil {
+		log.Error("Failed to get game box count: %v", err)
+		return ctx.ServerError()
+	}
+
+	return ctx.Success(map[string]interface{}{
+		"Data":  gameBoxes,
+		"Count": count,
+	})
 }
 
 // New creates game boxes with the given options.
 func (*GameBoxHandler) New(ctx context.Context, f form.NewGameBox, l *i18n.Locale) error {
+	if len(f) == 0 {
+		return ctx.Error(40000, "empty game box list")
+	}
+
 	gameBoxOptions := make([]db.CreateGameBoxOptions, 0, len(f))
 	for _, option := range f {
 		gameBoxOptions = append(gameBoxOptions, db.CreateGameBoxOptions{
 			TeamID:      option.TeamID,
 			ChallengeID: option.ChallengeID,
-			Address:     option.Address,
+			IPAddress:   option.IPAddress,
+			Port:        option.Port,
 			Description: option.Description,
 			InternalSSH: db.SSHConfig{
-				Port:     option.SSHPort,
-				User:     option.SSHUser,
-				Password: option.SSHPassword,
+				Port:     option.InternalSSHPort,
+				User:     option.InternalSSHUser,
+				Password: option.InternalSSHPassword,
 			},
 		})
 	}
@@ -65,14 +79,25 @@ func (*GameBoxHandler) New(ctx context.Context, f form.NewGameBox, l *i18n.Local
 // Update updates the game box.
 func (*GameBoxHandler) Update(ctx context.Context, f form.UpdateGameBox, l *i18n.Locale) error {
 	err := db.GameBoxes.Update(ctx.Request().Context(), f.ID, db.UpdateGameBoxOptions{
-		Address:     f.Address,
+		IPAddress:   f.IPAddress,
+		Port:        f.Port,
 		Description: f.Description,
 		InternalSSH: db.SSHConfig{
-			Port:     f.SSHPort,
-			User:     f.SSHUser,
-			Password: f.SSHPassword,
+			Port:     f.InternalSSHPort,
+			User:     f.InternalSSHUser,
+			Password: f.InternalSSHPassword,
 		},
 	})
+	if err == db.ErrGameBoxNotExists {
+		return ctx.Error(40400, "gamebox.not_found")
+	}
+	return ctx.Success()
+}
+
+// Delete removes the game box.
+func (*GameBoxHandler) Delete(ctx context.Context, l *i18n.Locale) error {
+	id := ctx.QueryInt("id")
+	err := db.GameBoxes.DeleteByIDs(ctx.Request().Context(), uint(id))
 	if err == db.ErrGameBoxNotExists {
 		return ctx.Error(40400, "gamebox.not_found")
 	}

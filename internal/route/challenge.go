@@ -119,13 +119,33 @@ func (*ChallengeHandler) Update(ctx context.Context, f form.UpdateChallenge, l *
 func (*ChallengeHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 	id := uint(ctx.QueryInt("id"))
 
+	// TODO Database transaction here.
+
 	// Check if the challenge exists.
-	_, err := db.Challenges.GetByID(ctx.Request().Context(), id)
+	challenge, err := db.Challenges.GetByID(ctx.Request().Context(), id)
 	if err != nil {
 		if err == db.ErrChallengeNotExists {
 			return ctx.Error(40400, l.T("challenge.not_found"))
 		}
 		log.Error("Failed to get challenge: %v", err)
+		return ctx.ServerError()
+	}
+
+	// Delete the game boxes which belong to the challenge.
+	gameBoxes, err := db.GameBoxes.Get(ctx.Request().Context(), db.GetGameBoxesOption{
+		ChallengeID: challenge.ID,
+	})
+	if err != nil {
+		log.Error("Failed to get game boxes of the given challenge: %v", err)
+		return ctx.ServerError()
+	}
+
+	gameBoxIDs := make([]uint, 0, len(gameBoxes))
+	for _, gameBox := range gameBoxes {
+		gameBoxIDs = append(gameBoxIDs, gameBox.ID)
+	}
+	if err := db.GameBoxes.DeleteByIDs(ctx.Request().Context(), gameBoxIDs...); err != nil {
+		log.Error("Failed to delete game boxes belongs to challenge: %v", err)
 		return ctx.ServerError()
 	}
 

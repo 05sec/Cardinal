@@ -20,14 +20,18 @@ var Actions ActionsStore
 
 // ActionsStore is the persistent interface for actions.
 type ActionsStore interface {
-	// Create creates a new action and persists to database.
-	Create(ctx context.Context, opts CreateActionOptions) error
+	// Create creates a new action and persists to database, it returns the Action if succeeded.
+	Create(ctx context.Context, opts CreateActionOptions) (*Action, error)
 	// Get returns the actions according to the given options.
 	Get(ctx context.Context, opts GetActionOptions) ([]*Action, error)
 	// SetScore updates the action's score.
-	SetScore(ctx context.Context, round, gameBoxID uint, score float64, replace ...bool) error
+	SetScore(ctx context.Context, opts SetActionScoreOptions) error
+	// CountScore counts score with the given options.
+	CountScore(ctx context.Context, opts CountActionScoreOptions) (float64, error)
 	// GetEmptyScore returns the empty score actions in the given round.
 	GetEmptyScore(ctx context.Context, round uint, actionType ActionType) ([]*Action, error)
+	// Delete deletes the actions with the given options.
+	Delete(ctx context.Context, opts DeleteActionOptions) error
 	// DeleteAll deletes all the actions.
 	DeleteAll(ctx context.Context) error
 }
@@ -73,15 +77,15 @@ type CreateActionOptions struct {
 
 var ErrDuplicateAction = errors.New("duplicate action")
 
-func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
-	if opts.Type == ActionTypeCheckDown {
+func (db *actions) Create(ctx context.Context, opts CreateActionOptions) (*Action, error) {
+	if opts.Type == ActionTypeCheckDown || opts.Type == ActionTypeAttack {
 		opts.AttackerTeamID = 0
 	}
 
 	gameBoxStore := NewGameBoxesStore(db.DB)
 	gameBox, err := gameBoxStore.GetByID(ctx, opts.GameBoxID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	tx := db.WithContext(ctx).Begin()
@@ -96,20 +100,21 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 	}).First(&action).Error
 	if err == nil {
 		tx.Rollback()
-		return ErrDuplicateAction
+		return nil, ErrDuplicateAction
 	} else if err != gorm.ErrRecordNotFound {
 		tx.Rollback()
-		return errors.Wrap(err, "get action")
+		return nil, errors.Wrap(err, "get action")
 	}
 
-	err = tx.Create(&Action{
+	action = Action{
 		Type:           opts.Type,
 		TeamID:         gameBox.TeamID,
 		ChallengeID:    gameBox.ChallengeID,
 		GameBoxID:      gameBox.ID,
 		AttackerTeamID: opts.AttackerTeamID,
 		Round:          opts.Round,
-	}).Error
+	}
+	err = tx.Create(&action).Error
 	if err != nil {
 		tx.Rollback()
 
@@ -118,20 +123,21 @@ func (db *actions) Create(ctx context.Context, opts CreateActionOptions) error {
 
 		// Postgres
 		if pgError, ok := err.(*pgconn.PgError); ok && errors.Is(err, pgError) && pgError.Code == "23505" {
-			return ErrDuplicateAction
+			return nil, ErrDuplicateAction
 		}
 		// MySQL
 		var mysqlErr mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-			return ErrDuplicateAction
+			return nil, ErrDuplicateAction
 		}
-		return err
+		return nil, err
 	}
 
-	return tx.Commit().Error
+	return &action, tx.Commit().Error
 }
 
 type GetActionOptions struct {
+	ActionID       uint
 	Type           ActionType
 	TeamID         uint
 	ChallengeID    uint
@@ -143,6 +149,7 @@ type GetActionOptions struct {
 func (db *actions) Get(ctx context.Context, opts GetActionOptions) ([]*Action, error) {
 	var actions []*Action
 	return actions, db.WithContext(ctx).Model(&Action{}).Where(&Action{
+		Model:          gorm.Model{ID: opts.ActionID},
 		Type:           opts.Type,
 		TeamID:         opts.TeamID,
 		ChallengeID:    opts.ChallengeID,
@@ -152,30 +159,103 @@ func (db *actions) Get(ctx context.Context, opts GetActionOptions) ([]*Action, e
 	}).Find(&actions).Error
 }
 
-var ErrActionNotExists = errors.New("action does not exist")
+type SetActionScoreOptions struct {
+	ActionID  uint
+	Round     uint
+	GameBoxID uint
+	Score     float64
 
-func (db *actions) SetScore(ctx context.Context, round, gameBoxID uint, score float64, replace ...bool) error {
+	Replace bool
+}
+
+var ErrActionScoreInvalid = errors.New("invalid score, please check the action type and the sign of the score")
+
+func (db *actions) SetScore(ctx context.Context, opts SetActionScoreOptions) error {
 	actions, err := db.Get(ctx, GetActionOptions{
-		GameBoxID: gameBoxID,
-		Round:     round,
+		ActionID:  opts.ActionID,
+		GameBoxID: opts.GameBoxID,
+		Round:     opts.Round,
 	})
 	if err != nil {
-		return errors.Wrap(err, "get action")
+		return err
 	}
+
 	if len(actions) == 0 {
-		return ErrActionNotExists
+		return nil
 	}
 
 	action := actions[0]
-	if action.Score == 0 || (len(replace) == 1 && replace[0]) {
-		return db.WithContext(ctx).Model(&Action{}).Where("id = ?", action.ID).Update("score", score).Error
+
+	// Check the action score sign, the BeenAttack and CheckDown score must be negative,
+	// the Attack and ServiceOnline score must be positive.
+	if action.Type == ActionTypeBeenAttack || action.Type == ActionTypeCheckDown {
+		if opts.Score > 0 {
+			return ErrActionScoreInvalid
+		}
+	} else if action.Type == ActionTypeAttack || action.Type == ActionTypeServiceOnline {
+		if opts.Score < 0 {
+			return ErrActionScoreInvalid
+		}
+	}
+
+	// If the score is not zero, we prefer not updating it, only if `replace` is true.
+	if action.Score == 0 || opts.Replace {
+		return db.WithContext(ctx).Model(&Action{}).Where("id = ?", action.ID).Update("score", opts.Score).Error
 	}
 	return nil
+}
+
+type CountActionScoreOptions struct {
+	Type           ActionType
+	TeamID         uint
+	ChallengeID    uint
+	GameBoxID      uint
+	AttackerTeamID uint
+	Round          uint
+}
+
+func (db *actions) CountScore(ctx context.Context, opts CountActionScoreOptions) (float64, error) {
+	var sum struct {
+		Score float64
+	}
+
+	return sum.Score, db.WithContext(ctx).Model(&Action{}).Select(`SUM(score) AS score`).Where(&Action{
+		Type:           opts.Type,
+		TeamID:         opts.TeamID,
+		ChallengeID:    opts.ChallengeID,
+		GameBoxID:      opts.GameBoxID,
+		AttackerTeamID: opts.AttackerTeamID,
+		Round:          opts.Round,
+	}).Find(&sum).Error
 }
 
 func (db *actions) GetEmptyScore(ctx context.Context, round uint, actionType ActionType) ([]*Action, error) {
 	var actions []*Action
 	return actions, db.WithContext(ctx).Model(&Action{}).Where("round = ? AND type = ? AND score = 0", round, actionType).Find(&actions).Error
+}
+
+type DeleteActionOptions struct {
+	ActionID       uint
+	Type           ActionType
+	TeamID         uint
+	ChallengeID    uint
+	GameBoxID      uint
+	AttackerTeamID uint
+	Round          uint
+}
+
+func (db *actions) Delete(ctx context.Context, opts DeleteActionOptions) error {
+	return db.WithContext(ctx).Where(&Action{
+		Model: gorm.Model{
+			ID: opts.ActionID,
+		},
+		Type:           opts.Type,
+		TeamID:         opts.TeamID,
+		ChallengeID:    opts.ChallengeID,
+		GameBoxID:      opts.GameBoxID,
+		AttackerTeamID: opts.AttackerTeamID,
+		Round:          opts.Round,
+	}).Delete(&Action{}).Error
 }
 
 func (db *actions) DeleteAll(ctx context.Context) error {

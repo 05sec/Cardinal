@@ -29,7 +29,7 @@ MaxOpenConns = 50
 MaxIdleConns = 50
 
 [Game]
-Duration = 300
+RoundDuration = 300
 AttackScore = 10
 CheckDownScore = 10
 `)

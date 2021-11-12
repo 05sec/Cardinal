@@ -11,6 +11,7 @@ import (
 // Build time and commit information.
 // It should only be set by "-ldflags".
 var (
+	Version     = "develop"
 	BuildTime   string
 	BuildCommit string
 )
@@ -23,6 +24,7 @@ type Period struct {
 var (
 	// App is the application settings.
 	App struct {
+		Name             string
 		Version          string `toml:"-"` // Version should only be set by the main package.
 		Language         string
 		HTTPAddr         string
@@ -35,6 +37,7 @@ var (
 	Database struct {
 		Type         string
 		Host         string
+		Port         uint
 		Name         string
 		User         string
 		Password     string
@@ -45,10 +48,13 @@ var (
 
 	// Game is the game settings.
 	Game struct {
-		StartAt   toml.LocalDateTime
-		EndAt     toml.LocalDateTime
-		PauseTime []Period
-		Duration  uint
+		StartAt       toml.LocalDateTime
+		EndAt         toml.LocalDateTime
+		PauseTime     []Period
+		RoundDuration uint
+
+		FlagPrefix string
+		FlagSuffix string
 
 		AttackScore    int
 		CheckDownScore int

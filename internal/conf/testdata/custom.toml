@@ -1,0 +1,23 @@
+[App]
+Name = "HCTF"
+EnableSentry = true
+HTTPAddr = ":19999"
+Language = "zh-CN"
+SeparateFrontend = true
+
+[Database]
+Type = "mysql"
+Host = "tcp(127.0.0.1:3306)"
+Name = "cardinal"
+User = "root"
+Password = "root"
+SSLMode = ""
+MaxIdleConns = 150
+MaxOpenConns = 200
+
+[Game]
+FlagPrefix = "hctf{"
+FlagSuffix = "}"
+AttackScore = 50
+CheckDownScore = 50
+Duration = 5

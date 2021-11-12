@@ -23,6 +23,14 @@ func TestChallenge(t *testing.T) {
 
 	router, managerToken, cleanup := NewTestRoute(t)
 
+	// Create one team.
+	createTeam(t, managerToken, router, form.NewTeam{
+		{
+			Name: "Vidar",
+			Logo: "https://vidar.club/logo.png",
+		},
+	})
+
 	for _, tc := range []struct {
 		name string
 		test func(t *testing.T, router *flamego.Flame, managerToken string)
@@ -251,6 +259,20 @@ func testDeleteChallenge(t *testing.T, router *flamego.Flame, managerToken strin
 		RenewFlagCommand: "",
 	})
 
+	// Create a game box belongs to the first challenge.
+	createGameBox(t, managerToken, router, form.NewGameBox{
+		{
+			ChallengeID:         1,
+			TeamID:              1,
+			IPAddress:           "192.168.1.1",
+			Port:                22,
+			Description:         "ShowHub for Vidar",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
+		},
+	})
+
 	// Delete not exist challenge.
 	req, err := http.NewRequest(http.MethodDelete, "/api/manager/challenge?id=5", nil)
 	assert.Nil(t, err)
@@ -261,7 +283,7 @@ func testDeleteChallenge(t *testing.T, router *flamego.Flame, managerToken strin
 	assert.Equal(t, http.StatusNotFound, w.Code)
 	assert.JSONEq(t, `{"error":40400, "msg":"Challenge Not Found!"}`, w.Body.String())
 
-	// Delete the first bulletin.
+	// Delete the first challenge.
 	req, err = http.NewRequest(http.MethodDelete, "/api/manager/challenge?id=1", nil)
 	assert.Nil(t, err)
 	req.Header.Set("Authorization", managerToken)
@@ -271,7 +293,16 @@ func testDeleteChallenge(t *testing.T, router *flamego.Flame, managerToken strin
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.JSONEq(t, `{"data":"", "error":0}`, w.Body.String())
 
-	// Check the bulletins.
+	// The game box of the challenge will also be deleted.
+	req, err = http.NewRequest(http.MethodGet, "/api/manager/gameBoxes", nil)
+	assert.Nil(t, err)
+	req.Header.Set("Authorization", managerToken)
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.JSONEq(t, `{"data":{"Count": 0, "Data": []}, "error":0}`, w.Body.String())
+
+	// Only one challenge exists now.
 	req, err = http.NewRequest(http.MethodGet, "/api/manager/challenges", nil)
 	assert.Nil(t, err)
 
@@ -311,33 +342,27 @@ func testSetChallengeVisible(t *testing.T, router *flamego.Flame, managerToken s
 		RenewFlagCommand: "",
 	})
 
-	// Create team.
-	createTeam(t, managerToken, router, form.NewTeam{
-		{
-			Name: "Vidar",
-			Logo: "https://vidar.club/logo.png",
-		},
-	})
-
 	// Create the game boxes of the challenges.
 	createGameBox(t, managerToken, router, form.NewGameBox{
 		{
-			ChallengeID: 1, // ShowHub
-			TeamID:      1,
-			Address:     "192.168.1.1",
-			Description: "ShowHub",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "passw0rd",
+			ChallengeID:         1, // ShowHub
+			TeamID:              1,
+			IPAddress:           "192.168.1.1",
+			Port:                80,
+			Description:         "ShowHub",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
 		},
 		{
-			ChallengeID: 2, // real_cloud
-			TeamID:      1,
-			Address:     "192.168.2.1",
-			Description: "real_cloud",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "s3cret",
+			ChallengeID:         2, // real_cloud
+			TeamID:              1,
+			IPAddress:           "192.168.2.1",
+			Port:                8080,
+			Description:         "real_cloud",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3cret",
 		},
 	})
 
