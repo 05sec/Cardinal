@@ -89,7 +89,7 @@ func testFlagGet(t *testing.T, router *flamego.Flame, managerToken string) {
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusOK, w.Code)
-	want := `{"error":0,"data":[]}`
+	want := `{"error":0,"data": {"Count": 0, "List": []}}`
 	assert.JSONEq(t, want, w.Body.String())
 
 	// Create flags.
@@ -104,72 +104,75 @@ func testFlagGet(t *testing.T, router *flamego.Flame, managerToken string) {
 
 	want = `
 {
-    "data": [
-        {
-            "ChallengeID": 1,
-            "GameBoxID": 1,
-            "ID": 1,
-            "Round": 1,
-            "TeamID": 1,
-            "Value": "d3ctf{7046a8da1dbbb0b70d9843f1e19e1eee4679f727}"
-        },
-        {
-            "ChallengeID": 1,
-            "GameBoxID": 2,
-            "ID": 2,
-            "Round": 1,
-            "TeamID": 2,
-            "Value": "d3ctf{782049c46936c0e01897ca35f11611b3878b8990}"
-        },
-        {
-            "ChallengeID": 2,
-            "GameBoxID": 3,
-            "ID": 3,
-            "Round": 1,
-            "TeamID": 1,
-            "Value": "d3ctf{15b15829651d2551b0904040dfb3ebbe5519e5e7}"
-        },
-        {
-            "ChallengeID": 2,
-            "GameBoxID": 4,
-            "ID": 4,
-            "Round": 1,
-            "TeamID": 2,
-            "Value": "d3ctf{241f46eecf5d15cd0571cb0f6b6acc3de7d1b277}"
-        },
-        {
-            "ChallengeID": 1,
-            "GameBoxID": 1,
-            "ID": 5,
-            "Round": 2,
-            "TeamID": 1,
-            "Value": "d3ctf{e11756ef65f34c46782fead3babd0726624f3d2d}"
-        },
-        {
-            "ChallengeID": 1,
-            "GameBoxID": 2,
-            "ID": 6,
-            "Round": 2,
-            "TeamID": 2,
-            "Value": "d3ctf{40091ccbbc5e4f516250b9b8125c3ebfa7e20515}"
-        },
-        {
-            "ChallengeID": 2,
-            "GameBoxID": 3,
-            "ID": 7,
-            "Round": 2,
-            "TeamID": 1,
-            "Value": "d3ctf{f7941b09ee3ad7b078052958dd4b55e62acb9da7}"
-        },
-        {
-            "ChallengeID": 2,
-            "GameBoxID": 4,
-            "ID": 8,
-            "Round": 2,
-            "TeamID": 2,
-            "Value": "d3ctf{3263048c9b68ff1f7759df13269fdf250ac84f66}"
-        }
-    ],
+    "data": {
+		"Count": 8,
+		"List": [
+			{
+				"ChallengeID": 1,
+				"GameBoxID": 1,
+				"ID": 1,
+				"Round": 1,
+				"TeamID": 1,
+				"Value": "d3ctf{7046a8da1dbbb0b70d9843f1e19e1eee4679f727}"
+			},
+			{
+				"ChallengeID": 1,
+				"GameBoxID": 2,
+				"ID": 2,
+				"Round": 1,
+				"TeamID": 2,
+				"Value": "d3ctf{782049c46936c0e01897ca35f11611b3878b8990}"
+			},
+			{
+				"ChallengeID": 2,
+				"GameBoxID": 3,
+				"ID": 3,
+				"Round": 1,
+				"TeamID": 1,
+				"Value": "d3ctf{15b15829651d2551b0904040dfb3ebbe5519e5e7}"
+			},
+			{
+				"ChallengeID": 2,
+				"GameBoxID": 4,
+				"ID": 4,
+				"Round": 1,
+				"TeamID": 2,
+				"Value": "d3ctf{241f46eecf5d15cd0571cb0f6b6acc3de7d1b277}"
+			},
+			{
+				"ChallengeID": 1,
+				"GameBoxID": 1,
+				"ID": 5,
+				"Round": 2,
+				"TeamID": 1,
+				"Value": "d3ctf{e11756ef65f34c46782fead3babd0726624f3d2d}"
+			},
+			{
+				"ChallengeID": 1,
+				"GameBoxID": 2,
+				"ID": 6,
+				"Round": 2,
+				"TeamID": 2,
+				"Value": "d3ctf{40091ccbbc5e4f516250b9b8125c3ebfa7e20515}"
+			},
+			{
+				"ChallengeID": 2,
+				"GameBoxID": 3,
+				"ID": 7,
+				"Round": 2,
+				"TeamID": 1,
+				"Value": "d3ctf{f7941b09ee3ad7b078052958dd4b55e62acb9da7}"
+			},
+			{
+				"ChallengeID": 2,
+				"GameBoxID": 4,
+				"ID": 8,
+				"Round": 2,
+				"TeamID": 2,
+				"Value": "d3ctf{3263048c9b68ff1f7759df13269fdf250ac84f66}"
+			}
+    	]
+	},
     "error": 0
 }`
 	assert.JSONPartialEq(t, want, w.Body.String())
