@@ -322,22 +322,24 @@ func testSetChallengeVisible(t *testing.T, router *flamego.Flame, managerToken s
 	// Create the game boxes of the challenges.
 	createGameBox(t, managerToken, router, form.NewGameBox{
 		{
-			ChallengeID: 1, // ShowHub
-			TeamID:      1,
-			Address:     "192.168.1.1",
-			Description: "ShowHub",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "passw0rd",
+			ChallengeID:         1, // ShowHub
+			TeamID:              1,
+			IPAddress:           "192.168.1.1",
+			Port:                80,
+			Description:         "ShowHub",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "passw0rd",
 		},
 		{
-			ChallengeID: 2, // real_cloud
-			TeamID:      1,
-			Address:     "192.168.2.1",
-			Description: "real_cloud",
-			SSHPort:     22,
-			SSHUser:     "root",
-			SSHPassword: "s3cret",
+			ChallengeID:         2, // real_cloud
+			TeamID:              1,
+			IPAddress:           "192.168.2.1",
+			Port:                8080,
+			Description:         "real_cloud",
+			InternalSSHPort:     22,
+			InternalSSHUser:     "root",
+			InternalSSHPassword: "s3cret",
 		},
 	})
 

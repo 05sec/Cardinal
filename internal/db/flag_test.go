@@ -58,7 +58,8 @@ func TestFlags(t *testing.T) {
 	_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{
 		TeamID:      1,
 		ChallengeID: 1,
-		Address:     "192.168.1.1",
+		IPAddress:   "192.168.1.1",
+		Port:        80,
 		Description: "Web1 For Vidar",
 		InternalSSH: SSHConfig{
 			Port:     22,
@@ -70,7 +71,8 @@ func TestFlags(t *testing.T) {
 	_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{
 		TeamID:      2,
 		ChallengeID: 1,
-		Address:     "192.168.2.1",
+		IPAddress:   "192.168.2.1",
+		Port:        80,
 		Description: "Web1 For E99p1ant",
 		InternalSSH: SSHConfig{
 			Port:     22,
@@ -82,7 +84,8 @@ func TestFlags(t *testing.T) {
 	_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{
 		TeamID:      1,
 		ChallengeID: 2,
-		Address:     "192.168.1.2",
+		IPAddress:   "192.168.1.2",
+		Port:        8080,
 		Description: "Web2 For Vidar",
 		InternalSSH: SSHConfig{
 			Port:     22,
@@ -94,7 +97,8 @@ func TestFlags(t *testing.T) {
 	_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{
 		TeamID:      2,
 		ChallengeID: 2,
-		Address:     "192.168.2.2",
+		IPAddress:   "192.168.2.2",
+		Port:        8080,
 		Description: "Web2 For E99p1ant",
 		InternalSSH: SSHConfig{
 			Port:     22,
@@ -110,6 +114,7 @@ func TestFlags(t *testing.T) {
 	}{
 		{"BatchCreate", testFlagsBatchCreate},
 		{"Get", testFlagsGet},
+		{"Count", testFlagsCount},
 		{"Check", testFlagsCheck},
 		{"DeleteAll", testFlagsDeleteAll},
 	} {
@@ -164,7 +169,7 @@ func testFlagsBatchCreate(t *testing.T, ctx context.Context, db *flags) {
 	})
 	assert.Nil(t, err)
 
-	flags, err := db.Get(ctx, GetFlagOptions{
+	flags, _, err := db.Get(ctx, GetFlagOptions{
 		GameBoxID: 1,
 		Round:     1,
 	})
@@ -246,7 +251,7 @@ func testFlagsGet(t *testing.T, ctx context.Context, db *flags) {
 	})
 	assert.Nil(t, err)
 
-	got, err := db.Get(ctx, GetFlagOptions{})
+	got, gotCount, err := db.Get(ctx, GetFlagOptions{})
 	assert.Nil(t, err)
 
 	for _, flag := range got {
@@ -297,12 +302,14 @@ func testFlagsGet(t *testing.T, ctx context.Context, db *flags) {
 		},
 	}
 	assert.Equal(t, want, got)
+	assert.Equal(t, int64(4), gotCount)
 
-	got, err = db.Get(ctx, GetFlagOptions{
+	got, gotCount, err = db.Get(ctx, GetFlagOptions{
 		Page:     1,
 		PageSize: 3,
 	})
 	assert.Nil(t, err)
+	assert.Equal(t, int64(4), gotCount)
 
 	for _, flag := range got {
 		flag.CreatedAt = time.Time{}
@@ -342,6 +349,44 @@ func testFlagsGet(t *testing.T, ctx context.Context, db *flags) {
 		},
 	}
 	assert.Equal(t, want, got)
+}
+
+func testFlagsCount(t *testing.T, ctx context.Context, db *flags) {
+	err := db.BatchCreate(ctx, CreateFlagOptions{
+		Flags: []FlagMetadata{
+			{
+				GameBoxID: 1,
+				Round:     1,
+				Value:     "d3ctf{c4ca4238a0b923820dcc509a6f75849b}",
+			},
+			{
+				GameBoxID: 2,
+				Round:     1,
+				Value:     "d3ctf{c81e728d9d4c2f636f067f89cc14862c}",
+			},
+			{
+				GameBoxID: 3,
+				Round:     1,
+				Value:     "d3ctf{eccbc87e4b5ce2fe28308fd9f2a7baf3}",
+			},
+			{
+				GameBoxID: 4,
+				Round:     1,
+				Value:     "d3ctf{a87ff679a2f3e71d9181a67b7542122c}",
+			},
+		},
+	})
+	assert.Nil(t, err)
+
+	got, err := db.Count(ctx, CountFlagOptions{})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(4), got)
+
+	got, err = db.Count(ctx, CountFlagOptions{
+		GameBoxID: 1,
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(1), got)
 }
 
 func testFlagsCheck(t *testing.T, ctx context.Context, db *flags) {
@@ -423,8 +468,9 @@ func testFlagsDeleteAll(t *testing.T, ctx context.Context, db *flags) {
 	err = db.DeleteAll(ctx)
 	assert.Nil(t, err)
 
-	got, err := db.Get(ctx, GetFlagOptions{})
+	got, gotCount, err := db.Get(ctx, GetFlagOptions{})
 	assert.Nil(t, err)
 	want := []*Flag{}
 	assert.Equal(t, want, got)
+	assert.Equal(t, int64(0), gotCount)
 }

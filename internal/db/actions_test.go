@@ -57,7 +57,8 @@ func TestActions(t *testing.T) {
 	_, err = gameBoxStore.Create(ctx, CreateGameBoxOptions{
 		TeamID:      1,
 		ChallengeID: 1,
-		Address:     "192.168.1.1",
+		IPAddress:   "192.168.1.1",
+		Port:        80,
 		Description: "Web1 For Vidar",
 		InternalSSH: SSHConfig{
 			Port:     22,
@@ -70,7 +71,8 @@ func TestActions(t *testing.T) {
 	_, err = gameBoxStore.Create(ctx, CreateGameBoxOptions{
 		TeamID:      2,
 		ChallengeID: 1,
-		Address:     "192.168.2.1",
+		IPAddress:   "192.168.2.1",
+		Port:        8080,
 		Description: "Web1 For E99p1ant",
 		InternalSSH: SSHConfig{
 			Port:     22,

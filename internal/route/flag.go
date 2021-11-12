@@ -30,7 +30,7 @@ func (*FlagHandler) Get(ctx context.Context) error {
 	gameBoxID := ctx.QueryInt("gameBoxID")
 	round := ctx.QueryInt("round")
 
-	flags, err := db.Flags.Get(ctx.Request().Context(), db.GetFlagOptions{
+	flags, totalCount, err := db.Flags.Get(ctx.Request().Context(), db.GetFlagOptions{
 		Page:        page,
 		PageSize:    pageSize,
 		TeamID:      uint(teamID),
@@ -43,7 +43,10 @@ func (*FlagHandler) Get(ctx context.Context) error {
 		return ctx.ServerError()
 	}
 
-	return ctx.Success(flags)
+	return ctx.Success(map[string]interface{}{
+		"List":  flags,
+		"Count": totalCount,
+	})
 }
 
 func (*FlagHandler) BatchCreate(ctx context.Context) error {
@@ -60,6 +63,7 @@ func (*FlagHandler) BatchCreate(ctx context.Context) error {
 	flagSuffix := conf.Game.FlagSuffix
 	salt := utils.Sha1Encode(conf.App.SecuritySalt)
 	totalRound := clock.T.TotalRound
+	log.Trace("Total Round: %d", totalRound)
 
 	flagMetadatas := make([]db.FlagMetadata, 0, int(totalRound)*len(gameBoxes))
 	for round := uint(1); round <= totalRound; round++ {

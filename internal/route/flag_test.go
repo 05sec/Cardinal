@@ -44,10 +44,10 @@ func TestFlag(t *testing.T) {
 
 	// Create four game boxes.
 	createGameBox(t, managerToken, router, form.NewGameBox{
-		{ChallengeID: 1, TeamID: 1, Address: "192.168.1.1", Description: "Web1 For Vidar"},
-		{ChallengeID: 1, TeamID: 2, Address: "192.168.1.2", Description: "Web1 For E99p1ant"},
-		{ChallengeID: 2, TeamID: 1, Address: "192.168.2.1", Description: "Web2 For Vidar"},
-		{ChallengeID: 2, TeamID: 2, Address: "192.168.2.2", Description: "Web2 For E99p1ant"},
+		{ChallengeID: 1, TeamID: 1, IPAddress: "192.168.1.1", Port: 80, Description: "Web1 For Vidar"},
+		{ChallengeID: 1, TeamID: 2, IPAddress: "192.168.1.2", Port: 8080, Description: "Web1 For E99p1ant"},
+		{ChallengeID: 2, TeamID: 1, IPAddress: "192.168.2.1", Port: 80, Description: "Web2 For Vidar"},
+		{ChallengeID: 2, TeamID: 2, IPAddress: "192.168.2.2", Port: 8080, Description: "Web2 For E99p1ant"},
 	})
 
 	conf.Game.FlagPrefix = "d3ctf{"

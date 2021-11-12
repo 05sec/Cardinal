@@ -11,7 +11,7 @@ type TeamLogin struct {
 
 type NewTeam []struct {
 	Name string `validate:"required,lt=255"`
-	Logo string `validate:"required,lt=255"`
+	Logo string
 }
 
 type UpdateTeam struct {

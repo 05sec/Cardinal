@@ -55,17 +55,17 @@ func TestRanks(t *testing.T) {
 
 			// Create game boxes for each team and challenge.
 			gameBoxesStore := NewGameBoxesStore(db)
-			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 1, Address: "192.168.1.1", Description: "Web1 For Vidar"})
+			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 1, IPAddress: "192.168.1.1", Port: 80, Description: "Web1 For Vidar"})
 			assert.Nil(t, err)
-			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 2, Address: "192.168.2.1", Description: "Pwn1 For Vidar"})
+			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 2, IPAddress: "192.168.2.1", Port: 8080, Description: "Pwn1 For Vidar"})
 			assert.Nil(t, err)
-			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 2, ChallengeID: 1, Address: "192.168.1.2", Description: "Web1 For E99p1ant"})
+			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 2, ChallengeID: 1, IPAddress: "192.168.1.2", Port: 80, Description: "Web1 For E99p1ant"})
 			assert.Nil(t, err)
-			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 2, ChallengeID: 2, Address: "192.168.2.2", Description: "Pwn1 For E99p1ant"})
+			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 2, ChallengeID: 2, IPAddress: "192.168.2.2", Port: 8080, Description: "Pwn1 For E99p1ant"})
 			assert.Nil(t, err)
-			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 3, ChallengeID: 1, Address: "192.168.1.3", Description: "Web1 For Cosmos"})
+			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 3, ChallengeID: 1, IPAddress: "192.168.1.3", Port: 80, Description: "Web1 For Cosmos"})
 			assert.Nil(t, err)
-			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 3, ChallengeID: 2, Address: "192.168.2.3", Description: "Pwn1 For Cosmos"})
+			_, err = gameBoxesStore.Create(ctx, CreateGameBoxOptions{TeamID: 3, ChallengeID: 2, IPAddress: "192.168.2.3", Port: 8080, Description: "Pwn1 For Cosmos"})
 			assert.Nil(t, err)
 
 			tc.test(t, context.Background(), ranksStore.(*ranks))

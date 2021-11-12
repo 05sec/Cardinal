@@ -41,8 +41,9 @@ func (*GeneralHandler) Time(c context.Context) error {
 		"EndAt":               clock.T.EndAt.Unix(),
 		"RoundDuration":       clock.T.RoundDuration.Seconds(),
 		"CurrentRound":        clock.T.CurrentRound,
-		"RoundRemainDuration": clock.T.RoundRemainDuration,
+		"RoundRemainDuration": int(clock.T.RoundRemainDuration.Seconds()),
 		"Status":              clock.T.Status,
+		"TotalRound":          clock.T.TotalRound,
 	})
 }
 

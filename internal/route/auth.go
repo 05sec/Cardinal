@@ -36,7 +36,23 @@ func (*AuthHandler) TeamAuthenticator(ctx context.Context, session session.Sessi
 			return ctx.Error(40300, "")
 		}
 
-		log.Error("Failed to get team: %v", err)
+		log.Error("Failed to get team by ID: %v", err)
+		return ctx.ServerError()
+	}
+
+	ctx.Map(team)
+	return nil
+}
+
+func (*AuthHandler) TeamTokenAuthenticator(ctx context.Context) error {
+	token := ctx.Query("token")
+	team, err := db.Teams.GetByToken(ctx.Request().Context(), token)
+	if err != nil {
+		if err == db.ErrTeamNotExists {
+			return ctx.Error(40300, "")
+		}
+
+		log.Error("Failed to get team by token: %v", err)
 		return ctx.ServerError()
 	}
 

@@ -42,19 +42,21 @@ func Init() error {
 
 	switch DatabaseType(conf.Database.Type) {
 	case DatabaseTypeMySQL:
-		dsn := fmt.Sprintf("%s:%s@%s/%s?parseTime=true&loc=Local&charset=utf8mb4,utf8",
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local&charset=utf8mb4,utf8",
 			conf.Database.User,
 			conf.Database.Password,
 			conf.Database.Host,
+			conf.Database.Port,
 			conf.Database.Name,
 		)
 		dialector = mysql.Open(dsn)
 
 	case DatabaseTypePostgres:
-		dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
+		dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s",
 			conf.Database.User,
 			conf.Database.Password,
 			conf.Database.Host,
+			conf.Database.Port,
 			conf.Database.Name,
 			conf.Database.SSLMode,
 		)
@@ -91,6 +93,7 @@ func SetDatabaseStore(db *gorm.DB) {
 	Flags = NewFlagsStore(db)
 	GameBoxes = NewGameBoxesStore(db)
 	Ranks = NewRanksStore(db)
+	Scores = NewScoresStore(db)
 	Logs = NewLogsStore(db)
 	Managers = NewManagersStore(db)
 	Teams = NewTeamsStore(db)

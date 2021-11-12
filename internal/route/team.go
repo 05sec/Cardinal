@@ -6,6 +6,7 @@ package route
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/thanhpk/randstr"
 	log "unknwon.dev/clog/v2"
@@ -33,22 +34,28 @@ func (*TeamHandler) List(ctx context.Context) error {
 	}
 
 	type team struct {
-		ID    uint    `json:"ID"`
-		Logo  string  `json:"Logo"`
-		Score float64 `json:"Score"`
-		Rank  uint    `json:"Rank"`
-		Token string  `json:"Token"`
+		ID        uint      `json:"ID"`
+		Name      string    `json:"Name"`
+		Logo      string    `json:"Logo"`
+		Score     float64   `json:"Score"`
+		Rank      uint      `json:"Rank"`
+		Token     string    `json:"Token"`
+		CreatedAt time.Time `json:"CreatedAt"`
+		UpdatedAt time.Time `json:"UpdatedAt"`
 	}
 
 	teamList := make([]*team, 0, len(teams))
 
 	for _, t := range teams {
 		teamList = append(teamList, &team{
-			ID:    t.ID,
-			Logo:  t.Logo,
-			Score: t.Score,
-			Rank:  t.Rank,
-			Token: t.Token,
+			ID:        t.ID,
+			Name:      t.Name,
+			Logo:      t.Logo,
+			Score:     t.Score,
+			Rank:      t.Rank,
+			Token:     t.Token,
+			CreatedAt: t.CreatedAt,
+			UpdatedAt: t.UpdatedAt,
 		})
 	}
 
@@ -96,7 +103,7 @@ func (*TeamHandler) Update(ctx context.Context, f form.UpdateTeam, l *i18n.Local
 	if err == nil {
 		if team.ID != newTeam.ID {
 			// TODO i18n
-			return ctx.Error(40000, fmt.Sprintf("Team name %q repeat.", team.Name))
+			return ctx.Error(40000, fmt.Sprintf("Team name %q repeat.", newTeam.Name))
 		}
 	} else if err != db.ErrTeamNotExists {
 		log.Error("Failed to get team by name: %v", err)
@@ -218,5 +225,8 @@ func (*TeamHandler) Bulletins(ctx context.Context) error {
 }
 
 func (*TeamHandler) Rank(ctx context.Context) error {
-	return ctx.Success(rank.ForTeam())
+	return ctx.Success(map[string]interface{}{
+		"Title": rank.Title(),
+		"Rank":  rank.ForTeam(),
+	})
 }

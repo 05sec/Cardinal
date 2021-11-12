@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	ErrZeroRoundDuration = errors.New("round duration is zero")
 	ErrStartTimeOrder    = errors.New("start time should before end time")
 	ErrRestTimeFormat    = errors.New("rest time format error")
 	ErrRestTimeOrder     = errors.New("rest start time should before end time")

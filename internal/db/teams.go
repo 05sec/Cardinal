@@ -40,6 +40,8 @@ type TeamsStore interface {
 	// GetByName returns the team with given name.
 	// It returns ErrTeamNotExists when not found.
 	GetByName(ctx context.Context, name string) (*Team, error)
+	// GetByToken returns the team with given token.
+	GetByToken(ctx context.Context, token string) (*Team, error)
 	// ChangePassword changes the team's password with given id.
 	ChangePassword(ctx context.Context, id uint, newPassword string) error
 	// Update updates the team with given id.
@@ -66,7 +68,7 @@ type Team struct {
 	Salt     string `json:"-"`
 	Logo     string
 	Score    float64
-	Rank     uint
+	Rank     uint `gorm:"-"`
 	Token    string
 }
 
@@ -188,7 +190,7 @@ func (db *teams) Get(ctx context.Context, opts GetTeamsOptions) ([]*Team, error)
 	}
 
 	q := db.WithContext(ctx).Model(&Team{}).
-		Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"})
+		Select([]string{"*", `RANK() OVER(ORDER BY score DESC) "rank"`})
 
 	if opts.PageSize != 0 {
 		q = q.Offset((opts.Page - 1) * opts.PageSize).Limit(opts.PageSize)
@@ -202,11 +204,10 @@ var ErrTeamNotExists = errors.New("team dose not exist")
 
 func (db *teams) GetByID(ctx context.Context, id uint) (*Team, error) {
 	var team Team
-	if err := db.WithContext(ctx).
-		Table("(?) as teams",
-			db.WithContext(ctx).Model(&Team{}).
-				Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}),
-		).
+	if err := db.WithContext(ctx).Table(
+		"(?) AS team",
+		db.WithContext(ctx).Model(&Team{}).Select([]string{"*", `RANK() OVER(ORDER BY score DESC) "rank"`}),
+	).
 		Where("id = ?", id).First(&team).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrTeamNotExists
@@ -219,12 +220,27 @@ func (db *teams) GetByID(ctx context.Context, id uint) (*Team, error) {
 
 func (db *teams) GetByName(ctx context.Context, name string) (*Team, error) {
 	var team Team
-	if err := db.WithContext(ctx).
-		Table("(?) as teams",
-			db.WithContext(ctx).Model(&Team{}).
-				Select([]string{"*", "RANK() OVER(ORDER BY score DESC) rank"}),
-		).
+	if err := db.WithContext(ctx).Table(
+		"(?) AS team",
+		db.WithContext(ctx).Model(&Team{}).Select([]string{"*", `RANK() OVER(ORDER BY score DESC) "rank"`}),
+	).
 		Where("name = ?", name).First(&team).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, ErrTeamNotExists
+		}
+		return nil, err
+	}
+
+	return &team, nil
+}
+
+func (db *teams) GetByToken(ctx context.Context, token string) (*Team, error) {
+	var team Team
+	if err := db.WithContext(ctx).Table(
+		"(?) AS team",
+		db.WithContext(ctx).Model(&Team{}).Select([]string{"*", `RANK() OVER(ORDER BY score DESC) "rank"`}),
+	).
+		Where("token = ?", token).First(&team).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, ErrTeamNotExists
 		}

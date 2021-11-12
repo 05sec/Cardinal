@@ -13,6 +13,7 @@ import (
 	"github.com/vidar-team/Cardinal/internal/db"
 	"github.com/vidar-team/Cardinal/internal/locales"
 	"github.com/vidar-team/Cardinal/internal/route"
+	"github.com/vidar-team/Cardinal/internal/store"
 )
 
 var Web = &cli.Command{
@@ -38,6 +39,13 @@ func runWeb(c *cli.Context) error {
 		log.Fatal("Failed to init database: %v", err)
 	}
 
+	// TODO Install
+
+	store.Init()
+
+	if err := clock.Init(); err != nil {
+		log.Fatal("Failed to init clock: %v", err)
+	}
 	clock.Start()
 
 	f := route.NewRouter()

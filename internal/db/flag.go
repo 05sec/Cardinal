@@ -22,7 +22,9 @@ type FlagsStore interface {
 	// BatchCreate creates flags and persists to database.
 	BatchCreate(ctx context.Context, opts CreateFlagOptions) error
 	// Get returns the flags.
-	Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, error)
+	Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, int64, error)
+	// Count counts the number of the flags with the given options.
+	Count(ctx context.Context, opts CountFlagOptions) (int64, error)
 	// Check checks the given flag.
 	// It returns ErrFlagNotExists when not found.
 	Check(ctx context.Context, flag string) (*Flag, error)
@@ -120,8 +122,9 @@ type GetFlagOptions struct {
 	Round       uint
 }
 
-func (db *flags) Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, error) {
+func (db *flags) Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, int64, error) {
 	var flags []*Flag
+	var count int64
 
 	q := db.WithContext(ctx).Model(&Flag{}).Where(&Flag{
 		TeamID:      opts.TeamID,
@@ -129,6 +132,7 @@ func (db *flags) Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, error) 
 		ChallengeID: opts.ChallengeID,
 		Round:       opts.Round,
 	})
+	q.Count(&count)
 
 	if opts.Page <= 0 {
 		opts.Page = 1
@@ -138,7 +142,26 @@ func (db *flags) Get(ctx context.Context, opts GetFlagOptions) ([]*Flag, error) 
 		q = q.Offset((opts.Page - 1) * opts.PageSize).Limit(opts.PageSize)
 	}
 
-	return flags, q.Find(&flags).Error
+	return flags, count, q.Find(&flags).Error
+}
+
+type CountFlagOptions struct {
+	TeamID      uint
+	ChallengeID uint
+	GameBoxID   uint
+	Round       uint
+}
+
+func (db *flags) Count(ctx context.Context, opts CountFlagOptions) (int64, error) {
+	var count int64
+	q := db.WithContext(ctx).Model(&Flag{}).Where(&Flag{
+		TeamID:      opts.TeamID,
+		GameBoxID:   opts.GameBoxID,
+		ChallengeID: opts.ChallengeID,
+		Round:       opts.Round,
+	})
+
+	return count, q.Count(&count).Error
 }
 
 var ErrFlagNotExists = errors.New("flag does not find")

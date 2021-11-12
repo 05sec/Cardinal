@@ -37,6 +37,7 @@ var (
 	Database struct {
 		Type         string
 		Host         string
+		Port         uint
 		Name         string
 		User         string
 		Password     string

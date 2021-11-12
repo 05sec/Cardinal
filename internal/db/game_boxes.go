@@ -6,7 +6,6 @@ package db
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -40,8 +39,12 @@ type GameBoxesStore interface {
 	CountScore(ctx context.Context, opts GameBoxCountScoreOptions) (float64, error)
 	// SetVisible sets the game box visibility with given id.
 	SetVisible(ctx context.Context, id uint, isVisible bool) error
-	// SetStatus sets the game box status with given id.
-	SetStatus(ctx context.Context, id uint, status GameBoxStatus) error
+	// SetDown activates the game box down status.
+	SetDown(ctx context.Context, id uint) error
+	// SetCaptured activates the game box captured status.
+	SetCaptured(ctx context.Context, id uint) error
+	// CleanStatus cleans the given game box's status.
+	CleanStatus(ctx context.Context, id uint) error
 	// CleanAllStatus sets all the game boxes' status to `GameBoxStatusUp`.
 	CleanAllStatus(ctx context.Context) error
 	// DeleteByID deletes the game box with given id.
@@ -55,14 +58,6 @@ func NewGameBoxesStore(db *gorm.DB) GameBoxesStore {
 	return &gameboxes{DB: db}
 }
 
-type GameBoxStatus string
-
-const (
-	GameBoxStatusUp       = "up"
-	GameBoxStatusDown     = "down"
-	GameBoxStatusCaptured = "captured"
-)
-
 // GameBox represents the game box.
 type GameBox struct {
 	gorm.Model
@@ -73,16 +68,17 @@ type GameBox struct {
 	Challenge   *Challenge `gorm:"-"`
 
 	IPAddress   string
-	Port        string
+	Port        uint
 	Description string
 
-	InternalSSHPort     string
+	InternalSSHPort     uint
 	InternalSSHUser     string
 	InternalSSHPassword string
 
-	Visible bool
-	Score   float64 // The score can be negative.
-	Status  GameBoxStatus
+	Visible    bool
+	Score      float64 // The score can be negative.
+	IsDown     bool
+	IsCaptured bool
 }
 
 type gameboxes struct {
@@ -136,14 +132,12 @@ func (db *gameboxes) Create(ctx context.Context, opts CreateGameBoxOptions) (uin
 		TeamID:              opts.TeamID,
 		ChallengeID:         opts.ChallengeID,
 		IPAddress:           opts.IPAddress,
-		Port:                strconv.Itoa(int(opts.Port)),
+		Port:                opts.Port,
 		Description:         opts.Description,
-		InternalSSHPort:     strconv.Itoa(int(opts.InternalSSH.Port)),
+		InternalSSHPort:     opts.InternalSSH.Port,
 		InternalSSHUser:     opts.InternalSSH.User,
 		InternalSSHPassword: opts.InternalSSH.Password,
-		Visible:             false,
 		Score:               challenge.BaseScore,
-		Status:              GameBoxStatusUp,
 	}
 
 	if err := db.WithContext(ctx).Create(g).Error; err != nil {
@@ -191,14 +185,12 @@ func (db *gameboxes) BatchCreate(ctx context.Context, opts []CreateGameBoxOption
 			TeamID:              option.TeamID,
 			ChallengeID:         option.ChallengeID,
 			IPAddress:           option.IPAddress,
-			Port:                strconv.Itoa(int(option.Port)),
+			Port:                option.Port,
 			Description:         option.Description,
-			InternalSSHPort:     strconv.Itoa(int(option.InternalSSH.Port)),
+			InternalSSHPort:     option.InternalSSH.Port,
 			InternalSSHUser:     option.InternalSSH.User,
 			InternalSSHPassword: option.InternalSSH.Password,
-			Visible:             false,
 			Score:               challengeSets[option.ChallengeID].BaseScore,
-			Status:              GameBoxStatusUp,
 		}
 		if err := tx.WithContext(ctx).Create(g).Error; err != nil {
 			tx.Rollback()
@@ -253,25 +245,19 @@ type GetGameBoxesOption struct {
 	TeamID      uint
 	ChallengeID uint
 	Visible     bool // If Visible is `false`, it returns the visible and invisible game boxes.
-	Status      GameBoxStatus
+	IsDown      bool
+	IsCaptured  bool
 }
 
 func (db *gameboxes) Get(ctx context.Context, opts GetGameBoxesOption) ([]*GameBox, error) {
 	var gameBoxes []*GameBox
-	query := db.DB.WithContext(ctx).Model(&GameBox{})
-
-	if opts.TeamID != 0 {
-		query = query.Where("team_id = ?", opts.TeamID)
-	}
-	if opts.ChallengeID != 0 {
-		query = query.Where("challenge_id = ?", opts.ChallengeID)
-	}
-	if opts.Visible {
-		query = query.Where("visible = ?", opts.Visible)
-	}
-	if opts.Status != "" {
-		query = query.Where("status = ?", opts.Status)
-	}
+	query := db.DB.WithContext(ctx).Model(&GameBox{}).Where(&GameBox{
+		TeamID:      opts.TeamID,
+		ChallengeID: opts.ChallengeID,
+		Visible:     opts.Visible,
+		IsDown:      opts.IsDown,
+		IsCaptured:  opts.IsCaptured,
+	})
 
 	err := query.Order("id ASC").Find(&gameBoxes).Error
 	if err != nil {
@@ -328,9 +314,9 @@ func (db *gameboxes) Update(ctx context.Context, id uint, opts UpdateGameBoxOpti
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).
 		Updates(&GameBox{
 			IPAddress:           opts.IPAddress,
-			Port:                strconv.Itoa(int(opts.Port)),
+			Port:                opts.Port,
 			Description:         opts.Description,
-			InternalSSHPort:     strconv.Itoa(int(opts.InternalSSH.Port)),
+			InternalSSHPort:     opts.InternalSSH.Port,
 			InternalSSHUser:     opts.InternalSSH.User,
 			InternalSSHPassword: opts.InternalSSH.Password,
 		}).Error
@@ -344,7 +330,8 @@ type GameBoxCountScoreOptions struct {
 	TeamID      uint
 	ChallengeID uint
 	Visible     bool // If Visible is `false`, it returns the visible and invisible game boxes.
-	Status      GameBoxStatus
+	IsDown      bool
+	IsCaptured  bool
 }
 
 func (db *gameboxes) CountScore(ctx context.Context, opts GameBoxCountScoreOptions) (float64, error) {
@@ -356,7 +343,8 @@ func (db *gameboxes) CountScore(ctx context.Context, opts GameBoxCountScoreOptio
 		TeamID:      opts.TeamID,
 		ChallengeID: opts.ChallengeID,
 		Visible:     opts.Visible,
-		Status:      opts.Status,
+		IsDown:      opts.IsDown,
+		IsCaptured:  opts.IsCaptured,
 	}).Find(&sum).Error
 }
 
@@ -364,20 +352,26 @@ func (db *gameboxes) SetVisible(ctx context.Context, id uint, isVisible bool) er
 	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("visible", isVisible).Error
 }
 
-var ErrBadGameBoxesStatus = errors.New("bad game box status")
+func (db *gameboxes) SetDown(ctx context.Context, id uint) error {
+	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("is_down", true).Error
+}
 
-func (db *gameboxes) SetStatus(ctx context.Context, id uint, status GameBoxStatus) error {
-	switch status {
-	case GameBoxStatusUp, GameBoxStatusDown, GameBoxStatusCaptured:
-	default:
-		return ErrBadGameBoxesStatus
-	}
+func (db *gameboxes) SetCaptured(ctx context.Context, id uint) error {
+	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("is_captured", true).Error
+}
 
-	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).Update("status", status).Error
+func (db *gameboxes) CleanStatus(ctx context.Context, id uint) error {
+	return db.WithContext(ctx).Model(&GameBox{}).Where("id = ?", id).
+		Update("is_down", false).
+		Update("is_captured", false).
+		Error
 }
 
 func (db *gameboxes) CleanAllStatus(ctx context.Context) error {
-	return db.WithContext(ctx).Session(&gorm.Session{AllowGlobalUpdate: true}).Model(&GameBox{}).Update("status", GameBoxStatusUp).Error
+	return db.WithContext(ctx).Session(&gorm.Session{AllowGlobalUpdate: true}).Model(&GameBox{}).
+		Update("is_down", false).
+		Update("is_captured", false).
+		Error
 }
 
 func (db *gameboxes) DeleteByID(ctx context.Context, id uint) error {

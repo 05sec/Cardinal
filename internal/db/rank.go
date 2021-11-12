@@ -49,7 +49,7 @@ type GameBoxInfoList []*GameBoxInfo
 // GameBoxInfo contains the game box info.
 type GameBoxInfo struct {
 	ChallengeID uint
-	IsAttacked  bool
+	IsCaptured  bool
 	IsDown      bool
 	Score       float64 `json:",omitempty"` // Manager only
 }
@@ -88,8 +88,8 @@ func (db *ranks) List(ctx context.Context) ([]*RankItem, error) {
 		for _, gameBox := range gameBoxes {
 			gameBoxInfo = append(gameBoxInfo, &GameBoxInfo{
 				ChallengeID: gameBox.ChallengeID,
-				IsAttacked:  gameBox.Status == GameBoxStatusCaptured,
-				IsDown:      gameBox.Status == GameBoxStatusDown,
+				IsCaptured:  gameBox.IsCaptured,
+				IsDown:      gameBox.IsDown,
 				Score:       gameBox.Score,
 			})
 		}

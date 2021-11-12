@@ -33,7 +33,11 @@ func NewRouter() *flamego.Flame {
 		}),
 	)
 
-	f.Use(cors.CORS())
+	f.Use(cors.CORS(
+		cors.Options{
+			Methods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		},
+	))
 
 	general := NewGeneralHandler()
 	auth := NewAuthHandler()
@@ -50,12 +54,13 @@ func NewRouter() *flamego.Flame {
 		f.Get("/time", general.Time)
 		f.Get("/asteroid")
 
+		f.Post("/submitFlag", form.Bind(form.SubmitFlag{}), auth.TeamTokenAuthenticator, team.SubmitFlag)
+
 		f.Group("/team", func() {
 			f.Post("/login", form.Bind(form.TeamLogin{}), auth.TeamLogin)
+			f.Get("/logout", auth.TeamLogout)
 
 			f.Group("", func() {
-				f.Get("/logout", auth.TeamLogout)
-				f.Post("/submitFlag", form.Bind(form.SubmitFlag{}), team.SubmitFlag)
 				f.Get("/info", team.Info)
 				f.Get("/gameBoxes", func() {
 					f.Get("/", team.GameBoxes)
@@ -95,6 +100,7 @@ func NewRouter() *flamego.Flame {
 				f.Post("/gameBoxes/reset")
 				f.Post("/gameBoxes", form.Bind(form.NewGameBox{}), gameBox.New)
 				f.Put("/gameBox", form.Bind(form.UpdateGameBox{}), gameBox.Update)
+				f.Delete("/gameBox", gameBox.Delete)
 				f.Post("/gameBox/sshTest")
 				f.Post("/gameBox/refreshFlag")
 
@@ -118,6 +124,14 @@ func NewRouter() *flamego.Flame {
 					f.Post("/easterEgg")
 					f.Post("/time")
 					f.Post("/clear")
+				})
+
+				// Account
+				f.Group("/account", func() {
+					f.Get("")
+					f.Post("")
+					f.Put("")
+					f.Delete("")
 				})
 
 				// Check

@@ -68,7 +68,9 @@ func TestGameBoxes(t *testing.T) {
 		{"SetScore", testGameBoxesSetScore},
 		{"CountScore", testCountScore},
 		{"SetVisible", testGameBoxesSetVisible},
-		{"SetStatus", testGameBoxesSetStatus},
+		{"SetDown", testGameBoxesSetDown},
+		{"SetCaptured", testGameBoxesSetCaptured},
+		{"CleanStatus", testGameBoxesCleanStatus},
 		{"CleanAllStatus", testGameBoxesCleanAllStatus},
 		{"DeleteByID", testGameBoxesDeleteByID},
 		{"DeleteAll", testGameBoxesDeleteAll},
@@ -157,26 +159,24 @@ func testGameBoxesBatchCreate(t *testing.T, ctx context.Context, db *gameboxes) 
 			TeamID:              1,
 			ChallengeID:         1,
 			IPAddress:           "192.168.1.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For Vidar",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "passw0rd",
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 		{
 			Model:               gorm.Model{ID: 2},
 			TeamID:              1,
 			ChallengeID:         2,
 			IPAddress:           "192.168.2.1",
-			Port:                "8080",
+			Port:                8080,
 			Description:         "Web2 For Vidar",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "s3cret",
 			Score:               1500,
-			Status:              GameBoxStatusUp,
 		},
 	}
 	assert.Equal(t, want, got)
@@ -276,14 +276,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.1.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For Vidar",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "passw0rd",
 			Visible:             false,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 		{
 			Model: gorm.Model{
@@ -294,14 +293,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.2.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For E99p1ant",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "s3crets",
 			Visible:             false,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 	}
 
@@ -328,14 +326,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.1.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For Vidar",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "passw0rd",
 			Visible:             false,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 	}
 	assert.Equal(t, want, got)
@@ -376,14 +373,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.1.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For Vidar",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "passw0rd",
 			Visible:             false,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 		{
 			Model: gorm.Model{
@@ -394,14 +390,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.2.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For E99p1ant",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "s3crets",
 			Visible:             false,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 	}
 	assert.Equal(t, want, got)
@@ -428,14 +423,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.2.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For E99p1ant",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "s3crets",
 			Visible:             false,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 	}
 	assert.Equal(t, want, got)
@@ -464,14 +458,13 @@ func testGameBoxesGet(t *testing.T, ctx context.Context, db *gameboxes) {
 			ChallengeID:         1,
 			Challenge:           challenge,
 			IPAddress:           "192.168.2.1",
-			Port:                "80",
+			Port:                80,
 			Description:         "Web1 For E99p1ant",
-			InternalSSHPort:     "22",
+			InternalSSHPort:     22,
 			InternalSSHUser:     "root",
 			InternalSSHPassword: "s3crets",
 			Visible:             true,
 			Score:               1000,
-			Status:              GameBoxStatusUp,
 		},
 	}
 	assert.Equal(t, want, got)
@@ -516,14 +509,13 @@ func testGameBoxesGetByID(t *testing.T, ctx context.Context, db *gameboxes) {
 		ChallengeID:         1,
 		Challenge:           challenge,
 		IPAddress:           "192.168.1.1",
-		Port:                "80",
+		Port:                80,
 		Description:         "Web1 For Vidar",
-		InternalSSHPort:     "22",
+		InternalSSHPort:     22,
 		InternalSSHUser:     "root",
 		InternalSSHPassword: "passw0rd",
 		Visible:             false,
 		Score:               1000,
-		Status:              GameBoxStatusUp,
 	}
 	assert.Equal(t, want, got)
 
@@ -633,14 +625,13 @@ func testGameBoxesUpdate(t *testing.T, ctx context.Context, db *gameboxes) {
 		ChallengeID:         1,
 		Challenge:           challenge,
 		IPAddress:           "192.168.1.11",
-		Port:                "8081",
+		Port:                8081,
 		Description:         "This is the Web1, have fun!",
-		InternalSSHPort:     "2222",
+		InternalSSHPort:     2222,
 		InternalSSHUser:     "r00t",
 		InternalSSHPassword: "s3cret",
 		Visible:             false,
 		Score:               1000,
-		Status:              GameBoxStatusUp,
 	}
 	assert.Equal(t, want, got)
 }
@@ -687,14 +678,13 @@ func testGameBoxesSetScore(t *testing.T, ctx context.Context, db *gameboxes) {
 		ChallengeID:         1,
 		Challenge:           challenge,
 		IPAddress:           "192.168.1.1",
-		Port:                "80",
+		Port:                80,
 		Description:         "Web1 For Vidar",
-		InternalSSHPort:     "22",
+		InternalSSHPort:     22,
 		InternalSSHUser:     "root",
 		InternalSSHPassword: "passw0rd",
 		Visible:             false,
 		Score:               1800,
-		Status:              GameBoxStatusUp,
 	}
 	assert.Equal(t, want, got)
 }
@@ -774,14 +764,13 @@ func testGameBoxesSetVisible(t *testing.T, ctx context.Context, db *gameboxes) {
 		ChallengeID:         1,
 		Challenge:           challenge,
 		IPAddress:           "192.168.1.1",
-		Port:                "80",
+		Port:                80,
 		Description:         "Web1 For Vidar",
-		InternalSSHPort:     "22",
+		InternalSSHPort:     22,
 		InternalSSHUser:     "root",
 		InternalSSHPassword: "passw0rd",
 		Visible:             true,
 		Score:               1000,
-		Status:              GameBoxStatusUp,
 	}
 	assert.Equal(t, want, got)
 
@@ -804,19 +793,18 @@ func testGameBoxesSetVisible(t *testing.T, ctx context.Context, db *gameboxes) {
 		ChallengeID:         1,
 		Challenge:           challenge,
 		IPAddress:           "192.168.1.1",
-		Port:                "80",
+		Port:                80,
 		Description:         "Web1 For Vidar",
-		InternalSSHPort:     "22",
+		InternalSSHPort:     22,
 		InternalSSHUser:     "root",
 		InternalSSHPassword: "passw0rd",
 		Visible:             false,
 		Score:               1000,
-		Status:              GameBoxStatusUp,
 	}
 	assert.Equal(t, want, got)
 }
 
-func testGameBoxesSetStatus(t *testing.T, ctx context.Context, db *gameboxes) {
+func testGameBoxesSetDown(t *testing.T, ctx context.Context, db *gameboxes) {
 	id, err := db.Create(ctx, CreateGameBoxOptions{
 		TeamID:      1,
 		ChallengeID: 1,
@@ -832,7 +820,7 @@ func testGameBoxesSetStatus(t *testing.T, ctx context.Context, db *gameboxes) {
 	assert.Equal(t, uint(1), id)
 	assert.Nil(t, err)
 
-	err = db.SetStatus(ctx, 1, GameBoxStatusCaptured)
+	err = db.SetDown(ctx, id)
 	assert.Nil(t, err)
 
 	teamsStore := NewTeamsStore(db.DB)
@@ -858,31 +846,138 @@ func testGameBoxesSetStatus(t *testing.T, ctx context.Context, db *gameboxes) {
 		ChallengeID:         1,
 		Challenge:           challenge,
 		IPAddress:           "192.168.1.1",
-		Port:                "80",
+		Port:                80,
 		Description:         "Web1 For Vidar",
-		InternalSSHPort:     "22",
+		InternalSSHPort:     22,
 		InternalSSHUser:     "root",
 		InternalSSHPassword: "passw0rd",
 		Visible:             false,
 		Score:               1000,
-		Status:              GameBoxStatusCaptured,
+		IsDown:              true,
 	}
 	assert.Equal(t, want, got)
+}
 
-	// Set unexpected game box status.
-	err = db.SetStatus(ctx, 1, "unexpected")
-	assert.Equal(t, ErrBadGameBoxesStatus, err)
+func testGameBoxesSetCaptured(t *testing.T, ctx context.Context, db *gameboxes) {
+	id, err := db.Create(ctx, CreateGameBoxOptions{
+		TeamID:      1,
+		ChallengeID: 1,
+		IPAddress:   "192.168.1.1",
+		Port:        80,
+		Description: "Web1 For Vidar",
+		InternalSSH: SSHConfig{
+			Port:     22,
+			User:     "root",
+			Password: "passw0rd",
+		},
+	})
+	assert.Equal(t, uint(1), id)
+	assert.Nil(t, err)
+
+	err = db.SetCaptured(ctx, id)
+	assert.Nil(t, err)
+
+	teamsStore := NewTeamsStore(db.DB)
+	team, err := teamsStore.GetByID(ctx, 1)
+	assert.Nil(t, err)
+
+	challengesStore := NewChallengesStore(db.DB)
+	challenge, err := challengesStore.GetByID(ctx, 1)
+	assert.Nil(t, err)
+
+	got, err := db.GetByID(ctx, 1)
+	assert.Nil(t, err)
+
+	got.CreatedAt = time.Time{}
+	got.UpdatedAt = time.Time{}
+
+	want := &GameBox{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		TeamID:              1,
+		Team:                team,
+		ChallengeID:         1,
+		Challenge:           challenge,
+		IPAddress:           "192.168.1.1",
+		Port:                80,
+		Description:         "Web1 For Vidar",
+		InternalSSHPort:     22,
+		InternalSSHUser:     "root",
+		InternalSSHPassword: "passw0rd",
+		Visible:             false,
+		Score:               1000,
+		IsCaptured:          true,
+	}
+	assert.Equal(t, want, got)
+}
+
+func testGameBoxesCleanStatus(t *testing.T, ctx context.Context, db *gameboxes) {
+	id, err := db.Create(ctx, CreateGameBoxOptions{
+		TeamID:      1,
+		ChallengeID: 1,
+		IPAddress:   "192.168.1.1",
+		Port:        80,
+		Description: "Web1 For Vidar",
+		InternalSSH: SSHConfig{
+			Port:     22,
+			User:     "root",
+			Password: "passw0rd",
+		},
+	})
+	assert.Equal(t, uint(1), id)
+	assert.Nil(t, err)
+
+	err = db.SetDown(ctx, id)
+	assert.Nil(t, err)
+	err = db.SetCaptured(ctx, id)
+	assert.Nil(t, err)
+	err = db.CleanStatus(ctx, id)
+	assert.Nil(t, err)
+
+	teamsStore := NewTeamsStore(db.DB)
+	team, err := teamsStore.GetByID(ctx, 1)
+	assert.Nil(t, err)
+
+	challengesStore := NewChallengesStore(db.DB)
+	challenge, err := challengesStore.GetByID(ctx, 1)
+	assert.Nil(t, err)
+
+	got, err := db.GetByID(ctx, 1)
+	assert.Nil(t, err)
+
+	got.CreatedAt = time.Time{}
+	got.UpdatedAt = time.Time{}
+
+	want := &GameBox{
+		Model: gorm.Model{
+			ID: 1,
+		},
+		TeamID:              1,
+		Team:                team,
+		ChallengeID:         1,
+		Challenge:           challenge,
+		IPAddress:           "192.168.1.1",
+		Port:                80,
+		Description:         "Web1 For Vidar",
+		InternalSSHPort:     22,
+		InternalSSHUser:     "root",
+		InternalSSHPassword: "passw0rd",
+		Visible:             false,
+		Score:               1000,
+	}
+	assert.Equal(t, want, got)
 }
 
 func testGameBoxesCleanAllStatus(t *testing.T, ctx context.Context, db *gameboxes) {
 	id1, err := db.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 1, IPAddress: "192.168.1.1", Port: 80, Description: "Web1 For Vidar"})
 	assert.Nil(t, err)
-	err = db.SetStatus(ctx, id1, GameBoxStatusDown)
+	err = db.SetDown(ctx, id1)
 	assert.Nil(t, err)
 
 	id2, err := db.Create(ctx, CreateGameBoxOptions{TeamID: 1, ChallengeID: 2, IPAddress: "192.168.1.2", Port: 8080, Description: "Web2 For Vidar"})
 	assert.Nil(t, err)
-	err = db.SetStatus(ctx, id2, GameBoxStatusCaptured)
+	err = db.SetCaptured(ctx, id2)
 	assert.Nil(t, err)
 
 	_, err = db.Create(ctx, CreateGameBoxOptions{TeamID: 2, ChallengeID: 1, IPAddress: "192.168.2.1", Port: 80, Description: "Web1 For E99p1ant"})
@@ -903,37 +998,32 @@ func testGameBoxesCleanAllStatus(t *testing.T, ctx context.Context, db *gameboxe
 
 	want := []*GameBox{
 		{
-			Model:           gorm.Model{ID: 1},
-			TeamID:          1,
-			ChallengeID:     1,
-			IPAddress:       "192.168.1.1",
-			Port:            "80",
-			Description:     "Web1 For Vidar",
-			InternalSSHPort: "0",
-			Score:           1000,
-			Status:          GameBoxStatusUp,
+			Model:       gorm.Model{ID: 1},
+			TeamID:      1,
+			ChallengeID: 1,
+			IPAddress:   "192.168.1.1",
+			Port:        80,
+			Description: "Web1 For Vidar",
+			Score:       1000,
 		},
 		{
-			Model:           gorm.Model{ID: 2},
-			TeamID:          1,
-			ChallengeID:     2,
-			IPAddress:       "192.168.1.2",
-			Port:            "8080",
-			Description:     "Web2 For Vidar",
-			InternalSSHPort: "0",
-			Score:           1500,
-			Status:          GameBoxStatusUp,
+			Model:       gorm.Model{ID: 2},
+			TeamID:      1,
+			ChallengeID: 2,
+			IPAddress:   "192.168.1.2",
+			Port:        8080,
+			Description: "Web2 For Vidar",
+			Score:       1500,
 		},
 		{
 			Model:           gorm.Model{ID: 3},
 			TeamID:          2,
 			ChallengeID:     1,
 			IPAddress:       "192.168.2.1",
-			Port:            "80",
+			Port:            80,
 			Description:     "Web1 For E99p1ant",
-			InternalSSHPort: "0",
+			InternalSSHPort: 0,
 			Score:           1000,
-			Status:          GameBoxStatusUp,
 		},
 	}
 	assert.Equal(t, want, got)

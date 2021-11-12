@@ -39,10 +39,14 @@ type Clock struct {
 }
 
 func Init() error {
+	if conf.Game.RoundDuration == 0 {
+		return ErrZeroRoundDuration
+	}
+
 	T = &Clock{
 		StartAt:       conf.Game.StartAt.In(time.Local),
 		EndAt:         conf.Game.EndAt.In(time.Local),
-		RoundDuration: time.Duration(conf.Game.RoundDuration) * time.Second,
+		RoundDuration: time.Duration(conf.Game.RoundDuration) * time.Minute,
 	}
 
 	restTime := make([][]time.Time, 0, len(conf.Game.PauseTime))
@@ -78,7 +82,7 @@ func Init() error {
 	for _, duration := range T.RunTime {
 		totalTime += duration[1].Sub(duration[0])
 	}
-	T.TotalRound = uint(math.Ceil(totalTime.Seconds() / float64(T.RoundDuration)))
+	T.TotalRound = uint(math.Ceil(totalTime.Minutes() / T.RoundDuration.Minutes()))
 
 	return nil
 }

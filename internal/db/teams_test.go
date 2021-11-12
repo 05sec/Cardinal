@@ -33,6 +33,7 @@ func TestTeams(t *testing.T) {
 		{"Get", testTeamsGet},
 		{"GetByID", testTeamsGetByID},
 		{"GetByName", testTeamsGetByName},
+		{"GetByToken", testTeamsGetByToken},
 		{"ChangePassword", testTeamsChangePassword},
 		{"Update", testTeamsUpdate},
 		{"SetScore", testTeamsSetScore},
@@ -431,6 +432,23 @@ func testTeamsGetByName(t *testing.T, ctx context.Context, db *teams) {
 	got, err = db.GetByName(ctx, "Vidar")
 	assert.Nil(t, err)
 	assert.Equal(t, uint(2), got.Rank)
+}
+
+func testTeamsGetByToken(t *testing.T, ctx context.Context, db *teams) {
+	want, err := db.Create(ctx, CreateTeamOptions{
+		Name:     "Vidar",
+		Password: "123456",
+		Logo:     "https://vidar.club/logo.png",
+	})
+	assert.Nil(t, err)
+	want.Rank = 1
+
+	got, err := db.GetByToken(ctx, want.Token)
+	assert.Nil(t, err)
+	assert.Equal(t, want, got)
+
+	_, err = db.GetByToken(ctx, "")
+	assert.Equal(t, ErrTeamNotExists, err)
 }
 
 func testTeamsChangePassword(t *testing.T, ctx context.Context, db *teams) {
