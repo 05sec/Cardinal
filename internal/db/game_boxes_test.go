@@ -72,7 +72,7 @@ func TestGameBoxes(t *testing.T) {
 		{"SetCaptured", testGameBoxesSetCaptured},
 		{"CleanStatus", testGameBoxesCleanStatus},
 		{"CleanAllStatus", testGameBoxesCleanAllStatus},
-		{"DeleteByID", testGameBoxesDeleteByID},
+		{"DeleteByIDs", testGameBoxesDeleteByIDs},
 		{"DeleteAll", testGameBoxesDeleteAll},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -1029,8 +1029,8 @@ func testGameBoxesCleanAllStatus(t *testing.T, ctx context.Context, db *gameboxe
 	assert.Equal(t, want, got)
 }
 
-func testGameBoxesDeleteByID(t *testing.T, ctx context.Context, db *gameboxes) {
-	id, err := db.Create(ctx, CreateGameBoxOptions{
+func testGameBoxesDeleteByIDs(t *testing.T, ctx context.Context, db *gameboxes) {
+	id1, err := db.Create(ctx, CreateGameBoxOptions{
 		TeamID:      1,
 		ChallengeID: 1,
 		IPAddress:   "192.168.1.1",
@@ -1042,15 +1042,37 @@ func testGameBoxesDeleteByID(t *testing.T, ctx context.Context, db *gameboxes) {
 			Password: "passw0rd",
 		},
 	})
-	assert.Equal(t, uint(1), id)
+	assert.Equal(t, uint(1), id1)
 	assert.Nil(t, err)
 
-	err = db.DeleteByID(ctx, 1)
+	id2, err := db.Create(ctx, CreateGameBoxOptions{
+		TeamID:      2,
+		ChallengeID: 1,
+		IPAddress:   "192.168.1.2",
+		Port:        80,
+		Description: "Web1 For E99p1ant",
+		InternalSSH: SSHConfig{
+			Port:     22,
+			User:     "root",
+			Password: "passw0rd",
+		},
+	})
+	assert.Equal(t, uint(2), id2)
 	assert.Nil(t, err)
 
+	// Delete the two game boxes.
+	err = db.DeleteByIDs(ctx, 1, 2)
+	assert.Nil(t, err)
+
+	// The two game boxes should be deleted.
 	got, err := db.GetByID(ctx, 1)
 	assert.Equal(t, ErrGameBoxNotExists, err)
 	want := (*GameBox)(nil)
+	assert.Equal(t, want, got)
+
+	got, err = db.GetByID(ctx, 2)
+	assert.Equal(t, ErrGameBoxNotExists, err)
+	want = (*GameBox)(nil)
 	assert.Equal(t, want, got)
 }
 

@@ -68,7 +68,7 @@ type Team struct {
 	Salt     string `json:"-"`
 	Logo     string
 	Score    float64
-	Rank     uint `gorm:"-"`
+	Rank     uint `gorm:"migration"` // Ignore in migration.
 	Token    string
 }
 

@@ -97,7 +97,7 @@ func (*GameBoxHandler) Update(ctx context.Context, f form.UpdateGameBox, l *i18n
 // Delete removes the game box.
 func (*GameBoxHandler) Delete(ctx context.Context, l *i18n.Locale) error {
 	id := ctx.QueryInt("id")
-	err := db.GameBoxes.DeleteByID(ctx.Request().Context(), uint(id))
+	err := db.GameBoxes.DeleteByIDs(ctx.Request().Context(), uint(id))
 	if err == db.ErrGameBoxNotExists {
 		return ctx.Error(40400, "gamebox.not_found")
 	}

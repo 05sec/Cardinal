@@ -47,8 +47,8 @@ type GameBoxesStore interface {
 	CleanStatus(ctx context.Context, id uint) error
 	// CleanAllStatus sets all the game boxes' status to `GameBoxStatusUp`.
 	CleanAllStatus(ctx context.Context) error
-	// DeleteByID deletes the game box with given id.
-	DeleteByID(ctx context.Context, id uint) error
+	// DeleteByIDs deletes the game box with given ids.
+	DeleteByIDs(ctx context.Context, ids ...uint) error
 	// DeleteAll deletes all the game boxes.
 	DeleteAll(ctx context.Context) error
 }
@@ -374,8 +374,8 @@ func (db *gameboxes) CleanAllStatus(ctx context.Context) error {
 		Error
 }
 
-func (db *gameboxes) DeleteByID(ctx context.Context, id uint) error {
-	return db.WithContext(ctx).Delete(&GameBox{}, "id = ?", id).Error
+func (db *gameboxes) DeleteByIDs(ctx context.Context, id ...uint) error {
+	return db.WithContext(ctx).Delete(&GameBox{}, "id IN (?)", id).Error
 }
 
 func (db *gameboxes) DeleteAll(ctx context.Context) error {
