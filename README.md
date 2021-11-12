@@ -62,6 +62,10 @@ Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本�
 
 ## 安装
 
+**Cardinal 当前正在进行部分基础架构的重写。目前强烈建议您通过 Release 或 Docker
+安装而非直接源码编译。若实在需要进行源码上的变更，请从 [eaea493d](https://github.com/vidar-team/Cardinal/commit/eaea493d847546786e8f2fe9e717ee11c79324b6)
+处进行编写。**
+
 ### Release 安装
 
 [下载](https://github.com/vidar-team/Cardinal/releases)适用于您目标机器的架构程序，运行即可。
@@ -113,11 +117,6 @@ curl https://sh.cardinal.ink | bash
 
 * 选手端 `http://localhost:19999/`
 * 后台管理 `http://localhost:19999/manager`
-
-## 使用 Cardinal 的团队及组织
-
-<a><img src="https://cardinal.ink/brand/QLNU.jpg" height="65px"  style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
-<a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
 
 ## 开源协议
 
