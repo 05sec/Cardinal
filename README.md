@@ -118,11 +118,6 @@ curl https://sh.cardinal.ink | bash
 * 选手端 `http://localhost:19999/`
 * 后台管理 `http://localhost:19999/manager`
 
-## 使用 Cardinal 的团队及组织
-
-<a><img src="https://cardinal.ink/brand/QLNU.jpg" height="65px"  style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
-<a href="https://cnc.poliupg.ac.id/" target="_blank"><img src="https://cardinal.ink/brand/CNC.png" height="65px" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"/></a>
-
 ## 开源协议
 
 © Vidar-Team
