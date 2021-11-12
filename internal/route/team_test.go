@@ -30,6 +30,11 @@ func TestTeam(t *testing.T) {
 		{"Update", testUpdateTeam},
 		{"Delete", testDeleteTeam},
 		{"ResetPassword", testResetPasswordTeam},
+		//{"SubmitFlag"},
+		//{"Info"},
+		//{"GameBoxes"},
+		//{"Bulletins"},
+		//{"Rank"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Cleanup(func() {
@@ -191,7 +196,7 @@ func testUpdateTeam(t *testing.T, router *flamego.Flame, managerToken string) {
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"error":40000, "msg":"Team name \"Vidar\" repeat."}`, w.Body.String())
+	assert.JSONEq(t, `{"error":40000, "msg":"Team name \"John\" repeat."}`, w.Body.String())
 }
 
 func testDeleteTeam(t *testing.T, router *flamego.Flame, managerToken string) {
