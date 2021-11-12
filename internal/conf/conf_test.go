@@ -11,5 +11,5 @@ import (
 )
 
 func TestNewInit(t *testing.T) {
-	assert.Nil(t, Init("./testdata/custom.ini"))
+	assert.Nil(t, Init("./testdata/custom.toml"))
 }
