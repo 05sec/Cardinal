@@ -10,6 +10,6 @@ import (
 	"github.com/Cardinal-Platform/testify/assert"
 )
 
-func TestInit(t *testing.T) {
+func TestNewInit(t *testing.T) {
 	assert.Nil(t, Init("./testdata/custom.ini"))
 }
