@@ -131,10 +131,6 @@ github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYF
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3 h1:EUQBkgIm+c6iJj7J/LxZ2xTu92LuJZvhXVk8bj6VsuQ=
 github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3/go.mod h1:CRIYtnbf5gDUsffghi0n2W6FTBVhJlH1VXhIKR+pVms=
-github.com/flamego/cors v0.0.0-20210821161518-78520f8fce77 h1:BqoaLprGzcCNm5KqBFKk7/ioa7KHSGo2V26Tzc169HY=
-github.com/flamego/cors v0.0.0-20210821161518-78520f8fce77/go.mod h1:x3CsxFB9sPLSDk/jlJw7ILu9kv3FMzdIjLQJQnDWEjY=
-github.com/flamego/cors v0.0.0-20211006165106-87c5b1378a1b h1:vHWU8Tqdo7Fh5LAYHOiDuuSXH10+HpjRhOYDCzNfWjA=
-github.com/flamego/cors v0.0.0-20211006165106-87c5b1378a1b/go.mod h1:x3CsxFB9sPLSDk/jlJw7ILu9kv3FMzdIjLQJQnDWEjY=
 github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19 h1:NXAOMHGs3TTqP+www0dtK6Tq/1KSzitW0NoHm2zPXhQ=
 github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19/go.mod h1:x3CsxFB9sPLSDk/jlJw7ILu9kv3FMzdIjLQJQnDWEjY=
 github.com/flamego/flamego v0.0.0-20210516144321-6b13a8d6f9bf/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
@@ -163,8 +159,8 @@ github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2 h1:xLG16iua01X7
 github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2/go.mod h1:VhW/Ch/3FhimwZb8Oj+qJmdMmoB8r7lmJ5auRjm50oQ=
 github.com/gin-gonic/gin v1.4.0/go.mod h1:OW2EZn3DO8Ln9oIKOvM++LBO+5UPHJJDH72/q/3rZdM=
 github.com/gin-gonic/gin v1.5.0/go.mod h1:Nd6IXA8m5kNZdNEHMBd93KT+mdY3+bewLgRvmCsR2Do=
-github.com/gin-gonic/gin v1.7.0 h1:jGB9xAJQ12AIGNB4HguylppmDK1Am9ppF7XnGXXJuoU=
-github.com/gin-gonic/gin v1.7.0/go.mod h1:jD2toBW3GZUr5UMcdrwQA10I7RuaFOl/SGeDjXkfUtY=
+github.com/gin-gonic/gin v1.7.7 h1:3DoBmSbJbZAWqXJC3SLjAPfutPJJRN1U5pALB7EeTTs=
+github.com/gin-gonic/gin v1.7.7/go.mod h1:axIBovoeJpVj8S3BwE0uPMTeReE4+AfFtqpqaZ1qq1U=
 github.com/go-check/check v0.0.0-20180628173108-788fd7840127/go.mod h1:9ES+weclKsC9YodN5RgxqK/VD9HM9JsCSh7rNhMZE98=
 github.com/go-errors/errors v1.0.1 h1:LUHzmkK3GUKUrL/1gfBUxAHzcev3apQlezX/+O7ma6w=
 github.com/go-errors/errors v1.0.1/go.mod h1:f4zRHt4oKfwPJE5k8C9vpYG+aDHdBFUsgrm6/TyX73Q=
@@ -767,8 +763,6 @@ golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef h1:fPxZ3Umkct3LZ8gK9nbk+DWDJ9fstZa2grBn+lWVKPs=
-golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211006225509-1a26e0398eed h1:E159xujlywdAeN3FqsTBPzRKGUq/pDHolXbuttkC36E=
 golang.org/x/sys v0.0.0-20211006225509-1a26e0398eed/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 h1:v+OssWQX+hTHEmOBgwxdZxK4zHq3yOs8F9J7mk0PY8E=

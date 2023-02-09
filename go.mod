@@ -19,14 +19,14 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3
-	github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19 // indirect
+	github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19
 	github.com/flamego/flamego v0.0.0-20211002062834-f84595763ddb
 	github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2
 	github.com/flamego/validator v0.0.0-20210821065223-7cb80dd2ce7a
 	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-contrib/cors v1.3.0
 	github.com/gin-contrib/static v0.0.0-20191128031702-f81c604d8ac2
-	github.com/gin-gonic/gin v1.7.0
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogo/protobuf v1.3.1 // indirect
