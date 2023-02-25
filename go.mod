@@ -19,7 +19,7 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3
-	github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19 // indirect
+	github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19
 	github.com/flamego/flamego v0.0.0-20211002062834-f84595763ddb
 	github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2
 	github.com/flamego/validator v0.0.0-20210821065223-7cb80dd2ce7a
@@ -78,7 +78,7 @@ require (
 	github.com/vidar-team/Cardinal_manager_frontend v0.7.3
 	github.com/yosssi/gohtml v0.0.0-20200424144038-a48de20dd9dd // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/sys v0.0.0-20211006225509-1a26e0398eed // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.3.6
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
