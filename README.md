@@ -10,6 +10,15 @@
 
 # [Cardinal](https://cardinal.ink) —— CTF AWD 线下赛平台
 
+## 版权说明
+
+> [!IMPORTANT]
+> <img src="https://github.com/wuhan005/Asteroid/assets/12731778/73101d56-de47-4e8f-9d1e-6920428b48e0" width="150px"/>
+> 
+> 本项目为凌武科技 [lwsec.cn](https://lwsec.cn/) 开源版竞赛平台。
+> 
+> 商业版支持 CTF、AWD、理论答题赛、车联网安全赛、数据安全赛、工控安全赛、供应链安全赛等更多赛制与功能，商业合作请于官网联系我们。
+
 ## 介绍
 
 Cardinal 是由 Vidar-Team 开发的 AWD 比赛平台，使用 Go 编写。本程序可以作为 CTF 线下比赛平台，亦可用于团队内部 AWD 模拟练习。
