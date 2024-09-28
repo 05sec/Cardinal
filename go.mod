@@ -19,7 +19,7 @@ require (
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3
-	github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19 // indirect
+	github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19
 	github.com/flamego/flamego v0.0.0-20211002062834-f84595763ddb
 	github.com/flamego/session v0.0.0-20210607182212-8d30fdff82f2
 	github.com/flamego/validator v0.0.0-20210821065223-7cb80dd2ce7a
@@ -29,7 +29,7 @@ require (
 	github.com/gin-gonic/gin v1.7.0
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
@@ -81,7 +81,6 @@ require (
 	golang.org/x/sys v0.0.0-20211006225509-1a26e0398eed // indirect
 	golang.org/x/text v0.3.6
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20201030142918-24207fddd1c3 // indirect
 	google.golang.org/grpc v1.33.1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
