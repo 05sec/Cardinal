@@ -131,10 +131,6 @@ github.com/fatih/color v1.13.0/go.mod h1:kLAiJbzzSOZDVNGyDpeOxJ47H46qBXwg5ILebYF
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3 h1:EUQBkgIm+c6iJj7J/LxZ2xTu92LuJZvhXVk8bj6VsuQ=
 github.com/flamego/binding v0.0.0-20210826141511-a26e848cdaa3/go.mod h1:CRIYtnbf5gDUsffghi0n2W6FTBVhJlH1VXhIKR+pVms=
-github.com/flamego/cors v0.0.0-20210821161518-78520f8fce77 h1:BqoaLprGzcCNm5KqBFKk7/ioa7KHSGo2V26Tzc169HY=
-github.com/flamego/cors v0.0.0-20210821161518-78520f8fce77/go.mod h1:x3CsxFB9sPLSDk/jlJw7ILu9kv3FMzdIjLQJQnDWEjY=
-github.com/flamego/cors v0.0.0-20211006165106-87c5b1378a1b h1:vHWU8Tqdo7Fh5LAYHOiDuuSXH10+HpjRhOYDCzNfWjA=
-github.com/flamego/cors v0.0.0-20211006165106-87c5b1378a1b/go.mod h1:x3CsxFB9sPLSDk/jlJw7ILu9kv3FMzdIjLQJQnDWEjY=
 github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19 h1:NXAOMHGs3TTqP+www0dtK6Tq/1KSzitW0NoHm2zPXhQ=
 github.com/flamego/cors v0.0.0-20211007054804-b92c10841d19/go.mod h1:x3CsxFB9sPLSDk/jlJw7ILu9kv3FMzdIjLQJQnDWEjY=
 github.com/flamego/flamego v0.0.0-20210516144321-6b13a8d6f9bf/go.mod h1:DkwGPPSOX6S/4th2btOuP3HQX8zL59GZbxxOt6aFF0A=
@@ -767,10 +763,8 @@ golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210806184541-e5e7981a1069/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef h1:fPxZ3Umkct3LZ8gK9nbk+DWDJ9fstZa2grBn+lWVKPs=
-golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20211006225509-1a26e0398eed h1:E159xujlywdAeN3FqsTBPzRKGUq/pDHolXbuttkC36E=
-golang.org/x/sys v0.0.0-20211006225509-1a26e0398eed/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.1.0 h1:kunALQeHf1/185U1i0GOB/fy1IPRDDpuoOOqRReG57U=
+golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1 h1:v+OssWQX+hTHEmOBgwxdZxK4zHq3yOs8F9J7mk0PY8E=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
